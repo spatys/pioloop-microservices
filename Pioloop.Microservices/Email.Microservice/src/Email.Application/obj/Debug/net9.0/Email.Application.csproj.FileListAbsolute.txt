@@ -1,0 +1,15 @@
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\obj\Debug\net9.0\Email.Application.csproj.AssemblyReference.cache
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\obj\Debug\net9.0\Email.Application.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\obj\Debug\net9.0\Email.Application.AssemblyInfoInputs.cache
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\obj\Debug\net9.0\Email.Application.AssemblyInfo.cs
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\obj\Debug\net9.0\Email.Application.csproj.CoreCompileInputs.cache
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\bin\Debug\net9.0\Email.Application.deps.json
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\bin\Debug\net9.0\Email.Application.dll
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\bin\Debug\net9.0\Email.Application.pdb
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\bin\Debug\net9.0\Email.Domain.dll
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\bin\Debug\net9.0\Email.Domain.pdb
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\obj\Debug\net9.0\Email.Ap.0FA5B6A6.Up2Date
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\obj\Debug\net9.0\Email.Application.dll
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\obj\Debug\net9.0\refint\Email.Application.dll
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\obj\Debug\net9.0\Email.Application.pdb
+C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Email.Microservice\src\Email.Application\obj\Debug\net9.0\ref\Email.Application.dll

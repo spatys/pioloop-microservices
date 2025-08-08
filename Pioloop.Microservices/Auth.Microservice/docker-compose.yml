@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  auth-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5001:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=auth-db;Database=pioloop_auth;Username=pioloop;Password=pioloop123;Port=5432
+      - Jwt__SecretKey=Pioloop2025SecretKey32CharsLong!@#
+      - Jwt__Issuer=Pioloop
+      - Jwt__Audience=PioloopUsers
+      - Jwt__ExpirationHours=24
+      - EmailApi__BaseUrl=http://localhost:5068
+    depends_on:
+      - auth-db
+    networks:
+      - auth-network
+
+  auth-db:
+    image: postgres:15
+    environment:
+      - POSTGRES_DB=pioloop_auth
+      - POSTGRES_USER=pioloop
+      - POSTGRES_PASSWORD=pioloop123
+    ports:
+      - "5433:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    networks:
+      - auth-network
+
+volumes:
+  auth-db-data:
+
+networks:
+  auth-network:
+    driver: bridge
