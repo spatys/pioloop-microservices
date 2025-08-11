@@ -9,14 +9,15 @@ services:
       - "5001:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ConnectionStrings__DefaultConnection=Host=auth-db;Database=pioloop_auth;Username=pioloop;Password=pioloop123;Port=5432
+      - ConnectionStrings__DefaultConnection=Host=auth-db;Database=pioloop_auth;Username=pioloop12345;Password=piolOOP_&!?12345;Port=5432
       - Jwt__SecretKey=Pioloop2025SecretKey32CharsLong!@#
       - Jwt__Issuer=Pioloop
       - Jwt__Audience=PioloopUsers
       - Jwt__ExpirationHours=24
-      - EmailApi__BaseUrl=http://localhost:5068
+      - EmailApi__BaseUrl=http://localhost:5002
     depends_on:
-      - auth-db
+      auth-db:
+        condition: service_healthy
     networks:
       - auth-network
 
@@ -24,14 +25,19 @@ services:
     image: postgres:15
     environment:
       - POSTGRES_DB=pioloop_auth
-      - POSTGRES_USER=pioloop
-      - POSTGRES_PASSWORD=pioloop123
+      - POSTGRES_USER=pioloop12345
+      - POSTGRES_PASSWORD=piolOOP_&!?12345
     ports:
       - "5433:5432"
     volumes:
       - auth-db-data:/var/lib/postgresql/data
     networks:
       - auth-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pioloop12345 -d pioloop_auth"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   auth-db-data:

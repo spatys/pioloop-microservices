@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5068:80"
+      - "5002:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - EmailSettings__SmtpServer=smtp.gmail.com

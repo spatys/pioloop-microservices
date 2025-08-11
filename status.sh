@@ -70,10 +70,10 @@ echo "🌐 Test de connectivité :"
 echo "------------------------"
 
 # Test Email API
-if curl -s http://localhost:5068/health > /dev/null 2>&1; then
-    print_success "✅ Email API accessible sur http://localhost:5068"
+if curl -s http://localhost:5002/health > /dev/null 2>&1; then
+    print_success "✅ Email API accessible sur http://localhost:5002"
 else
-    print_warning "⚠️  Email API non accessible sur http://localhost:5068"
+    print_warning "⚠️  Email API non accessible sur http://localhost:5002"
 fi
 
 # Test Auth API
@@ -87,8 +87,8 @@ echo ""
 echo "📋 URLs des services :"
 echo "  • Auth API:     http://localhost:5001"
 echo "  • Auth Swagger: http://localhost:5001/swagger"
-echo "  • Email API:    http://localhost:5068"
-echo "  • Email Swagger: http://localhost:5068/swagger"
+echo "  • Email API:    http://localhost:5002"
+echo "  • Email Swagger: http://localhost:5002/swagger"
 echo "  • PostgreSQL:   localhost:5433"
 echo ""
 echo "🔧 Commandes utiles :"

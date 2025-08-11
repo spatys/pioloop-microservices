@@ -124,13 +124,13 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ApiRespon
             // Appel Email MS pour envoyer le code
             try
             {
-                var emailApiUrl = _configuration["EmailApi:BaseUrl"] ?? "http://localhost:5068";
+                var emailApiUrl = _configuration["EmailApi:BaseUrl"] ?? "http://localhost:5002";
                 var payload = new
                 {
                     Email = createdUser.Email,
                     Code = createdUser.EmailVerificationCode
                 };
-                using var response = await _httpClient.PostAsJsonAsync($"{emailApiUrl}/api/email/send-verification", payload, cancellationToken);
+                using var response = await _httpClient.PostAsJsonAsync($"{emailApiUrl}/api/email/send-email-verification", payload, cancellationToken);
                 // ignore response content; best-effort
             }
             catch { /* ignore send failures */ }

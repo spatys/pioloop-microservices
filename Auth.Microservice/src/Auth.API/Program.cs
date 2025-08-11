@@ -84,6 +84,18 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Login
 // Repositories
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserPasswordRepository, UserPasswordRepository>();
+builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+
+// Enable CORS for API Gateway only
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowApiGateway", policy =>
+    {
+        policy.WithOrigins("http://localhost:5002")
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
 
 // Services
 builder.Services.AddScoped<IPasswordService, PasswordService>();
@@ -112,6 +124,9 @@ if (app.Environment.IsDevelopment())
     });
 }
 
+// Enable CORS
+app.UseCors("AllowApiGateway");
+
 app.UseHttpsRedirection();
 
 app.UseCors("AllowAll");
@@ -127,5 +142,9 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     context.Database.EnsureCreated();
 }
+
+// Configure the application to listen on the correct port
+app.Urls.Clear();
+app.Urls.Add("http://0.0.0.0:80");
 
 app.Run();
