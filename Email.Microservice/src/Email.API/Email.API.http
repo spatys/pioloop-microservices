@@ -1,6 +1,67 @@
-@Email.API_HostAddress = http://localhost:5068
+@Email.API_HostAddress = http://localhost:5002
 
-GET {{Email.API_HostAddress}}/weatherforecast/
-Accept: application/json
+### Send Email Verification
+POST {{Email.API_HostAddress}}/api/email/send-email-verification
+Content-Type: application/json
 
-###
+{
+  "email": "test@example.com",
+  "code": "123456"
+}
+
+### Send Email Account Created
+POST {{Email.API_HostAddress}}/api/email/send-email-account-created
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "firstName": "John",
+  "lastName": "Doe"
+}
+
+### Send Email Password Reset
+POST {{Email.API_HostAddress}}/api/email/send-email-password-reset
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "resetToken": "reset-token-123"
+}
+
+### Send Email Reservation Confirmation
+POST {{Email.API_HostAddress}}/api/email/send-email-reservation-confirmation
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "reservationDetails": "Reservation details here"
+}
+
+### Send Email Payment Confirmation
+POST {{Email.API_HostAddress}}/api/email/send-email-payment-confirmation
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "paymentDetails": "Payment details here"
+}
+
+### Send Email Invoice
+POST {{Email.API_HostAddress}}/api/email/send-email-invoice
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "invoiceNumber": "INV-001",
+  "invoiceUrl": "https://example.com/invoice/INV-001"
+}
+
+### Send Email Contract
+POST {{Email.API_HostAddress}}/api/email/send-email-contract
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "contractNumber": "CON-001",
+  "contractUrl": "https://example.com/contract/CON-001"
+}

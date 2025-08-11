@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Email.Domain.Interfaces;
-using Email.API.Models;
+using Email.Application.DTOs.Request;
 
 namespace Email.API.Controllers;
 
