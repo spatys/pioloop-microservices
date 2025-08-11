@@ -2,7 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using Auth.Application.Commands;
 using Auth.Application.Queries;
-using Auth.Application.DTOs;
+using Auth.Application.DTOs.Request;
+using Auth.Application.DTOs.Response;
 
 namespace Auth.API.Controllers;
 
@@ -18,20 +19,20 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Authenticate user and generate JWT token
+    /// Step 1: Initiate registration with email only
+    /// Creates a temporary user and sends verification code via email
     /// </summary>
-    /// <param name="request">User credentials</param>
-    /// <returns>Login response with user data and JWT token</returns>
-    [HttpPost("login")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<LoginResponseDto>))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponseDto<LoginResponseDto>))]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<LoginResponseDto>))]
-    public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
+    /// <param name="request">Email address for registration</param>
+    /// <returns>Registration initiated successfully with confirmation message</returns>
+    [HttpPost("register/register-email")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<RegisterEmailResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponseDto<RegisterEmailResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<RegisterEmailResponseDto>))]
+    public async Task<IActionResult> RegisterEmail([FromBody] RegisterEmailRequest request)
     {
-        var command = new LoginCommand
+        var command = new RegisterEmailCommand
         {
-            Email = request.Email,
-            Password = request.Password
+            Email = request.Email
         };
 
         var result = await _mediator.Send(command);
@@ -45,17 +46,47 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Register a new user
+    /// Step 2: Verify email code
+    /// Validates the 6-digit code sent to user's email and confirms email
     /// </summary>
-    /// <param name="request">User registration data</param>
-    /// <returns>Registration response with user data</returns>
-    [HttpPost("register")]
+    /// <param name="request">Email and verification code</param>
+    /// <returns>Email verified successfully with verification status</returns>
+    [HttpPost("register/register-verify-email")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<RegisterVerifyEmailResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponseDto<RegisterVerifyEmailResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<RegisterVerifyEmailResponseDto>))]
+    public async Task<IActionResult> RegisterVerifyEmail([FromBody] RegisterVerifyEmailRequest request)
+    {
+        var command = new RegisterVerifyEmailCommand
+        {
+            Email = request.Email,
+            Code = request.Code
+        };
+
+        var result = await _mediator.Send(command);
+        
+        if (result.Success)
+        {
+            return Ok(result);
+        }
+        
+        return BadRequest(result);
+    }
+
+    /// <summary>
+    /// Step 3: Complete registration with profile details
+    /// Finalizes user registration with personal information and password
+    /// Requires email to be verified from Step 2
+    /// </summary>
+    /// <param name="request">Complete user profile information</param>
+    /// <returns>Registration completed successfully with user data</returns>
+    [HttpPost("register/register-complete")]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<UserDto>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponseDto<UserDto>))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<UserDto>))]
-    public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
+    public async Task<IActionResult> RegisterComplete([FromBody] RegisterCompleteRequest request)
     {
-        var command = new RegisterCommand
+        var command = new RegisterCompleteCommand
         {
             Email = request.Email,
             FirstName = request.FirstName,
@@ -77,20 +108,20 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
-    /// Verify email with verification code
+    /// Authenticate user and generate JWT token
     /// </summary>
-    /// <param name="request">Email verification data</param>
-    /// <returns>Verification result</returns>
-    [HttpPost("verify-email")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<bool>))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponseDto<bool>))]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<bool>))]
-    public async Task<IActionResult> VerifyEmail([FromBody] EmailVerificationRequestDto request)
+    /// <param name="request">User credentials</param>
+    /// <returns>Login response with user data and JWT token</returns>
+    [HttpPost("login")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<LoginResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponseDto<LoginResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<LoginResponseDto>))]
+    public async Task<IActionResult> Login([FromBody] LoginRequestDto request)
     {
-        var command = new VerifyEmailCommand
+        var command = new LoginCommand
         {
             Email = request.Email,
-            Code = request.Code
+            Password = request.Password
         };
 
         var result = await _mediator.Send(command);
@@ -150,7 +181,7 @@ public class AuthController : ControllerBase
     /// <summary>
     /// Health check endpoint
     /// </summary>
-    /// <returns>Service status</returns>
+    /// <returns>Health status</returns>
     [HttpGet("health")]
     public IActionResult Health()
     {

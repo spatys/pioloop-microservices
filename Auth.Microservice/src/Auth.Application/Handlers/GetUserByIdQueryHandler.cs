@@ -1,6 +1,6 @@
 using MediatR;
-using Auth.Application.DTOs;
 using Auth.Application.Queries;
+using Auth.Application.DTOs.Response;
 using Auth.Domain.Interfaces;
 
 namespace Auth.Application.Handlers;
@@ -24,7 +24,6 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, ApiResp
                 return ApiResponseDto<UserDto>.Error("Utilisateur non trouvé");
             }
 
-            var roles = await _userRepository.GetUserRolesAsync(user.Id);
             var userDto = new UserDto
             {
                 Id = user.Id,
@@ -39,12 +38,12 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, ApiResp
                 EmailConfirmed = user.EmailConfirmed,
                 ConsentAccepted = user.ConsentAccepted,
                 ConsentAcceptedAt = user.ConsentAcceptedAt,
-                Roles = roles
+                Roles = new List<string>() // TODO: Ajouter les rôles
             };
 
-            return ApiResponseDto<UserDto>.FromSuccess(userDto);
+            return ApiResponseDto<UserDto>.FromSuccess(userDto, "Utilisateur trouvé");
         }
-        catch
+        catch (Exception ex)
         {
             return ApiResponseDto<UserDto>.Error("Erreur interne du serveur");
         }

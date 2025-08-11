@@ -3,8 +3,7 @@ using Auth.Application.DTOs.Response;
 
 namespace Auth.Application.Commands;
 
-public class LoginCommand : IRequest<ApiResponseDto<LoginResponseDto>>
+public class RegisterEmailCommand : IRequest<ApiResponseDto<RegisterEmailResponseDto>>
 {
     public string Email { get; set; } = string.Empty;
-    public string Password { get; set; } = string.Empty;
 }

@@ -1,5 +1,5 @@
 using MediatR;
-using Auth.Application.DTOs;
+using Auth.Application.DTOs.Response;
 
 namespace Auth.Application.Queries;
 

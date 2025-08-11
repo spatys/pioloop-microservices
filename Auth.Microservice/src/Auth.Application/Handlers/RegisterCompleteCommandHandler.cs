@@ -1,15 +1,15 @@
 using MediatR;
 using Auth.Application.Commands;
-using Auth.Application.DTOs;
+using Auth.Application.DTOs.Response;
 using Auth.Domain.Interfaces;
-using Auth.Domain.Services;
 using Auth.Domain.Entities;
+using Auth.Domain.Services;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Configuration;
 
 namespace Auth.Application.Handlers;
 
-public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ApiResponseDto<UserDto>>
+public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCommand, ApiResponseDto<UserDto>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserPasswordRepository _userPasswordRepository;
@@ -17,7 +17,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ApiRespon
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
 
-    public RegisterCommandHandler(
+    public RegisterCompleteCommandHandler(
         IUserRepository userRepository,
         IUserPasswordRepository userPasswordRepository,
         IPasswordService passwordService,
@@ -30,7 +30,7 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ApiRespon
         _configuration = configuration;
     }
 
-    public async Task<ApiResponseDto<UserDto>> Handle(RegisterCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponseDto<UserDto>> Handle(RegisterCompleteCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -40,10 +40,6 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ApiRespon
             if (string.IsNullOrEmpty(request.Email))
             {
                 fieldErrors["email"] = "L'email est requis";
-            }
-            else if (!IsValidEmail(request.Email))
-            {
-                fieldErrors["email"] = "Format d'email invalide";
             }
             
             if (string.IsNullOrEmpty(request.FirstName))
@@ -80,17 +76,26 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ApiRespon
                 return ApiResponseDto<UserDto>.ValidationError(fieldErrors);
             }
 
-            // Vérification si l'email existe déjà
-            if (await _userRepository.EmailExistsAsync(request.Email))
+            // Recherche de l'utilisateur existant
+            var user = await _userRepository.GetByEmailAsync(request.Email);
+            if (user == null)
             {
                 return ApiResponseDto<UserDto>.ValidationError(new Dictionary<string, string>
                 {
-                    ["email"] = "Cet email est déjà utilisé"
+                    ["email"] = "Utilisateur non trouvé"
                 });
             }
 
-            // Création de l'utilisateur
-            var user = new User(request.Email, request.FirstName, request.LastName);
+            // Vérification que l'email est confirmé
+            if (!user.EmailConfirmed)
+            {
+                return ApiResponseDto<UserDto>.ValidationError(new Dictionary<string, string>
+                {
+                    ["email"] = "L'email doit être vérifié avant de compléter l'inscription"
+                });
+            }
+
+            // Mise à jour du profil utilisateur
             user.UpdateProfile(request.FirstName, request.LastName, request.PhoneNumber);
             
             if (request.AcceptConsent)
@@ -98,39 +103,25 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ApiRespon
                 user.AcceptConsent();
             }
 
-            // Génération du code de vérification email
-            user.GenerateEmailVerificationCode();
-
-            // Sauvegarde de l'utilisateur
-            var createdUser = await _userRepository.CreateAsync(user);
+            // Mise à jour de l'utilisateur
+            var updatedUser = await _userRepository.UpdateAsync(user);
 
             // Hashage et sauvegarde du mot de passe
             var passwordHash = _passwordService.HashPassword(request.Password, out var passwordSalt);
             var userPassword = new UserPassword(user.Id, passwordHash, passwordSalt);
             await _userPasswordRepository.CreateAsync(userPassword);
 
-            // Affecter le rôle par défaut "User" si disponible (meilleure UX)
-            try
-            {
-                var roles = await _userRepository.GetUserRolesAsync(createdUser.Id);
-                if (!roles.Any())
-                {
-                    // Chercher le rôle "User" via IRoleRepository serait idéal;
-                    // à défaut, ignorer silencieusement si non dispo.
-                }
-            }
-            catch { /* ignore */ }
-
-            // Appel Email MS pour envoyer le code
+            // Envoi de l'email de bienvenue
             try
             {
                 var emailApiUrl = _configuration["EmailApi:BaseUrl"] ?? "http://localhost:5002";
                 var payload = new
                 {
-                    Email = createdUser.Email,
-                    Code = createdUser.EmailVerificationCode
+                    Email = updatedUser.Email,
+                    FirstName = updatedUser.FirstName,
+                    LastName = updatedUser.LastName
                 };
-                using var response = await _httpClient.PostAsJsonAsync($"{emailApiUrl}/api/email/send-email-verification", payload, cancellationToken);
+                using var response = await _httpClient.PostAsJsonAsync($"{emailApiUrl}/api/email/send-email-account-created", payload, cancellationToken);
                 // ignore response content; best-effort
             }
             catch { /* ignore send failures */ }
@@ -138,39 +129,26 @@ public class RegisterCommandHandler : IRequestHandler<RegisterCommand, ApiRespon
             // Création du DTO utilisateur
             var userDto = new UserDto
             {
-                Id = createdUser.Id,
-                Email = createdUser.Email,
-                FirstName = createdUser.FirstName,
-                LastName = createdUser.LastName,
-                FullName = createdUser.GetFullName(),
-                PhoneNumber = createdUser.PhoneNumber,
-                IsActive = createdUser.IsActive,
-                CreatedAt = createdUser.CreatedAt,
-                LastLoginAt = createdUser.LastLoginAt,
-                EmailConfirmed = createdUser.EmailConfirmed,
-                ConsentAccepted = createdUser.ConsentAccepted,
-                ConsentAcceptedAt = createdUser.ConsentAcceptedAt,
+                Id = updatedUser.Id,
+                Email = updatedUser.Email,
+                FirstName = updatedUser.FirstName,
+                LastName = updatedUser.LastName,
+                FullName = updatedUser.GetFullName(),
+                PhoneNumber = updatedUser.PhoneNumber,
+                IsActive = updatedUser.IsActive,
+                CreatedAt = updatedUser.CreatedAt,
+                LastLoginAt = updatedUser.LastLoginAt,
+                EmailConfirmed = updatedUser.EmailConfirmed,
+                ConsentAccepted = updatedUser.ConsentAccepted,
+                ConsentAcceptedAt = updatedUser.ConsentAcceptedAt,
                 Roles = new List<string>()
             };
 
-            return ApiResponseDto<UserDto>.FromSuccess(userDto, "Inscription réussie. Veuillez vérifier votre email.");
+            return ApiResponseDto<UserDto>.FromSuccess(userDto, "Inscription complétée avec succès");
         }
         catch (Exception ex)
         {
             return ApiResponseDto<UserDto>.Error("Erreur interne du serveur");
-        }
-    }
-
-    private bool IsValidEmail(string email)
-    {
-        try
-        {
-            var addr = new System.Net.Mail.MailAddress(email);
-            return addr.Address == email;
-        }
-        catch
-        {
-            return false;
         }
     }
 }

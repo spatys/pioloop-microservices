@@ -1,9 +1,14 @@
 using MediatR;
 using Auth.Application.Commands;
-using Auth.Application.DTOs;
+using Auth.Application.DTOs.Response;
 using Auth.Domain.Interfaces;
-using Auth.Domain.Services;
 using Auth.Domain.Entities;
+using Auth.Domain.Services;
+using Microsoft.Extensions.Configuration;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Text;
 
 namespace Auth.Application.Handlers;
 
@@ -11,22 +16,19 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserPasswordRepository _userPasswordRepository;
-    private readonly IRoleRepository _roleRepository;
     private readonly IPasswordService _passwordService;
-    private readonly IJwtService _jwtService;
+    private readonly IConfiguration _configuration;
 
     public LoginCommandHandler(
         IUserRepository userRepository,
         IUserPasswordRepository userPasswordRepository,
-        IRoleRepository roleRepository,
         IPasswordService passwordService,
-        IJwtService jwtService)
+        IConfiguration configuration)
     {
         _userRepository = userRepository;
         _userPasswordRepository = userPasswordRepository;
-        _roleRepository = roleRepository;
         _passwordService = passwordService;
-        _jwtService = jwtService;
+        _configuration = configuration;
     }
 
     public async Task<ApiResponseDto<LoginResponseDto>> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -34,21 +36,20 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
         try
         {
             // Validation des champs
-            var fieldErrors = new Dictionary<string, string>();
-            
             if (string.IsNullOrEmpty(request.Email))
             {
-                fieldErrors["email"] = "L'email est requis";
-            }
-            
-            if (string.IsNullOrEmpty(request.Password))
-            {
-                fieldErrors["password"] = "Le mot de passe est requis";
+                return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
+                {
+                    ["email"] = "L'email est requis"
+                });
             }
 
-            if (fieldErrors.Count > 0)
+            if (string.IsNullOrEmpty(request.Password))
             {
-                return ApiResponseDto<LoginResponseDto>.ValidationError(fieldErrors);
+                return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
+                {
+                    ["password"] = "Le mot de passe est requis"
+                });
             }
 
             // Recherche de l'utilisateur
@@ -57,41 +58,26 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
             {
                 return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
                 {
-                    ["email"] = "Email non trouvé"
-                });
-            }
-
-            if (!user.IsActive)
-            {
-                return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
-                {
-                    ["email"] = "Compte non actif"
-                });
-            }
-
-            if (!user.EmailConfirmed)
-            {
-                return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
-                {
-                    ["email"] = "Email non confirmé. Veuillez vérifier votre email d'abord."
+                    ["email"] = "Email ou mot de passe incorrect"
                 });
             }
 
             // Vérification du mot de passe
             var userPassword = await _userPasswordRepository.GetByUserIdAsync(user.Id);
-            if (userPassword == null)
+            if (userPassword == null || !_passwordService.VerifyPassword(request.Password, userPassword.PasswordHash, userPassword.PasswordSalt))
             {
                 return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
                 {
-                    ["email"] = "Compte utilisateur non complètement configuré. Veuillez terminer l'inscription d'abord."
+                    ["password"] = "Email ou mot de passe incorrect"
                 });
             }
 
-            if (!_passwordService.VerifyPassword(request.Password, userPassword.PasswordHash, userPassword.PasswordSalt))
+            // Vérification que l'utilisateur est actif
+            if (!user.IsActive)
             {
                 return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
                 {
-                    ["password"] = "Mot de passe incorrect"
+                    ["email"] = "Compte désactivé"
                 });
             }
 
@@ -99,11 +85,8 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
             user.UpdateLastLogin();
             await _userRepository.UpdateAsync(user);
 
-            // Récupération des rôles
-            var roles = await _userRepository.GetUserRolesAsync(user.Id);
-
             // Génération du token JWT
-            var token = _jwtService.GenerateToken(user, roles);
+            var token = GenerateJwtToken(user);
 
             // Création du DTO utilisateur
             var userDto = new UserDto
@@ -120,21 +103,46 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
                 EmailConfirmed = user.EmailConfirmed,
                 ConsentAccepted = user.ConsentAccepted,
                 ConsentAcceptedAt = user.ConsentAcceptedAt,
-                Roles = roles
+                Roles = new List<string>() // TODO: Ajouter les rôles
             };
 
-            var loginData = new LoginResponseDto
+            var loginResponse = new LoginResponseDto
             {
-                Message = "Connexion réussie",
+                Token = token,
                 User = userDto,
-                Token = token
+                ExpiresAt = DateTime.UtcNow.AddHours(Convert.ToDouble(_configuration["JwtSettings:ExpirationHours"]))
             };
 
-            return ApiResponseDto<LoginResponseDto>.FromSuccess(loginData, "Connexion réussie");
+            return ApiResponseDto<LoginResponseDto>.FromSuccess(loginResponse, "Connexion réussie");
         }
         catch (Exception ex)
         {
             return ApiResponseDto<LoginResponseDto>.Error("Erreur interne du serveur");
         }
+    }
+
+    private string GenerateJwtToken(User user)
+    {
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"] ?? "default-secret-key"));
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+
+        var claims = new List<Claim>
+        {
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+            new Claim(ClaimTypes.Email, user.Email),
+            new Claim(ClaimTypes.Name, user.GetFullName()),
+            new Claim("email_confirmed", user.EmailConfirmed.ToString()),
+            new Claim("consent_accepted", user.ConsentAccepted.ToString())
+        };
+
+        var token = new JwtSecurityToken(
+            issuer: _configuration["JwtSettings:Issuer"],
+            audience: _configuration["JwtSettings:Audience"],
+            claims: claims,
+            expires: DateTime.UtcNow.AddHours(Convert.ToDouble(_configuration["JwtSettings:ExpirationHours"])),
+            signingCredentials: credentials
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
     }
 }
