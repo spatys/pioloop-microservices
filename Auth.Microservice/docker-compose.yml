@@ -10,11 +10,24 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=auth-db;Database=pioloop_auth;Username=pioloop12345;Password=piolOOP_&!?12345;Port=5432
-      - Jwt__SecretKey=Pioloop2025SecretKey32CharsLong!@#
-      - Jwt__Issuer=Pioloop
-      - Jwt__Audience=PioloopUsers
-      - Jwt__ExpirationHours=24
+      # JWT Settings
+      - JwtSettings__SecretKey=Pioloop2025SecretKey32CharsLong!@#
+      - JwtSettings__Issuer=Pioloop
+      - JwtSettings__Audience=PioloopUsers
+      - JwtSettings__ExpirationHours=24
+      # Email Settings
       - EmailApi__BaseUrl=http://localhost:5002
+      - EmailSettings__SmtpServer=smtp.gmail.com
+      - EmailSettings__SmtpPort=587
+      - EmailSettings__SmtpUsername=nanyim.alain@gmail.com
+      - EmailSettings__SmtpPassword=ekcc pfre ybmb iuol
+      - EmailSettings__FromEmail=noreply@pioloop.com
+      - EmailSettings__FromName=Pioloop
+       # Auth Settings (in minutes)
+      - Auth__EmailVerificationExpiration=1
+      # Stripe Settings
+      - StripeSettings__SecretKey=your-stripe-secret-key
+      - StripeSettings__PublishableKey=your-stripe-publishable-key
     depends_on:
       auth-db:
         condition: service_healthy
