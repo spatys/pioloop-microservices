@@ -120,8 +120,11 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
+        policy.WithOrigins(
+                "http://localhost:3000",     // Frontend local
+                "https://www.pioloop.com"    // Production frontend
+              )
+              .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH")
               .AllowAnyHeader();
     });
 });

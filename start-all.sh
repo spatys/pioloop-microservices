@@ -34,8 +34,8 @@ if ! command -v dotnet &> /dev/null; then
 fi
 
 DOTNET_VERSION=$(dotnet --version)
-if [[ ! $DOTNET_VERSION == 8.* ]]; then
-    print_error ".NET 8.0 est requis, version actuelle: $DOTNET_VERSION"
+if [[ ! $DOTNET_VERSION =~ ^(8\.|9\.) ]]; then
+    print_error ".NET 8.0+ est requis, version actuelle: $DOTNET_VERSION"
     exit 1
 fi
 

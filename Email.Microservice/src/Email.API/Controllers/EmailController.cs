@@ -220,8 +220,4 @@ public class EmailController : ControllerBase
     {
         return Ok(ApiResponseDto<object>.SuccessResponse("Email Microservice is healthy", new { status = "healthy", timestamp = DateTime.UtcNow }));
     }
-
-
 }
-
-

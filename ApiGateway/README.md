@@ -102,7 +102,7 @@ EmailService__Url=http://localhost:5002
 |---------|----------|-------------|
 | `GET` | `/health` | Health check |
 | `GET` | `/api/health` | Health check détaillé |
-| `GET` | `/api/health/info` | Informations du service |
+
 | `GET` | `/swagger` | Documentation Swagger |
 
 ## 🔐 Authentification
