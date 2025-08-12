@@ -1,0 +1,19 @@
+# Logs
+logs/
+**/logs/
+
+# Build outputs
+**/bin/
+**/obj/
+
+# Editors/IDE
+.idea/
+.vscode/
+*.user
+*.suo
+*.swp
+
+# Docker local state
+**/.build-hash/
+
+
