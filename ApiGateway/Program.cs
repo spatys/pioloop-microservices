@@ -25,8 +25,15 @@ builder.Services.AddControllers();
 // Configuration Ocelot
 builder.Services.AddOcelot(builder.Configuration);
 
-// **Ajout SwaggerForOcelot ici**
-builder.Services.AddSwaggerForOcelot(builder.Configuration);
+// Configuration Ocelot
+builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
+builder.Configuration.AddJsonFile($"ocelot.{builder.Environment.EnvironmentName}.json", optional: true);
+
+// Configuration SwaggerForOcelot
+builder.Services.AddSwaggerForOcelot(builder.Configuration, opt => {
+    opt.GenerateDocsForAggregates = false;
+});
+
 
 // Configuration de l'authentification JWT
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -66,20 +73,9 @@ builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "Pioloop API Gateway",
-        Version = "1.0.0",
-        Description = "API Gateway unifié pour l'écosystème Pioloop",
-        Contact = new OpenApiContact
-        {
-            Name = "Pioloop Team",
-            Email = "support@pioloop.com",
-            Url = new Uri("https://www.pioloop.com")
-        },
-        License = new OpenApiLicense
-        {
-            Name = "MIT",
-            Url = new Uri("https://opensource.org/licenses/MIT")
-        }
+        Title = "Auth Service API",
+        Version = "v1",
+        Description = "Authentication Microservice"
     });
 
     // Configuration JWT pour Swagger
@@ -166,16 +162,14 @@ app.UseCors("Policy");
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Ocelot + SwaggerForOcelot
+// Important: SwaggerForOcelot doit être avant les MapControllers
+app.UseSwaggerForOcelotUI().UseOcelot().Wait();
+
 // Routes API classiques
 app.MapControllers();
 
 // Endpoint de santé
 app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Service = "API Gateway", Timestamp = DateTime.UtcNow }));
-
-// Ocelot + SwaggerForOcelot (terminal middleware - should be last)
-app.UseSwaggerForOcelotUI(opt =>
-{
-    // Default path is /swagger/docs per library; not overriding to avoid mismatch
-}).UseOcelot().Wait();
 
 app.Run();

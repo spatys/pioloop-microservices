@@ -35,50 +35,51 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
     {
         try
         {
-            // Validation des champs
-            if (string.IsNullOrEmpty(request.Email))
+            var errors = new Dictionary<string, string>();
+
+            // Validation simple des champs requis
+            if (string.IsNullOrWhiteSpace(request.Email))
             {
-                return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
-                {
-                    ["email"] = "L'email est requis"
-                });
+                errors["email"] = "L'email est requis";
+            }
+            if (string.IsNullOrWhiteSpace(request.Password))
+            {
+                errors["password"] = "Le mot de passe est requis";
             }
 
-            if (string.IsNullOrEmpty(request.Password))
+            if (errors.Count > 0)
             {
-                return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
-                {
-                    ["password"] = "Le mot de passe est requis"
-                });
+                return ApiResponseDto<LoginResponseDto>.ValidationError(errors);
             }
 
-            // Recherche de l'utilisateur
+            // Recherche de l'utilisateur par email
             var user = await _userRepository.GetByEmailAsync(request.Email);
             if (user == null)
             {
-                return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
-                {
-                    ["email"] = "Email ou mot de passe incorrect"
-                });
+                // Email inexistant => message spécifique
+                errors["email"] = "Email incorrect";
+
+                // On retourne ici, car on ne peut pas vérifier un mot de passe sans utilisateur
+                return ApiResponseDto<LoginResponseDto>.ValidationError(errors);
             }
 
             // Vérification du mot de passe
             var userPassword = await _userPasswordRepository.GetByUserIdAsync(user.Id);
-            if (userPassword == null || !_passwordService.VerifyPassword(request.Password, userPassword.PasswordHash, userPassword.PasswordSalt))
+            var isPasswordValid = userPassword != null && _passwordService.VerifyPassword(request.Password, userPassword.PasswordHash, userPassword.PasswordSalt);
+            if (!isPasswordValid)
             {
-                return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
-                {
-                    ["password"] = "Email ou mot de passe incorrect"
-                });
+                errors["password"] = "Mot de passe incorrect";
             }
 
             // Vérification que l'utilisateur est actif
             if (!user.IsActive)
             {
-                return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
-                {
-                    ["email"] = "Compte désactivé"
-                });
+                errors["email"] = "Compte désactivé";
+            }
+
+            if (errors.Count > 0)
+            {
+                return ApiResponseDto<LoginResponseDto>.ValidationError(errors);
             }
 
             // Mise à jour de la dernière connexion

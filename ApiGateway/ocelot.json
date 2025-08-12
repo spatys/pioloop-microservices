@@ -1,7 +1,7 @@
 {
   "Routes": [
     {
-      "DownstreamPathTemplate": "/api/Auth/{everything}",
+      "DownstreamPathTemplate": "/api/auth/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -10,17 +10,11 @@
         }
       ],
       "UpstreamPathTemplate": "/api/auth/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "PATCH" ],
-      "SwaggerKey": "auth",
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer"
-      },
-      "RouteClaimsRequirement": {
-        "role": "user"
-      }
+      "UpstreamHttpMethod": ["GET", "POST", "PUT", "DELETE"],
+      "SwaggerKey": "auth"
     },
     {
-      "DownstreamPathTemplate": "/api/Auth/login",
+      "DownstreamPathTemplate": "/api/auth/login",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -29,11 +23,11 @@
         }
       ],
       "UpstreamPathTemplate": "/api/auth/login",
-      "UpstreamHttpMethod": [ "POST" ],
+      "UpstreamHttpMethod": ["POST"],
       "SwaggerKey": "auth"
     },
     {
-      "DownstreamPathTemplate": "/api/Email/{everything}",
+      "DownstreamPathTemplate": "/api/email/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
@@ -42,7 +36,20 @@
         }
       ],
       "UpstreamPathTemplate": "/api/email/{everything}",
-      "UpstreamHttpMethod": [ "GET", "POST", "PUT", "DELETE", "PATCH" ],
+      "UpstreamHttpMethod": ["GET", "POST", "PUT", "DELETE"],
+      "SwaggerKey": "email"
+    },
+    {
+      "DownstreamPathTemplate": "/api/email/health",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "email-microservice",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/email/health",
+      "UpstreamHttpMethod": ["GET"],
       "SwaggerKey": "email"
     }
   ],
@@ -51,7 +58,7 @@
       "Key": "auth",
       "Config": [
         {
-          "Name": "Auth Microservice API",
+          "Name": "Auth Service",
           "Version": "v1",
           "Url": "http://auth-microservice/swagger/v1/swagger.json"
         }
@@ -61,7 +68,7 @@
       "Key": "email",
       "Config": [
         {
-          "Name": "Email Microservice API",
+          "Name": "Email Service",
           "Version": "v1",
           "Url": "http://email-microservice/swagger/v1/swagger.json"
         }
