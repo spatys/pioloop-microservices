@@ -36,8 +36,8 @@
 
 ## 📋 Prérequis
 
-- **.NET 8.0 SDK** - [Télécharger](https://dotnet.microsoft.com/download/dotnet/8.0)
-- **PostgreSQL** (optionnel, inclus dans Docker)
+- **Docker** - [Télécharger](https://www.docker.com/products/docker-desktop)
+- **Docker Compose** - Inclus avec Docker Desktop
 - **Git** - Pour cloner le repository
 
 ## 🛠️ Installation Rapide
@@ -48,16 +48,29 @@ git clone <repository-url>
 cd pioloop-microservices
 ```
 
-### 2. Démarrer tous les services
+### 2. Démarrer l'écosystème complet
 ```bash
+# Démarrer tous les services
 ./start-all.sh
+
+# Arrêter tous les services
+./stop-all.sh
 ```
+
+**Avantages de cette approche :**
+- ✅ Environnement isolé et reproductible
+- ✅ Configuration centralisée
+- ✅ Base de données PostgreSQL incluse
+- ✅ Health checks automatiques
+- ✅ Logs centralisés
+- ✅ Déploiement simplifié
 
 ### 3. Accéder aux services
 - **API Gateway**: http://localhost:5000
 - **Swagger Unifié**: http://localhost:5000/swagger
 - **Auth Service**: http://localhost:5001
 - **Email Service**: http://localhost:5002
+- **PostgreSQL DB**: localhost:5433
 
 ## 📡 API Endpoints
 
@@ -161,24 +174,22 @@ Le fichier `ApiGateway/ocelot.json` configure :
 
 ## 🚀 Démarrage Manuel
 
-### Option 1: Script automatique (Recommandé)
+### Script automatique (Recommandé)
 ```bash
 ./start-all.sh
 ```
 
-### Option 2: Démarrage manuel
+### Démarrage manuel avec Docker Compose
 ```bash
-# Terminal 1 - Auth Service
-cd Auth.Microservice
-dotnet run
-
-# Terminal 2 - Email Service
-cd Email.Microservice
-dotnet run
-
-# Terminal 3 - API Gateway
+# Démarrer l'écosystème complet
 cd ApiGateway
-dotnet run
+docker-compose up -d
+
+# Voir les logs
+docker-compose logs -f
+
+# Arrêter
+docker-compose down
 ```
 
 ## 🛑 Arrêt des Services
@@ -190,8 +201,8 @@ dotnet run
 
 ### Arrêt manuel
 ```bash
-# Arrêter tous les processus dotnet
-pkill -f "dotnet.*(Auth|Email|ApiGateway)"
+cd ApiGateway
+docker-compose down
 ```
 
 ## 📊 Monitoring et Logs

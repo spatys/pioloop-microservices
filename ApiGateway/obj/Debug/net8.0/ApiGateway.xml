@@ -15,12 +15,6 @@
             </summary>
             <returns>Statut de santé de l'API Gateway</returns>
         </member>
-        <member name="M:ApiGateway.Controllers.HealthController.Info">
-            <summary>
-            Obtient les informations détaillées de l'API Gateway
-            </summary>
-            <returns>Informations détaillées du service</returns>
-        </member>
         <member name="T:ApiGateway.Middleware.ErrorHandlingMiddleware">
             <summary>
             Middleware pour la gestion globale des erreurs

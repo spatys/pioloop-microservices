@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Text;
 using ApiGateway.Middleware;
 using ApiGateway.Models;
+using MMLib.SwaggerForOcelot;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +24,9 @@ builder.Services.AddControllers();
 
 // Configuration Ocelot
 builder.Services.AddOcelot(builder.Configuration);
+
+// **Ajout SwaggerForOcelot ici**
+builder.Services.AddSwaggerForOcelot(builder.Configuration);
 
 // Configuration de l'authentification JWT
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -110,19 +114,16 @@ builder.Services.AddSwaggerGen(c =>
     {
         c.IncludeXmlComments(xmlPath);
     }
-
-    // Ajouter des exemples de réponses (optionnel)
-    // c.ExampleFilters();
 });
 
 // Configuration CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("Policy", policy =>
     {
         policy.WithOrigins(
-                "http://localhost:3000",     // Frontend local
-                "https://www.pioloop.com"    // Production frontend
+                "http://localhost:3000",
+                "https://www.pioloop.com"
               )
               .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH")
               .AllowAnyHeader();
@@ -146,64 +147,35 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Pioloop API Gateway v1.0.0");
-        c.RoutePrefix = "swagger";
-        c.DocumentTitle = "Pioloop API Gateway Documentation";
-        c.DefaultModelsExpandDepth(-1);
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Gateway API v1");
+        c.RoutePrefix = "gateway-swagger"; // éviter le conflit avec l'UI agrégée
     });
 }
-else
-{
-    // En production, Swagger accessible via une route sécurisée
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Pioloop API Gateway v1.0.0");
-        c.RoutePrefix = "api-docs";
-        c.DocumentTitle = "Pioloop API Gateway Documentation";
-        c.DefaultModelsExpandDepth(-1);
-    });
-}
+
 
 // Middleware de logging des requêtes
 app.UseMiddleware<RequestLoggingMiddleware>();
 
 // Middleware de gestion d'erreurs global
 app.UseMiddleware<ErrorHandlingMiddleware>();
-
+app.UseRouting();
 // CORS
-app.UseCors("AllowAll");
+app.UseCors("Policy");
 
 // Authentification et autorisation
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Configuration Ocelot avec Swagger
-await app.UseOcelot();
-
-// Configuration des routes
+// Routes API classiques
 app.MapControllers();
-
-// Configuration Swagger pour Ocelot
-app.UseSwaggerForOcelotUI(opt =>
-{
-    opt.PathToSwaggerGenerator = "/swagger/docs";
-});
 
 // Endpoint de santé
 app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Service = "API Gateway", Timestamp = DateTime.UtcNow }));
 
-// Démarrage de l'application
-try
+// Ocelot + SwaggerForOcelot (terminal middleware - should be last)
+app.UseSwaggerForOcelotUI(opt =>
 {
-    Log.Information("Démarrage de l'API Gateway Pioloop...");
-    app.Run();
-}
-catch (Exception ex)
-{
-    Log.Fatal(ex, "L'API Gateway n'a pas pu démarrer");
-}
-finally
-{
-    Log.CloseAndFlush();
-}
+    // Default path is /swagger/docs per library; not overriding to avoid mismatch
+}).UseOcelot().Wait();
+
+app.Run();

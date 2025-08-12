@@ -20,6 +20,13 @@ public class ErrorHandlingMiddleware
 
     public async Task InvokeAsync(HttpContext context)
     {
+        // Ne pas interférer avec les endpoints Swagger/Ocelot
+        if (context.Request.Path.StartsWithSegments("/swagger", StringComparison.OrdinalIgnoreCase))
+        {
+            await _next(context);
+            return;
+        }
+
         try
         {
             await _next(context);

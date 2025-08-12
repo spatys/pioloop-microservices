@@ -135,29 +135,15 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+// Serve Swagger UI under /swagger consistently
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth Microservice API v1.0.0");
-        c.RoutePrefix = string.Empty; // Pour accéder à Swagger à la racine
-        c.DocumentTitle = "Auth Microservice API Documentation";
-        c.DefaultModelsExpandDepth(-1); // Masquer les modèles par défaut
-    });
-}
-else
-{
-    // En production, on peut toujours avoir Swagger mais avec une route différente
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth Microservice API v1.0.0");
-        c.RoutePrefix = "api-docs"; // Route sécurisée pour la production
-        c.DocumentTitle = "Auth Microservice API Documentation";
-        c.DefaultModelsExpandDepth(-1);
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth Microservice API v1.0.0");
+    c.RoutePrefix = "swagger";
+    c.DocumentTitle = "Auth Microservice API Documentation";
+    c.DefaultModelsExpandDepth(-1);
+});
 
 // Enable CORS
 app.UseCors("AllowApiGateway");

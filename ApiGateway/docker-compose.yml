@@ -1,0 +1,102 @@
+version: '3.8'
+
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pioloop-api-gateway
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+    volumes:
+      - ./logs:/app/logs
+    networks:
+      - pioloop-network
+    depends_on:
+      - auth-microservice
+      - email-microservice
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  auth-microservice:
+    build:
+      context: ../Auth.Microservice
+      dockerfile: Dockerfile
+    container_name: pioloop-auth-microservice
+    ports:
+      - "5001:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - ConnectionStrings__DefaultConnection=Host=auth-db;Database=pioloop_auth;Username=pioloop;Password=pioloop123
+    volumes:
+      - ../Auth.Microservice/logs:/app/logs
+    networks:
+      - pioloop-network
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/auth/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  email-microservice:
+    build:
+      context: ../Email.Microservice
+      dockerfile: Dockerfile
+    container_name: pioloop-email-microservice
+    ports:
+      - "5002:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+    volumes:
+      - ../Email.Microservice/logs:/app/logs
+    networks:
+      - pioloop-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/api/email/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
+  auth-db:
+    image: postgres:15-alpine
+    container_name: pioloop-auth-db
+    ports:
+      - "5433:5432"
+    environment:
+      - POSTGRES_DB=pioloop_auth
+      - POSTGRES_USER=pioloop
+      - POSTGRES_PASSWORD=pioloop123
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    networks:
+      - pioloop-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pioloop -d pioloop_auth"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+networks:
+  pioloop-network:
+    driver: bridge
+
+volumes:
+  auth-db-data:

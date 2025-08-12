@@ -5,8 +5,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5001
+          "Host": "auth-microservice",
+          "Port": 80
         }
       ],
       "UpstreamPathTemplate": "/api/auth/{everything}",
@@ -24,24 +24,11 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5001
+          "Host": "auth-microservice",
+          "Port": 80
         }
       ],
       "UpstreamPathTemplate": "/api/auth/login",
-      "UpstreamHttpMethod": [ "POST" ],
-      "SwaggerKey": "auth"
-    },
-    {
-      "DownstreamPathTemplate": "/api/auth/register",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 5001
-        }
-      ],
-      "UpstreamPathTemplate": "/api/auth/register",
       "UpstreamHttpMethod": [ "POST" ],
       "SwaggerKey": "auth"
     },
@@ -50,8 +37,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 5002
+          "Host": "email-microservice",
+          "Port": 80
         }
       ],
       "UpstreamPathTemplate": "/api/email/{everything}",
@@ -66,7 +53,7 @@
         {
           "Name": "Auth Microservice API",
           "Version": "v1",
-          "Url": "http://localhost:5001/swagger/v1/swagger.json"
+          "Url": "http://auth-microservice/swagger/v1/swagger.json"
         }
       ]
     },
@@ -76,12 +63,12 @@
         {
           "Name": "Email Microservice API",
           "Version": "v1",
-          "Url": "http://localhost:5002/swagger/v1/swagger.json"
+          "Url": "http://email-microservice/swagger/v1/swagger.json"
         }
       ]
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:5000"
+    "BaseUrl": "http://api-gateway:80"
   }
 }

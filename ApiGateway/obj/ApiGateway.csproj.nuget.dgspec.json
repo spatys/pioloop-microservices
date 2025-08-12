@@ -53,7 +53,7 @@
           "dependencies": {
             "MMLib.SwaggerForOcelot": {
               "target": "Package",
-              "version": "[6.0.0, )"
+              "version": "[7.0.0, )"
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
@@ -65,7 +65,7 @@
             },
             "Ocelot": {
               "target": "Package",
-              "version": "[22.0.1, )"
+              "version": "[22.0.0, )"
             },
             "Serilog.AspNetCore": {
               "target": "Package",

@@ -61,29 +61,15 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+// Serve Swagger UI under /swagger consistently
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Email Microservice API v1.0.0");
-        c.RoutePrefix = string.Empty; // Pour accéder à Swagger à la racine
-        c.DocumentTitle = "Email Microservice API Documentation";
-        c.DefaultModelsExpandDepth(-1); // Masquer les modèles par défaut
-    });
-}
-else
-{
-    // En production, on peut toujours avoir Swagger mais avec une route différente
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Email Microservice API v1.0.0");
-        c.RoutePrefix = "api-docs"; // Route sécurisée pour la production
-        c.DocumentTitle = "Email Microservice API Documentation";
-        c.DefaultModelsExpandDepth(-1);
-    });
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Email Microservice API v1.0.0");
+    c.RoutePrefix = "swagger";
+    c.DocumentTitle = "Email Microservice API Documentation";
+    c.DefaultModelsExpandDepth(-1);
+});
 
 // Enable CORS
 app.UseCors("AllowApiGateway");
