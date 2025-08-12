@@ -27,8 +27,8 @@ RUN apt-get update && apt-get install -y curl && rm -rf /var/lib/apt/lists/*
 # Copier l'application publiée
 COPY --from=publish /app/publish .
 
-# Créer le dossier de logs
-RUN mkdir -p /app/logs && chown -R appuser:appuser /app
+# (Logs fichiers désactivés; les logs passent par la console et Docker)
+RUN chown -R appuser:appuser /app
 
 # Changer vers l'utilisateur non-root
 USER appuser

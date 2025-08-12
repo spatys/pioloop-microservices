@@ -11,8 +11,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-    volumes:
-      - ./logs:/app/logs
+    # No file logs mounted; logs via Docker stdout
     networks:
       - pioloop-network
     depends_on:
@@ -37,8 +36,7 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - ConnectionStrings__DefaultConnection=Host=auth-db;Database=pioloop_auth;Username=pioloop;Password=pioloop123
-    volumes:
-      - ../Auth.Microservice/logs:/app/logs
+    # No file logs mounted; logs via Docker stdout
     networks:
       - pioloop-network
     depends_on:
@@ -62,8 +60,7 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-    volumes:
-      - ../Email.Microservice/logs:/app/logs
+    # No file logs mounted; logs via Docker stdout
     networks:
       - pioloop-network
     healthcheck:
