@@ -72,8 +72,8 @@ builder.Services.AddSwaggerGen(c =>
         c.IncludeXmlComments(xmlPath);
     }
 
-    // Ajouter des exemples de réponses
-    c.ExampleFilters();
+    // Ajouter des exemples de réponses (optionnel)
+    // c.ExampleFilters();
 });
 
 // Database

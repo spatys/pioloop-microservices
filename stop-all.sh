@@ -1,12 +1,6 @@
 #!/bin/bash
 
-# Pioloop Microservices - Script d'arrêt
-# Ce script arrête tous les microservices
-
-set -e  # Arrêter en cas d'erreur
-
-echo "🛑 Arrêt des microservices Pioloop..."
-echo "====================================="
+echo "🛑 Arrêt de l'écosystème Pioloop..."
 
 # Couleurs pour les messages
 RED='\033[0;31m'
@@ -32,34 +26,56 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Vérifier que les répertoires existent
-if [ ! -d "Email.Microservice" ]; then
-    print_error "Le répertoire Email.Microservice n'existe pas"
-    exit 1
+# Arrêter l'API Gateway en premier
+print_status "Arrêt de l'API Gateway..."
+pkill -f "dotnet.*ApiGateway" || print_warning "API Gateway n'était pas en cours d'exécution"
+
+# Arrêter les microservices
+print_status "Arrêt des microservices..."
+
+# Auth Microservice
+print_status "Arrêt de Auth.Microservice..."
+pkill -f "dotnet.*Auth.Microservice" || print_warning "Auth.Microservice n'était pas en cours d'exécution"
+
+# Email Microservice
+print_status "Arrêt de Email.Microservice..."
+pkill -f "dotnet.*Email.Microservice" || print_warning "Email.Microservice n'était pas en cours d'exécution"
+
+# Attendre que les processus se terminent
+sleep 3
+
+# Vérifier s'il reste des processus
+remaining_processes=$(pgrep -f "dotnet.*(Auth|Email|ApiGateway)" || true)
+
+if [ -n "$remaining_processes" ]; then
+    print_warning "Forçage de l'arrêt des processus restants..."
+    echo "$remaining_processes" | xargs kill -9
+    sleep 2
 fi
 
-if [ ! -d "Auth.Microservice" ]; then
-    print_error "Le répertoire Auth.Microservice n'existe pas"
-    exit 1
+# Vérifier que tous les ports sont libres
+ports=(5000 5001 5002)
+all_ports_free=true
+
+for port in "${ports[@]}"; do
+    if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null 2>&1; then
+        print_error "Le port $port est encore utilisé"
+        all_ports_free=false
+    else
+        print_success "Port $port libéré"
+    fi
+done
+
+echo ""
+if [ "$all_ports_free" = true ]; then
+    print_success "🎉 Tous les services ont été arrêtés avec succès !"
+else
+    print_warning "⚠️  Certains ports pourraient encore être utilisés"
 fi
 
-# Arrêter Auth Microservice
-print_status "Arrêt du Auth Microservice..."
-cd Auth.Microservice
-docker-compose down
-print_success "Auth Microservice arrêté"
-cd ..
-
-# Arrêter Email Microservice
-print_status "Arrêt du Email Microservice..."
-cd Email.Microservice
-docker-compose down
-print_success "Email Microservice arrêté"
-cd ..
+echo ""
+print_status "Nettoyage des fichiers PID..."
+rm -f logs/*.pid
 
 echo ""
-print_success "Tous les microservices ont été arrêtés !"
-echo ""
-echo "💡 Pour supprimer aussi les volumes (données) :"
-echo "  • Auth:    cd Auth.Microservice && docker-compose down -v"
-echo "  • Email:   cd Email.Microservice && docker-compose down -v"
+print_success "Écosystème Pioloop arrêté"

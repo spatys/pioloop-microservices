@@ -1,12 +1,6 @@
 #!/bin/bash
 
-# Pioloop Microservices - Script de démarrage
-# Ce script démarre tous les microservices dans l'ordre correct
-
-set -e  # Arrêter en cas d'erreur
-
-echo "🚀 Démarrage des microservices Pioloop..."
-echo "========================================"
+echo "🚀 Démarrage de l'écosystème Pioloop..."
 
 # Couleurs pour les messages
 RED='\033[0;31m'
@@ -32,89 +26,125 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-# Vérifier que Docker est en cours d'exécution
-if ! docker info > /dev/null 2>&1; then
-    print_error "Docker n'est pas en cours d'exécution. Veuillez démarrer Docker."
+# Vérifier que .NET 8.0 est installé
+print_status "Vérification de .NET 8.0..."
+if ! command -v dotnet &> /dev/null; then
+    print_error ".NET SDK n'est pas installé"
     exit 1
 fi
 
-print_success "Docker est en cours d'exécution"
-
-# Vérifier que les répertoires existent
-if [ ! -d "Email.Microservice" ]; then
-    print_error "Le répertoire Email.Microservice n'existe pas"
+DOTNET_VERSION=$(dotnet --version)
+if [[ ! $DOTNET_VERSION == 8.* ]]; then
+    print_error ".NET 8.0 est requis, version actuelle: $DOTNET_VERSION"
     exit 1
 fi
 
-if [ ! -d "Auth.Microservice" ]; then
-    print_error "Le répertoire Auth.Microservice n'existe pas"
-    exit 1
-fi
+print_success ".NET $DOTNET_VERSION détecté"
 
-print_success "Tous les répertoires microservices sont présents"
+# Créer le dossier logs s'il n'existe pas
+mkdir -p logs
 
-# Arrêter les services existants s'ils sont en cours d'exécution
+# Fonction pour démarrer un service
+start_service() {
+    local service_name=$1
+    local service_path=$2
+    local port=$3
+    
+    print_status "Démarrage de $service_name sur le port $port..."
+    
+    # Vérifier si le port est déjà utilisé
+    if lsof -Pi :$port -sTCP:LISTEN -t >/dev/null ; then
+        print_warning "Le port $port est déjà utilisé. Arrêt du processus existant..."
+        lsof -ti:$port | xargs kill -9
+        sleep 2
+    fi
+    
+    # Démarrer le service en arrière-plan
+    cd "$service_path"
+    dotnet run --no-build > "../logs/$service_name.log" 2>&1 &
+    local pid=$!
+    echo $pid > "../logs/$service_name.pid"
+    cd ..
+    
+    # Attendre que le service démarre
+    sleep 5
+    
+    # Vérifier si le service répond
+    if curl -s "http://localhost:$port/health" > /dev/null 2>&1; then
+        print_success "$service_name démarré avec succès (PID: $pid)"
+    else
+        print_warning "$service_name pourrait ne pas être complètement démarré"
+    fi
+}
+
+# Arrêter les services existants
 print_status "Arrêt des services existants..."
-cd Email.Microservice && docker-compose down > /dev/null 2>&1 || true
-cd ../Auth.Microservice && docker-compose down > /dev/null 2>&1 || true
-cd ..
+pkill -f "dotnet.*Auth.Microservice" || true
+pkill -f "dotnet.*Email.Microservice" || true
+pkill -f "dotnet.*ApiGateway" || true
 
-# 1. Démarrer Email Microservice (en premier car Auth en dépend)
-print_status "Démarrage du Email Microservice..."
-cd Email.Microservice
-docker-compose up -d
+# Attendre que les processus se terminent
+sleep 3
 
-# Attendre que Email soit prêt
-print_status "Attente que Email Microservice soit prêt..."
-sleep 10
+# Démarrer les microservices
+print_status "Démarrage des microservices..."
 
-# Vérifier que Email est en cours d'exécution
-if docker-compose ps | grep -q "Up"; then
-    print_success "Email Microservice démarré avec succès"
+# Auth Microservice
+start_service "Auth.Microservice" "Auth.Microservice" 5001
+
+# Email Microservice  
+start_service "Email.Microservice" "Email.Microservice" 5002
+
+# Attendre un peu avant de démarrer l'API Gateway
+sleep 3
+
+# API Gateway
+start_service "ApiGateway" "ApiGateway" 5000
+
+# Attendre que tous les services démarrent
+sleep 5
+
+# Vérifier l'état de tous les services
+print_status "Vérification de l'état des services..."
+
+services=(
+    "Auth.Microservice:5001"
+    "Email.Microservice:5002"
+    "ApiGateway:5000"
+)
+
+all_healthy=true
+
+for service in "${services[@]}"; do
+    IFS=':' read -r name port <<< "$service"
+    
+    if curl -s "http://localhost:$port/health" > /dev/null 2>&1; then
+        print_success "$name est en ligne (http://localhost:$port)"
+    else
+        print_error "$name n'est pas accessible sur le port $port"
+        all_healthy=false
+    fi
+done
+
+echo ""
+if [ "$all_healthy" = true ]; then
+    print_success "🎉 Tous les services sont démarrés et opérationnels !"
+    echo ""
+    echo "📋 URLs des services :"
+    echo "  🔐 Auth Service:     http://localhost:5001"
+    echo "  📧 Email Service:    http://localhost:5002"
+    echo "  🌐 API Gateway:      http://localhost:5000"
+    echo ""
+    echo "📚 Documentation Swagger :"
+    echo "  🔐 Auth Swagger:     http://localhost:5001/"
+    echo "  📧 Email Swagger:    http://localhost:5002/"
+    echo "  🌐 Gateway Swagger:  http://localhost:5000/swagger"
+    echo ""
+    echo "🔍 Logs disponibles dans le dossier 'logs/'"
+    echo "🛑 Pour arrêter tous les services: ./stop-all.sh"
 else
-    print_error "Échec du démarrage du Email Microservice"
-    docker-compose logs
-    exit 1
+    print_error "❌ Certains services ne sont pas accessibles"
+    echo "Vérifiez les logs dans le dossier 'logs/' pour plus de détails"
 fi
 
-cd ..
-
-# 2. Démarrer Auth Microservice
-print_status "Démarrage du Auth Microservice..."
-cd Auth.Microservice
-docker-compose up -d
-
-# Attendre que Auth soit prêt
-print_status "Attente que Auth Microservice soit prêt..."
-sleep 15
-
-# Vérifier que Auth est en cours d'exécution
-if docker-compose ps | grep -q "Up"; then
-    print_success "Auth Microservice démarré avec succès"
-else
-    print_error "Échec du démarrage du Auth Microservice"
-    docker-compose logs
-    exit 1
-fi
-
-cd ..
-
-# Afficher le statut final
 echo ""
-echo "🎉 Tous les microservices sont démarrés !"
-echo "========================================"
-echo ""
-echo "📋 URLs des services :"
-echo "  • Auth API:     http://localhost:5001"
-echo "  • Auth Swagger: http://localhost:5001/swagger"
-echo "  • Email API:    http://localhost:5002"
-echo "  • Email Swagger: http://localhost:5002/swagger"
-echo "  • PostgreSQL:   localhost:5433"
-echo ""
-echo "🔧 Commandes utiles :"
-echo "  • Voir les logs Auth:    cd Auth.Microservice && docker-compose logs -f"
-echo "  • Voir les logs Email:   cd Email.Microservice && docker-compose logs -f"
-echo "  • Arrêter tous:          ./stop-all.sh"
-echo "  • Statut des services:   ./status.sh"
-echo ""
-print_success "Les microservices sont prêts pour les tests !"

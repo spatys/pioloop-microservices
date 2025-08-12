@@ -37,8 +37,6 @@ builder.Services.AddSwaggerGen(c =>
         c.IncludeXmlComments(xmlPath);
     }
 
-    // Ajouter des exemples de réponses
-    c.ExampleFilters();
 });
 
 // Add MediatR
