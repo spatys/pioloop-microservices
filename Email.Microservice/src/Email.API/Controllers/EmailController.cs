@@ -221,35 +221,7 @@ public class EmailController : ControllerBase
         return Ok(ApiResponseDto<object>.SuccessResponse("Email Microservice is healthy", new { status = "healthy", timestamp = DateTime.UtcNow }));
     }
 
-    /// <summary>
-    /// Endpoint pour obtenir les informations du service
-    /// </summary>
-    /// <returns>Informations du service</returns>
-    [HttpGet("info")]
-    [ProducesResponseType(typeof(ApiResponseDto<object>), 200)]
-    public IActionResult Info()
-    {
-        var info = new
-        {
-            service = "Email Microservice",
-            version = "1.0.0",
-            environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development",
-            endpoints = new[]
-            {
-                "POST /api/email/send-email-verification",
-                "POST /api/email/send-email-account-created",
-                "POST /api/email/send-email-password-reset",
-                "POST /api/email/send-email-reservation-confirmation",
-                "POST /api/email/send-email-payment-confirmation",
-                "POST /api/email/send-email-invoice",
-                "POST /api/email/send-email-contract",
-                "GET /api/email/health",
-                "GET /api/email/info"
-            }
-        };
 
-        return Ok(ApiResponseDto<object>.SuccessResponse("Email Microservice Information", info));
-    }
 }
 
 
