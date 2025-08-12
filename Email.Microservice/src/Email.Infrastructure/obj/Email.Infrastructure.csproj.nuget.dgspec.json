@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Infrastructure\\Email.Infrastructure.csproj": {}
+    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Infrastructure\\Email.Infrastructure.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Application\\Email.Application.csproj": {
+    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Application\\Email.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Application\\Email.Application.csproj",
+        "projectUniqueName": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Application\\Email.Application.csproj",
         "projectName": "Email.Application",
-        "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Application\\Email.Application.csproj",
+        "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Application\\Email.Application.csproj",
         "packagesPath": "C:\\Users\\nanyi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Application\\obj\\",
+        "outputPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -22,7 +22,7 @@
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net9.0"
+          "net8.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -30,11 +30,11 @@
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net9.0": {
-            "targetAlias": "net9.0",
+          "net8.0": {
+            "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Domain\\Email.Domain.csproj": {
-                "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Domain\\Email.Domain.csproj"
+              "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Domain\\Email.Domain.csproj": {
+                "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Domain\\Email.Domain.csproj"
               }
             }
           }
@@ -52,8 +52,14 @@
         "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
-        "net9.0": {
-          "targetAlias": "net9.0",
+        "net8.0": {
+          "targetAlias": "net8.0",
+          "dependencies": {
+            "MediatR": {
+              "target": "Package",
+              "version": "[12.2.0, )"
+            }
+          },
           "imports": [
             "net461",
             "net462",
@@ -74,14 +80,14 @@
         }
       }
     },
-    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Domain\\Email.Domain.csproj": {
+    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Domain\\Email.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Domain\\Email.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Domain\\Email.Domain.csproj",
         "projectName": "Email.Domain",
-        "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Domain\\Email.Domain.csproj",
+        "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Domain\\Email.Domain.csproj",
         "packagesPath": "C:\\Users\\nanyi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Domain\\obj\\",
+        "outputPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -92,7 +98,7 @@
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net9.0"
+          "net8.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -100,8 +106,8 @@
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net9.0": {
-            "targetAlias": "net9.0",
+          "net8.0": {
+            "targetAlias": "net8.0",
             "projectReferences": {}
           }
         },
@@ -118,8 +124,8 @@
         "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
-        "net9.0": {
-          "targetAlias": "net9.0",
+        "net8.0": {
+          "targetAlias": "net8.0",
           "imports": [
             "net461",
             "net462",
@@ -140,14 +146,14 @@
         }
       }
     },
-    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Infrastructure\\Email.Infrastructure.csproj": {
+    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Infrastructure\\Email.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Infrastructure\\Email.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Infrastructure\\Email.Infrastructure.csproj",
         "projectName": "Email.Infrastructure",
-        "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Infrastructure\\Email.Infrastructure.csproj",
+        "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Infrastructure\\Email.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\nanyi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Infrastructure\\obj\\",
+        "outputPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -158,7 +164,7 @@
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
-          "net9.0"
+          "net8.0"
         ],
         "sources": {
           "C:\\Program Files (x86)\\Microsoft SDKs\\NuGetPackages\\": {},
@@ -166,11 +172,11 @@
           "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
-          "net9.0": {
-            "targetAlias": "net9.0",
+          "net8.0": {
+            "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Application\\Email.Application.csproj": {
-                "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Email.Microservice\\src\\Email.Application\\Email.Application.csproj"
+              "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Application\\Email.Application.csproj": {
+                "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Email.Microservice\\src\\Email.Application\\Email.Application.csproj"
               }
             }
           }
@@ -188,16 +194,16 @@
         "SdkAnalysisLevel": "9.0.200"
       },
       "frameworks": {
-        "net9.0": {
-          "targetAlias": "net9.0",
+        "net8.0": {
+          "targetAlias": "net8.0",
           "dependencies": {
             "Microsoft.Extensions.Configuration.Abstractions": {
               "target": "Package",
-              "version": "[9.0.0, )"
+              "version": "[8.0.4, )"
             },
             "Microsoft.Extensions.Configuration.Binder": {
               "target": "Package",
-              "version": "[9.0.0, )"
+              "version": "[8.0.4, )"
             }
           },
           "imports": [

@@ -76,6 +76,10 @@ dotnet run --project src/Auth.API
 ### Santé du service
 - `GET /api/auth/health` - Vérifier l'état du service
 
+### Documentation Swagger
+- **Développement**: `http://localhost:5001/`
+- **Production**: `https://api.pioloop.com/api-docs`
+
 ## 🔧 Configuration
 
 ### Variables d'environnement
@@ -114,6 +118,19 @@ dotnet ef database update --project src/Auth.Infrastructure --startup-project sr
 ```
 
 ## 🔐 Sécurité
+
+### CORS
+Le service accepte les requêtes depuis :
+- `https://api.pioloop.com` (API Gateway uniquement)
+
+**Méthodes HTTP autorisées :**
+- `GET` - Lecture des données
+- `POST` - Création de données
+- `PUT` - Mise à jour complète
+- `DELETE` - Suppression de données
+- `PATCH` - Mise à jour partielle
+
+**Note de sécurité :** Seul l'API Gateway a accès direct aux microservices. Les clients frontend doivent passer par l'API Gateway.
 
 ### JWT Authentication
 - Tokens signés avec HMAC-SHA256

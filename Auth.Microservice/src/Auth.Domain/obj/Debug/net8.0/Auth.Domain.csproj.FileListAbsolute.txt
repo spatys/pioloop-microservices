@@ -9,3 +9,15 @@ C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Auth.Microservice\src\
 C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Auth.Microservice\src\Auth.Domain\obj\Debug\net8.0\refint\Auth.Domain.dll
 C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Auth.Microservice\src\Auth.Domain\obj\Debug\net8.0\Auth.Domain.pdb
 C:\Users\nanyi\Source\Repos\Pioloop\Pioloop.Microservices\Auth.Microservice\src\Auth.Domain\obj\Debug\net8.0\ref\Auth.Domain.dll
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Auth.Microservice\src\Auth.Domain\bin\Debug\net8.0\Auth.Domain.deps.json
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Auth.Microservice\src\Auth.Domain\bin\Debug\net8.0\Auth.Domain.dll
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Auth.Microservice\src\Auth.Domain\bin\Debug\net8.0\Auth.Domain.pdb
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Auth.Microservice\src\Auth.Domain\obj\Debug\net8.0\Auth.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Auth.Microservice\src\Auth.Domain\obj\Debug\net8.0\Auth.Domain.AssemblyInfoInputs.cache
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Auth.Microservice\src\Auth.Domain\obj\Debug\net8.0\Auth.Domain.AssemblyInfo.cs
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Auth.Microservice\src\Auth.Domain\obj\Debug\net8.0\Auth.Domain.csproj.CoreCompileInputs.cache
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Auth.Microservice\src\Auth.Domain\obj\Debug\net8.0\Auth.Domain.sourcelink.json
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Auth.Microservice\src\Auth.Domain\obj\Debug\net8.0\Auth.Domain.dll
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Auth.Microservice\src\Auth.Domain\obj\Debug\net8.0\refint\Auth.Domain.dll
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Auth.Microservice\src\Auth.Domain\obj\Debug\net8.0\Auth.Domain.pdb
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Auth.Microservice\src\Auth.Domain\obj\Debug\net8.0\ref\Auth.Domain.dll

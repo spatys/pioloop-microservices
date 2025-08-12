@@ -2,6 +2,8 @@ using Microsoft.OpenApi.Models;
 using Email.Infrastructure.Services;
 using Email.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using MediatR;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,27 +11,80 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Email Microservice API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo 
+    { 
+        Title = "Email Microservice API", 
+        Version = "1.0.0",
+        Description = "API pour l'envoi d'emails dans l'écosystème Pioloop",
+        Contact = new OpenApiContact
+        {
+            Name = "Pioloop Team",
+            Email = "support@pioloop.com",
+            Url = new Uri("https://www.pioloop.com")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "MIT",
+            Url = new Uri("https://opensource.org/licenses/MIT")
+        }
+    });
+
+    // Inclure la documentation XML si elle existe
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
+
+    // Ajouter des exemples de réponses
+    c.ExampleFilters();
 });
+
+// Add MediatR
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+
 builder.Services.AddScoped<IEmailService, EmailService>();
 
-// Enable CORS for API Gateway only
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowApiGateway", policy =>
-    {
-        policy.WithOrigins("http://localhost:5002")
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
+            // Enable CORS for API Gateway only
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowApiGateway", policy =>
+                {
+                    policy.WithOrigins(
+                             "https://api.pioloop.com",          // Production API Gateway
+                             "http://localhost:5000"              // Local API Gateway (HTTP)
+                           )
+                          .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH")
+                          .AllowAnyHeader();
+                });
+            });
 
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Email Microservice API v1.0.0");
+        c.RoutePrefix = string.Empty; // Pour accéder à Swagger à la racine
+        c.DocumentTitle = "Email Microservice API Documentation";
+        c.DefaultModelsExpandDepth(-1); // Masquer les modèles par défaut
+    });
+}
+else
+{
+    // En production, on peut toujours avoir Swagger mais avec une route différente
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Email Microservice API v1.0.0");
+        c.RoutePrefix = "api-docs"; // Route sécurisée pour la production
+        c.DocumentTitle = "Email Microservice API Documentation";
+        c.DefaultModelsExpandDepth(-1);
+    });
 }
 
 // Enable CORS
@@ -39,9 +94,6 @@ app.UseHttpsRedirection();
 
 app.MapControllers();
 
-// Configure the application to listen on the correct port
-app.Urls.Clear();
-app.Urls.Add("http://0.0.0.0:80");
 
 app.Run();
 

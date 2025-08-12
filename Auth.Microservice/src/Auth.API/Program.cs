@@ -10,6 +10,7 @@ using Auth.Domain.Interfaces;
 using Auth.Domain.Services;
 using Auth.Infrastructure.Services;
 using Auth.Application.Handlers;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,7 +21,23 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Auth Microservice API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo 
+    { 
+        Title = "Auth Microservice API", 
+        Version = "1.0.0",
+        Description = "API pour l'authentification et la gestion des utilisateurs dans l'écosystème Pioloop",
+        Contact = new OpenApiContact
+        {
+            Name = "Pioloop Team",
+            Email = "support@pioloop.com",
+            Url = new Uri("https://www.pioloop.com")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "MIT",
+            Url = new Uri("https://opensource.org/licenses/MIT")
+        }
+    });
     
     // Add JWT authentication to Swagger
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -46,6 +63,17 @@ builder.Services.AddSwaggerGen(c =>
             new string[] {}
         }
     });
+
+    // Inclure la documentation XML si elle existe
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
+
+    // Ajouter des exemples de réponses
+    c.ExampleFilters();
 });
 
 // Database
@@ -86,31 +114,23 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserPasswordRepository, UserPasswordRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 
-// Enable CORS for API Gateway only
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowApiGateway", policy =>
-    {
-        policy.WithOrigins("http://localhost:5002")
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
+            // Enable CORS for API Gateway only
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowApiGateway", policy =>
+                {
+                    policy.WithOrigins(
+                            "https://api.pioloop.com",          // Production API Gateway
+                            "http://localhost:5000"              // Local API Gateway (HTTP)
+                          )
+                          .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH")
+                          .AllowAnyHeader();
+                });
+            });
 
 // Services
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
-
-// CORS
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAll", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
-    });
-});
 
 var app = builder.Build();
 
@@ -120,7 +140,22 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth Microservice API V1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth Microservice API v1.0.0");
+        c.RoutePrefix = string.Empty; // Pour accéder à Swagger à la racine
+        c.DocumentTitle = "Auth Microservice API Documentation";
+        c.DefaultModelsExpandDepth(-1); // Masquer les modèles par défaut
+    });
+}
+else
+{
+    // En production, on peut toujours avoir Swagger mais avec une route différente
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Auth Microservice API v1.0.0");
+        c.RoutePrefix = "api-docs"; // Route sécurisée pour la production
+        c.DocumentTitle = "Auth Microservice API Documentation";
+        c.DefaultModelsExpandDepth(-1);
     });
 }
 
@@ -129,7 +164,8 @@ app.UseCors("AllowApiGateway");
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+// Remove the old AllowAll CORS policy
+// app.UseCors("AllowAll");
 
 app.UseAuthentication();
 app.UseAuthorization();
@@ -142,9 +178,5 @@ using (var scope = app.Services.CreateScope())
     var context = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
     context.Database.EnsureCreated();
 }
-
-// Configure the application to listen on the correct port
-app.Urls.Clear();
-app.Urls.Add("http://0.0.0.0:80");
 
 app.Run();

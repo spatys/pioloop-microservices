@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.API\\Auth.API.csproj": {}
+    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.API\\Auth.API.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.API\\Auth.API.csproj": {
+    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.API\\Auth.API.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.API\\Auth.API.csproj",
+        "projectUniqueName": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.API\\Auth.API.csproj",
         "projectName": "Auth.API",
-        "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.API\\Auth.API.csproj",
+        "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.API\\Auth.API.csproj",
         "packagesPath": "C:\\Users\\nanyi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.API\\obj\\",
+        "outputPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.API\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -33,11 +33,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Application\\Auth.Application.csproj": {
-                "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Application\\Auth.Application.csproj"
+              "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Application\\Auth.Application.csproj": {
+                "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Application\\Auth.Application.csproj"
               },
-              "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Infrastructure\\Auth.Infrastructure.csproj": {
-                "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Infrastructure\\Auth.Infrastructure.csproj"
+              "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Infrastructure\\Auth.Infrastructure.csproj": {
+                "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Infrastructure\\Auth.Infrastructure.csproj"
               }
             }
           }
@@ -64,25 +64,25 @@
             },
             "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[8.0.4, )"
             },
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[8.0.4, )"
             },
             "Microsoft.EntityFrameworkCore.Design": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[8.0.4, )"
             },
             "Microsoft.Extensions.DependencyInjection": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[8.0.4, )"
             },
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[8.0.4, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
@@ -112,14 +112,14 @@
         }
       }
     },
-    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Application\\Auth.Application.csproj": {
+    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Application\\Auth.Application.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Application\\Auth.Application.csproj",
+        "projectUniqueName": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Application\\Auth.Application.csproj",
         "projectName": "Auth.Application",
-        "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Application\\Auth.Application.csproj",
+        "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Application\\Auth.Application.csproj",
         "packagesPath": "C:\\Users\\nanyi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Application\\obj\\",
+        "outputPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Application\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -141,8 +141,8 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Domain\\Auth.Domain.csproj": {
-                "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Domain\\Auth.Domain.csproj"
+              "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Domain\\Auth.Domain.csproj": {
+                "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Domain\\Auth.Domain.csproj"
               }
             }
           }
@@ -169,7 +169,19 @@
             },
             "Microsoft.Extensions.Configuration.Abstractions": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[8.0.4, )"
+            },
+            "Microsoft.Extensions.Configuration.Binder": {
+              "target": "Package",
+              "version": "[8.0.4, )"
+            },
+            "Microsoft.IdentityModel.Tokens": {
+              "target": "Package",
+              "version": "[7.4.0, )"
+            },
+            "System.IdentityModel.Tokens.Jwt": {
+              "target": "Package",
+              "version": "[7.4.0, )"
             }
           },
           "imports": [
@@ -192,14 +204,14 @@
         }
       }
     },
-    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Domain\\Auth.Domain.csproj": {
+    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Domain\\Auth.Domain.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Domain\\Auth.Domain.csproj",
+        "projectUniqueName": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Domain\\Auth.Domain.csproj",
         "projectName": "Auth.Domain",
-        "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Domain\\Auth.Domain.csproj",
+        "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Domain\\Auth.Domain.csproj",
         "packagesPath": "C:\\Users\\nanyi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Domain\\obj\\",
+        "outputPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Domain\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -258,14 +270,14 @@
         }
       }
     },
-    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Infrastructure\\Auth.Infrastructure.csproj": {
+    "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Infrastructure\\Auth.Infrastructure.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Infrastructure\\Auth.Infrastructure.csproj",
+        "projectUniqueName": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Infrastructure\\Auth.Infrastructure.csproj",
         "projectName": "Auth.Infrastructure",
-        "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Infrastructure\\Auth.Infrastructure.csproj",
+        "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Infrastructure\\Auth.Infrastructure.csproj",
         "packagesPath": "C:\\Users\\nanyi\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Infrastructure\\obj\\",
+        "outputPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Infrastructure\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -287,11 +299,11 @@
           "net8.0": {
             "targetAlias": "net8.0",
             "projectReferences": {
-              "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Application\\Auth.Application.csproj": {
-                "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Application\\Auth.Application.csproj"
+              "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Application\\Auth.Application.csproj": {
+                "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Application\\Auth.Application.csproj"
               },
-              "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Domain\\Auth.Domain.csproj": {
-                "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\Pioloop.Microservices\\Auth.Microservice\\src\\Auth.Domain\\Auth.Domain.csproj"
+              "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Domain\\Auth.Domain.csproj": {
+                "projectPath": "C:\\Users\\nanyi\\Source\\Repos\\Pioloop\\pioloop-microservices\\Auth.Microservice\\src\\Auth.Domain\\Auth.Domain.csproj"
               }
             }
           }
@@ -314,33 +326,33 @@
           "dependencies": {
             "Microsoft.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[8.0.4, )"
             },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[8.0.4, )"
             },
             "Microsoft.Extensions.Configuration": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[8.0.4, )"
             },
             "Microsoft.Extensions.Configuration.Abstractions": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[8.0.4, )"
             },
             "Microsoft.IdentityModel.Tokens": {
               "target": "Package",
-              "version": "[7.0.3, )"
+              "version": "[7.4.0, )"
             },
             "Npgsql.EntityFrameworkCore.PostgreSQL": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[8.0.4, )"
             },
             "System.IdentityModel.Tokens.Jwt": {
               "target": "Package",
-              "version": "[7.0.3, )"
+              "version": "[7.4.0, )"
             }
           },
           "imports": [

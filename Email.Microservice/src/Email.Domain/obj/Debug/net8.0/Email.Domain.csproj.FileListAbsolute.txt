@@ -1,0 +1,12 @@
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Email.Microservice\src\Email.Domain\bin\Debug\net8.0\Email.Domain.deps.json
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Email.Microservice\src\Email.Domain\bin\Debug\net8.0\Email.Domain.dll
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Email.Microservice\src\Email.Domain\bin\Debug\net8.0\Email.Domain.pdb
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Email.Microservice\src\Email.Domain\obj\Debug\net8.0\Email.Domain.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Email.Microservice\src\Email.Domain\obj\Debug\net8.0\Email.Domain.AssemblyInfoInputs.cache
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Email.Microservice\src\Email.Domain\obj\Debug\net8.0\Email.Domain.AssemblyInfo.cs
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Email.Microservice\src\Email.Domain\obj\Debug\net8.0\Email.Domain.csproj.CoreCompileInputs.cache
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Email.Microservice\src\Email.Domain\obj\Debug\net8.0\Email.Domain.sourcelink.json
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Email.Microservice\src\Email.Domain\obj\Debug\net8.0\Email.Domain.dll
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Email.Microservice\src\Email.Domain\obj\Debug\net8.0\refint\Email.Domain.dll
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Email.Microservice\src\Email.Domain\obj\Debug\net8.0\Email.Domain.pdb
+C:\Users\nanyi\Source\Repos\Pioloop\pioloop-microservices\Email.Microservice\src\Email.Domain\obj\Debug\net8.0\ref\Email.Domain.dll

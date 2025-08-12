@@ -1,102 +1,254 @@
 using Microsoft.AspNetCore.Mvc;
-using Email.Domain.Interfaces;
+using MediatR;
+using Email.Application.DTOs;
 using Email.Application.DTOs.Request;
+using Email.Application.Handlers;
 
 namespace Email.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
+[Produces("application/json")]
+[ProducesResponseType(typeof(ApiResponseDto<object>), 200)]
+[ProducesResponseType(typeof(ApiResponseDto<object>), 400)]
+[ProducesResponseType(typeof(ApiResponseDto<object>), 500)]
 public class EmailController : ControllerBase
 {
-    private readonly IEmailService _emailService;
+    private readonly IMediator _mediator;
 
-    public EmailController(IEmailService emailService)
+    public EmailController(IMediator mediator)
     {
-        _emailService = emailService;
+        _mediator = mediator;
     }
 
+    /// <summary>
+    /// Envoie un email de vérification avec un code de confirmation
+    /// </summary>
+    /// <param name="request">Données de la demande d'envoi d'email de vérification</param>
+    /// <returns>Résultat de l'envoi de l'email</returns>
     [HttpPost("send-email-verification")]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 200)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 400)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 500)]
     public async Task<IActionResult> SendEmailVerification([FromBody] SendEmailVerificationRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Code))
+        var command = new SendEmailVerificationCommand(request.Email, request.Code);
+        var result = await _mediator.Send(command);
+
+        if (result.Success)
         {
-            return BadRequest(new { success = false, message = "Email et code requis" });
+            return Ok(result);
         }
 
-        await _emailService.SendEmailVerificationAsync(request.Email, request.Code);
-        return Ok(new { success = true });
+        if (result.ErrorType == "ValidationError")
+        {
+            return BadRequest(result);
+        }
+
+        return StatusCode(500, result);
     }
 
+    /// <summary>
+    /// Envoie un email de bienvenue lors de la création d'un compte
+    /// </summary>
+    /// <param name="request">Données de la demande d'envoi d'email de bienvenue</param>
+    /// <returns>Résultat de l'envoi de l'email</returns>
     [HttpPost("send-email-account-created")]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 200)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 400)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 500)]
     public async Task<IActionResult> SendEmailAccountCreated([FromBody] SendEmailAccountCreatedRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.FirstName) || string.IsNullOrWhiteSpace(request.LastName))
+        var command = new SendEmailAccountCreatedCommand(request.Email, request.FirstName, request.LastName);
+        var result = await _mediator.Send(command);
+
+        if (result.Success)
         {
-            return BadRequest(new { success = false, message = "Email, prénom et nom requis" });
+            return Ok(result);
         }
 
-        await _emailService.SendEmailAccountCreatedAsync(request.Email, request.FirstName, request.LastName);
-        return Ok(new { success = true });
+        if (result.ErrorType == "ValidationError")
+        {
+            return BadRequest(result);
+        }
+
+        return StatusCode(500, result);
     }
 
+    /// <summary>
+    /// Envoie un email de réinitialisation de mot de passe
+    /// </summary>
+    /// <param name="request">Données de la demande d'envoi d'email de réinitialisation</param>
+    /// <returns>Résultat de l'envoi de l'email</returns>
     [HttpPost("send-email-password-reset")]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 200)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 400)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 500)]
     public async Task<IActionResult> SendEmailPasswordReset([FromBody] SendEmailPasswordResetRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.ResetToken))
+        var command = new SendEmailPasswordResetCommand(request.Email, request.ResetToken);
+        var result = await _mediator.Send(command);
+
+        if (result.Success)
         {
-            return BadRequest(new { success = false, message = "Email et token de réinitialisation requis" });
+            return Ok(result);
         }
 
-        await _emailService.SendEmailPasswordResetAsync(request.Email, request.ResetToken);
-        return Ok(new { success = true });
+        if (result.ErrorType == "ValidationError")
+        {
+            return BadRequest(result);
+        }
+
+        return StatusCode(500, result);
     }
 
+    /// <summary>
+    /// Envoie un email de confirmation de réservation
+    /// </summary>
+    /// <param name="request">Données de la demande d'envoi d'email de confirmation de réservation</param>
+    /// <returns>Résultat de l'envoi de l'email</returns>
     [HttpPost("send-email-reservation-confirmation")]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 200)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 400)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 500)]
     public async Task<IActionResult> SendEmailReservationConfirmation([FromBody] SendEmailReservationConfirmationRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.ReservationDetails))
+        var command = new SendEmailReservationConfirmationCommand(request.Email, request.ReservationDetails);
+        var result = await _mediator.Send(command);
+
+        if (result.Success)
         {
-            return BadRequest(new { success = false, message = "Email et détails de réservation requis" });
+            return Ok(result);
         }
 
-        await _emailService.SendEmailReservationConfirmationAsync(request.Email, request.ReservationDetails);
-        return Ok(new { success = true });
+        if (result.ErrorType == "ValidationError")
+        {
+            return BadRequest(result);
+        }
+
+        return StatusCode(500, result);
     }
 
+    /// <summary>
+    /// Envoie un email de confirmation de paiement
+    /// </summary>
+    /// <param name="request">Données de la demande d'envoi d'email de confirmation de paiement</param>
+    /// <returns>Résultat de l'envoi de l'email</returns>
     [HttpPost("send-email-payment-confirmation")]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 200)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 400)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 500)]
     public async Task<IActionResult> SendEmailPaymentConfirmation([FromBody] SendEmailPaymentConfirmationRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.PaymentDetails))
+        var command = new SendEmailPaymentConfirmationCommand(request.Email, request.PaymentDetails);
+        var result = await _mediator.Send(command);
+
+        if (result.Success)
         {
-            return BadRequest(new { success = false, message = "Email et détails de paiement requis" });
+            return Ok(result);
         }
 
-        await _emailService.SendEmailPaymentConfirmationAsync(request.Email, request.PaymentDetails);
-        return Ok(new { success = true });
+        if (result.ErrorType == "ValidationError")
+        {
+            return BadRequest(result);
+        }
+
+        return StatusCode(500, result);
     }
 
+    /// <summary>
+    /// Envoie un email de facture
+    /// </summary>
+    /// <param name="request">Données de la demande d'envoi d'email de facture</param>
+    /// <returns>Résultat de l'envoi de l'email</returns>
     [HttpPost("send-email-invoice")]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 200)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 400)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 500)]
     public async Task<IActionResult> SendEmailInvoice([FromBody] SendEmailInvoiceRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.InvoiceNumber) || string.IsNullOrWhiteSpace(request.InvoiceUrl))
+        var command = new SendEmailInvoiceCommand(request.Email, request.InvoiceNumber, request.InvoiceUrl);
+        var result = await _mediator.Send(command);
+
+        if (result.Success)
         {
-            return BadRequest(new { success = false, message = "Email, numéro de facture et URL requis" });
+            return Ok(result);
         }
 
-        await _emailService.SendEmailInvoiceAsync(request.Email, request.InvoiceNumber, request.InvoiceUrl);
-        return Ok(new { success = true });
+        if (result.ErrorType == "ValidationError")
+        {
+            return BadRequest(result);
+        }
+
+        return StatusCode(500, result);
     }
 
+    /// <summary>
+    /// Envoie un email de contrat
+    /// </summary>
+    /// <param name="request">Données de la demande d'envoi d'email de contrat</param>
+    /// <returns>Résultat de l'envoi de l'email</returns>
     [HttpPost("send-email-contract")]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 200)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 400)]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 500)]
     public async Task<IActionResult> SendEmailContract([FromBody] SendEmailContractRequest request)
     {
-        if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.ContractNumber) || string.IsNullOrWhiteSpace(request.ContractUrl))
+        var command = new SendEmailContractCommand(request.Email, request.ContractNumber, request.ContractUrl);
+        var result = await _mediator.Send(command);
+
+        if (result.Success)
         {
-            return BadRequest(new { success = false, message = "Email, numéro de contrat et URL requis" });
+            return Ok(result);
         }
 
-        await _emailService.SendEmailContractAsync(request.Email, request.ContractNumber, request.ContractUrl);
-        return Ok(new { success = true });
+        if (result.ErrorType == "ValidationError")
+        {
+            return BadRequest(result);
+        }
+
+        return StatusCode(500, result);
+    }
+
+    /// <summary>
+    /// Endpoint de santé pour vérifier que le service fonctionne
+    /// </summary>
+    /// <returns>Statut du service</returns>
+    [HttpGet("health")]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 200)]
+    public IActionResult Health()
+    {
+        return Ok(ApiResponseDto<object>.SuccessResponse("Email Microservice is healthy", new { status = "healthy", timestamp = DateTime.UtcNow }));
+    }
+
+    /// <summary>
+    /// Endpoint pour obtenir les informations du service
+    /// </summary>
+    /// <returns>Informations du service</returns>
+    [HttpGet("info")]
+    [ProducesResponseType(typeof(ApiResponseDto<object>), 200)]
+    public IActionResult Info()
+    {
+        var info = new
+        {
+            service = "Email Microservice",
+            version = "1.0.0",
+            environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development",
+            endpoints = new[]
+            {
+                "POST /api/email/send-email-verification",
+                "POST /api/email/send-email-account-created",
+                "POST /api/email/send-email-password-reset",
+                "POST /api/email/send-email-reservation-confirmation",
+                "POST /api/email/send-email-payment-confirmation",
+                "POST /api/email/send-email-invoice",
+                "POST /api/email/send-email-contract",
+                "GET /api/email/health",
+                "GET /api/email/info"
+            }
+        };
+
+        return Ok(ApiResponseDto<object>.SuccessResponse("Email Microservice Information", info));
     }
 }
 
