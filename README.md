@@ -70,8 +70,22 @@ POST http://localhost:5000/api/auth/login
   "password": "password"
 }
 
-# Inscription utilisateur
-POST http://localhost:5000/api/auth/register
+# Inscription utilisateur (3 étapes)
+# Étape 1: Enregistrement email
+POST http://localhost:5000/api/auth/register-email
+{
+  "email": "user@example.com"
+}
+
+# Étape 2: Vérification email
+POST http://localhost:5000/api/auth/register-verify-email
+{
+  "email": "user@example.com",
+  "code": "123456"
+}
+
+# Étape 3: Finalisation inscription
+POST http://localhost:5000/api/auth/register-complete
 {
   "email": "user@example.com",
   "password": "password",

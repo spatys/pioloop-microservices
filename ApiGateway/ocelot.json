@@ -32,19 +32,7 @@
       "UpstreamHttpMethod": [ "POST" ],
       "SwaggerKey": "auth"
     },
-    {
-      "DownstreamPathTemplate": "/api/auth/register",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 5001
-        }
-      ],
-      "UpstreamPathTemplate": "/api/auth/register",
-      "UpstreamHttpMethod": [ "POST" ],
-      "SwaggerKey": "auth"
-    },
+
     {
       "DownstreamPathTemplate": "/api/email/{everything}",
       "DownstreamScheme": "http",

@@ -82,7 +82,9 @@ EmailService__Url=http://localhost:5002
 | Méthode | Endpoint | Description | Auth Requise |
 |---------|----------|-------------|--------------|
 | `POST` | `/api/auth/login` | Connexion utilisateur | ❌ |
-| `POST` | `/api/auth/register` | Inscription utilisateur | ❌ |
+| `POST` | `/api/auth/register-email` | Étape 1: Enregistrement email | ❌ |
+| `POST` | `/api/auth/register-verify-email` | Étape 2: Vérification email | ❌ |
+| `POST` | `/api/auth/register-complete` | Étape 3: Finalisation inscription | ❌ |
 | `POST` | `/api/auth/verify-email` | Vérification email | ✅ |
 | `GET` | `/api/auth/users/{id}` | Récupérer utilisateur | ✅ |
 
@@ -107,11 +109,13 @@ EmailService__Url=http://localhost:5002
 
 ### Endpoints publics (sans authentification)
 - `/api/auth/login`
-- `/api/auth/register`
+- `/api/auth/register-email`
+- `/api/auth/register-verify-email`
+- `/api/auth/register-complete`
 - `/api/email/*` (tous les endpoints email)
 
 ### Endpoints protégés (authentification requise)
-- `/api/auth/*` (sauf login et register)
+- `/api/auth/*` (sauf login et endpoints d'inscription)
 
 ### Utilisation du token JWT
 
@@ -199,6 +203,11 @@ curl http://localhost:5000/health
 curl -X POST "http://localhost:5000/api/auth/login" \
   -H "Content-Type: application/json" \
   -d '{"email":"user@example.com","password":"password"}'
+
+# Inscription (3 étapes)
+curl -X POST "http://localhost:5000/api/auth/register-email" \
+  -H "Content-Type: application/json" \
+  -d '{"email":"user@example.com"}'
 
 # Utilisation du token
 curl -X GET "http://localhost:5000/api/auth/users/1" \
