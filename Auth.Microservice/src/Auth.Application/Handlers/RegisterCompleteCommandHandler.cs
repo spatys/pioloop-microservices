@@ -153,14 +153,14 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
 
             // Générer le token et renvoyer LoginResponseDto (le contrôleur posera le cookie et videra le token)
             var token = _jwtService.GenerateToken(updatedUser, roles);
-            var response = new LoginResponseDto
+            var loginResponse = new LoginResponseDto
             {
                 Token = token,
                 User = userDto,
                 ExpiresAt = DateTime.UtcNow.AddHours(Convert.ToDouble(_configuration["JwtSettings:ExpirationHours"] ?? "24"))
             };
 
-            return ApiResponseDto<LoginResponseDto>.FromSuccess(response, "Inscription complétée avec succès");
+            return ApiResponseDto<LoginResponseDto>.FromSuccess(loginResponse, "Inscription complétée avec succès");
         }
         catch (Exception ex)
         {
