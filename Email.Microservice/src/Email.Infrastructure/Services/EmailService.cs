@@ -113,7 +113,7 @@ public class EmailService : IEmailService
 
     public async Task SendEmailVerificationAsync(string to, string confirmationCode)
     {
-        var expirationMinutes = _configuration.GetValue<int>("Auth:EmailVerificationExpiration", 10);
+        var expirationMinutes = _configuration.GetValue<int>("Auth:EmailVerificationExpiration", 1);
         var subject = "Confirmez votre email - Pioloop";
         var body = $@"
             <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;'>
@@ -136,6 +136,7 @@ public class EmailService : IEmailService
                     <p style='color: #999; font-size: 12px; text-align: center;'>
                         Si vous n'avez pas créé de compte avec Pioloop, veuillez ignorer cet email.
                     </p>
+                    <p style='text-align: center; margin-top: 15px; color: #555; font-weight: 600;'>L'équipe Pioloop</p>
                 </div>
             </div>";
 
@@ -168,6 +169,7 @@ public class EmailService : IEmailService
                     <p style='color: #999; font-size: 12px; text-align: center;'>
                         Merci de faire confiance à Pioloop pour vos besoins.
                     </p>
+                    <p style='text-align: center; margin-top: 15px; color: #555; font-weight: 600;'>L'équipe Pioloop</p>
                 </div>
             </div>";
 
@@ -198,6 +200,7 @@ public class EmailService : IEmailService
                     <p style='color: #999; font-size: 12px; text-align: center;'>
                         Si vous n'avez pas demandé cette réinitialisation, contactez immédiatement notre support.
                     </p>
+                    <p style='text-align: center; margin-top: 15px; color: #555; font-weight: 600;'>L'équipe Pioloop</p>
                 </div>
             </div>";
 
@@ -225,6 +228,7 @@ public class EmailService : IEmailService
                     <p style='color: #999; font-size: 12px; text-align: center;'>
                         Pour toute question, n'hésitez pas à nous contacter.
                     </p>
+                    <p style='text-align: center; margin-top: 15px; color: #555; font-weight: 600;'>L'équipe Pioloop</p>
                 </div>
             </div>";
 
@@ -252,6 +256,7 @@ public class EmailService : IEmailService
                     <p style='color: #999; font-size: 12px; text-align: center;'>
                         Merci de votre confiance en Pioloop.
                     </p>
+                    <p style='text-align: center; margin-top: 15px; color: #555; font-weight: 600;'>L'équipe Pioloop</p>
                 </div>
             </div>";
 
@@ -284,6 +289,7 @@ public class EmailService : IEmailService
                     <p style='color: #999; font-size: 12px; text-align: center;'>
                         Pour toute question concernant cette facture, contactez notre service comptabilité.
                     </p>
+                    <p style='text-align: center; margin-top: 15px; color: #555; font-weight: 600;'>L'équipe Pioloop</p>
                 </div>
             </div>";
 
@@ -316,6 +322,7 @@ public class EmailService : IEmailService
                     <p style='color: #999; font-size: 12px; text-align: center;'>
                         Pour toute question concernant ce contrat, contactez notre service juridique.
                     </p>
+                    <p style='text-align: center; margin-top: 15px; color: #555; font-weight: 600;'>L'équipe Pioloop</p>
                 </div>
             </div>";
 

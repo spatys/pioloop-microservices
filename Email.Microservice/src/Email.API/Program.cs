@@ -4,6 +4,7 @@ using Email.Domain.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using System.Reflection;
+using Email.Application.Handlers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,9 +40,8 @@ builder.Services.AddSwaggerGen(c =>
 
 });
 
-// Add MediatR
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(Assembly.GetExecutingAssembly()));
+// Add MediatR (register handlers from Application assembly)
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SendEmailVerificationHandler).Assembly));
 
 builder.Services.AddScoped<IEmailService, EmailService>();
 

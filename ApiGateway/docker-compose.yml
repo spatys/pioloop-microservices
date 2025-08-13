@@ -35,7 +35,8 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
-      - ConnectionStrings__DefaultConnection=Host=auth-db;Database=pioloop_auth;Username=pioloop;Password=pioloop123
+      - ConnectionStrings__DefaultConnection=Host=auth-db;Database=pioloop_auth;Username=pioloop12345;Password=piolOOP_&!?12345
+      - EmailApi__BaseUrl=http://email-microservice
     # No file logs mounted; logs via Docker stdout
     networks:
       - pioloop-network
@@ -60,6 +61,12 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
+      - EmailSettings__SmtpServer=smtp.gmail.com
+      - EmailSettings__SmtpPort=587
+      - EmailSettings__SmtpUsername=nanyim.alain@gmail.com
+      - EmailSettings__SmtpPassword=ekcc pfre ybmb iuol
+      - EmailSettings__FromEmail=noreply@pioloop.com
+      - EmailSettings__FromName=Pioloop
     # No file logs mounted; logs via Docker stdout
     networks:
       - pioloop-network
@@ -78,14 +85,14 @@ services:
       - "5433:5432"
     environment:
       - POSTGRES_DB=pioloop_auth
-      - POSTGRES_USER=pioloop
-      - POSTGRES_PASSWORD=pioloop123
+      - POSTGRES_USER=pioloop12345
+      - POSTGRES_PASSWORD=piolOOP_&!?12345
     volumes:
       - auth-db-data:/var/lib/postgresql/data
     networks:
       - pioloop-network
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U pioloop -d pioloop_auth"]
+      test: ["CMD-SHELL", "pg_isready -U pioloop12345 -d pioloop_auth"]
       interval: 10s
       timeout: 5s
       retries: 5
