@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MediatR;
 using Auth.Infrastructure.Data;
 using Auth.Infrastructure.Repositories;
@@ -104,6 +105,19 @@ builder.Services.AddAuthentication(options =>
         ValidateLifetime = true,
         ClockSkew = TimeSpan.Zero
     };
+
+    // Read JWT from HttpOnly cookie 'auth_token'
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            if (context.Request.Cookies.TryGetValue("auth_token", out var token))
+            {
+                context.Token = token;
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
 // MediatR
@@ -120,11 +134,12 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
                 options.AddPolicy("AllowApiGateway", policy =>
                 {
                     policy.WithOrigins(
-                            "https://api.pioloop.com",          // Production API Gateway
-                            "http://localhost:5000"              // Local API Gateway (HTTP)
+                            "https://api.pioloop.com",  // Production API Gateway
+                            "http://localhost:5000" // Local API Gateway (HTTP)
                           )
                           .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH")
-                          .AllowAnyHeader();
+                          .AllowAnyHeader()
+                          .AllowCredentials();
                 });
             });
 
