@@ -9,28 +9,31 @@ using Microsoft.Extensions.Configuration;
 
 namespace Auth.Application.Handlers;
 
-public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCommand, ApiResponseDto<UserDto>>
+public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCommand, ApiResponseDto<LoginResponseDto>>
 {
     private readonly IUserRepository _userRepository;
     private readonly IUserPasswordRepository _userPasswordRepository;
     private readonly IPasswordService _passwordService;
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
+    private readonly IJwtService _jwtService;
 
     public RegisterCompleteCommandHandler(
         IUserRepository userRepository,
         IUserPasswordRepository userPasswordRepository,
         IPasswordService passwordService,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IJwtService jwtService)
     {
         _userRepository = userRepository;
         _userPasswordRepository = userPasswordRepository;
         _passwordService = passwordService;
         _httpClient = new HttpClient();
         _configuration = configuration;
+        _jwtService = jwtService;
     }
 
-    public async Task<ApiResponseDto<UserDto>> Handle(RegisterCompleteCommand request, CancellationToken cancellationToken)
+    public async Task<ApiResponseDto<LoginResponseDto>> Handle(RegisterCompleteCommand request, CancellationToken cancellationToken)
     {
         try
         {
@@ -73,14 +76,14 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
 
             if (fieldErrors.Count > 0)
             {
-                return ApiResponseDto<UserDto>.ValidationError(fieldErrors);
+                return ApiResponseDto<LoginResponseDto>.ValidationError(fieldErrors);
             }
 
             // Recherche de l'utilisateur existant
             var user = await _userRepository.GetByEmailAsync(request.Email);
             if (user == null)
             {
-                return ApiResponseDto<UserDto>.ValidationError(new Dictionary<string, string>
+                return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
                 {
                     ["email"] = "Utilisateur non trouvé"
                 });
@@ -89,7 +92,7 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
             // Vérification que l'email est confirmé
             if (!user.EmailConfirmed)
             {
-                return ApiResponseDto<UserDto>.ValidationError(new Dictionary<string, string>
+                return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
                 {
                     ["email"] = "L'email doit être vérifié avant de compléter l'inscription"
                 });
@@ -144,11 +147,24 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
                 Roles = new List<string>()
             };
 
-            return ApiResponseDto<UserDto>.FromSuccess(userDto, "Inscription complétée avec succès");
+            // Ajouter les rôles au DTO et générer le token via service
+            var roles = (await _userRepository.GetUserRolesAsync(updatedUser.Id)).ToList();
+            userDto.Roles = roles;
+
+            // Générer le token et renvoyer LoginResponseDto (le contrôleur posera le cookie et videra le token)
+            var token = _jwtService.GenerateToken(updatedUser, roles);
+            var response = new LoginResponseDto
+            {
+                Token = token,
+                User = userDto,
+                ExpiresAt = DateTime.UtcNow.AddHours(Convert.ToDouble(_configuration["JwtSettings:ExpirationHours"] ?? "24"))
+            };
+
+            return ApiResponseDto<LoginResponseDto>.FromSuccess(response, "Inscription complétée avec succès");
         }
         catch (Exception ex)
         {
-            return ApiResponseDto<UserDto>.Error("Erreur interne du serveur");
+            return ApiResponseDto<LoginResponseDto>.Error("Erreur interne du serveur");
         }
     }
 }

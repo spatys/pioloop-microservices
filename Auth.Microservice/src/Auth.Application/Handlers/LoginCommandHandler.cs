@@ -18,17 +18,20 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
     private readonly IUserPasswordRepository _userPasswordRepository;
     private readonly IPasswordService _passwordService;
     private readonly IConfiguration _configuration;
+    private readonly IJwtService _jwtService;
 
     public LoginCommandHandler(
         IUserRepository userRepository,
         IUserPasswordRepository userPasswordRepository,
         IPasswordService passwordService,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IJwtService jwtService)
     {
         _userRepository = userRepository;
         _userPasswordRepository = userPasswordRepository;
         _passwordService = passwordService;
         _configuration = configuration;
+        _jwtService = jwtService;
     }
 
     public async Task<ApiResponseDto<LoginResponseDto>> Handle(LoginCommand request, CancellationToken cancellationToken)
@@ -86,8 +89,9 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
             user.UpdateLastLogin();
             await _userRepository.UpdateAsync(user);
 
-            // Génération du token JWT
-            var token = GenerateJwtToken(user);
+            // Récupération des rôles et génération du token JWT via service
+            var roles = (await _userRepository.GetUserRolesAsync(user.Id)).ToList();
+            var token = _jwtService.GenerateToken(user, roles);
 
             // Création du DTO utilisateur
             var userDto = new UserDto
@@ -122,28 +126,5 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
         }
     }
 
-    private string GenerateJwtToken(User user)
-    {
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JwtSettings:SecretKey"] ?? "default-secret-key"));
-        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
-        var claims = new List<Claim>
-        {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Name, user.GetFullName()),
-            new Claim("email_confirmed", user.EmailConfirmed.ToString()),
-            new Claim("consent_accepted", user.ConsentAccepted.ToString())
-        };
-
-        var token = new JwtSecurityToken(
-            issuer: _configuration["JwtSettings:Issuer"],
-            audience: _configuration["JwtSettings:Audience"],
-            claims: claims,
-            expires: DateTime.UtcNow.AddHours(Convert.ToDouble(_configuration["JwtSettings:ExpirationHours"])),
-            signingCredentials: credentials
-        );
-
-        return new JwtSecurityTokenHandler().WriteToken(token);
-    }
+    // removed local token generation; now uses IJwtService
 }

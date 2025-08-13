@@ -1,9 +1,13 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Configuration;
 using MediatR;
 using Auth.Application.Commands;
 using Auth.Application.Queries;
 using Auth.Application.DTOs.Request;
 using Auth.Application.DTOs.Response;
+using Auth.Domain.Interfaces;
 
 namespace Auth.API.Controllers;
 
@@ -12,10 +16,14 @@ namespace Auth.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly IHostEnvironment _env;
+    private readonly IConfiguration _configuration;
 
-    public AuthController(IMediator mediator)
+    public AuthController(IMediator mediator, IHostEnvironment env, IConfiguration configuration)
     {
         _mediator = mediator;
+        _env = env;
+        _configuration = configuration;
     }
 
     /// <summary>
@@ -81,9 +89,9 @@ public class AuthController : ControllerBase
     /// <param name="request">Complete user profile information</param>
     /// <returns>Registration completed successfully with user data</returns>
     [HttpPost("register/register-complete")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<UserDto>))]
-    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponseDto<UserDto>))]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<UserDto>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<LoginResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponseDto<LoginResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<LoginResponseDto>))]
     public async Task<IActionResult> RegisterComplete([FromBody] RegisterCompleteRequest request)
     {
         var command = new RegisterCompleteCommand
@@ -101,6 +109,19 @@ public class AuthController : ControllerBase
         
         if (result.Success)
         {
+            // Poser le cookie HttpOnly et vider le token (le handler a généré le token)
+            if (result.Data is not null && !string.IsNullOrWhiteSpace(result.Data.Token))
+            {
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = _env.IsProduction(),
+                    SameSite = SameSiteMode.Lax,
+                    Expires = result.Data.ExpiresAt
+                };
+                Response.Cookies.Append("auth_token", result.Data.Token, cookieOptions);
+                result.Data.Token = string.Empty;
+            }
             return Ok(result);
         }
         
@@ -128,6 +149,19 @@ public class AuthController : ControllerBase
         
         if (result.Success)
         {
+            // Poser le cookie HttpOnly côté backend et vider le token du body
+            if (result.Data is not null && !string.IsNullOrWhiteSpace(result.Data.Token))
+            {
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    Secure = _env.IsProduction(),
+                    SameSite = SameSiteMode.Lax,
+                    Expires = result.Data.ExpiresAt
+                };
+                Response.Cookies.Append("auth_token", result.Data.Token, cookieOptions);
+                result.Data.Token = string.Empty;
+            }
             return Ok(result);
         }
         
