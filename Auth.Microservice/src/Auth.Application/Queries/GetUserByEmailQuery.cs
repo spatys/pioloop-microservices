@@ -3,7 +3,7 @@ using Auth.Application.DTOs.Response;
 
 namespace Auth.Application.Queries;
 
-public class GetUserByEmailQuery : IRequest<ApiResponseDto<UserDto>>
+public class GetUserByEmailQuery : IRequest<ApiResponseDto<ApplicationUserDto>>
 {
     public string Email { get; set; } = string.Empty;
 }

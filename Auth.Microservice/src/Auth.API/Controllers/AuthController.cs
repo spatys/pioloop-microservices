@@ -174,9 +174,9 @@ public class AuthController : ControllerBase
     /// <param name="id">User ID</param>
     /// <returns>User data</returns>
     [HttpGet("users/{id}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<UserDto>))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiResponseDto<UserDto>))]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<UserDto>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<ApplicationUserDto>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiResponseDto<ApplicationUserDto>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<ApplicationUserDto>))]
     public async Task<IActionResult> GetUserById(Guid id)
     {
         var query = new GetUserByIdQuery { Id = id };
@@ -196,9 +196,9 @@ public class AuthController : ControllerBase
     /// <param name="email">User email</param>
     /// <returns>User data</returns>
     [HttpGet("users/email/{email}")]
-    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<UserDto>))]
-    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiResponseDto<UserDto>))]
-    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<UserDto>))]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<ApplicationUserDto>))]
+    [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ApiResponseDto<ApplicationUserDto>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<ApplicationUserDto>))]
     public async Task<IActionResult> GetUserByEmail(string email)
     {
         var query = new GetUserByEmailQuery { Email = email };

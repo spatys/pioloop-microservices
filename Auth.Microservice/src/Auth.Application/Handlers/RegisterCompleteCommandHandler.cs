@@ -1,33 +1,27 @@
 using MediatR;
 using Auth.Application.Commands;
 using Auth.Application.DTOs.Response;
-using Auth.Domain.Interfaces;
-using Auth.Domain.Entities;
 using Auth.Domain.Services;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Identity;
+using Auth.Domain.Identity;
 
 namespace Auth.Application.Handlers;
 
 public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCommand, ApiResponseDto<LoginResponseDto>>
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IUserPasswordRepository _userPasswordRepository;
-    private readonly IPasswordService _passwordService;
+    private readonly UserManager<ApplicationUser> _userManager;
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
     private readonly IJwtService _jwtService;
 
     public RegisterCompleteCommandHandler(
-        IUserRepository userRepository,
-        IUserPasswordRepository userPasswordRepository,
-        IPasswordService passwordService,
+        UserManager<ApplicationUser> userManager,
         IConfiguration configuration,
         IJwtService jwtService)
     {
-        _userRepository = userRepository;
-        _userPasswordRepository = userPasswordRepository;
-        _passwordService = passwordService;
+        _userManager = userManager;
         _httpClient = new HttpClient();
         _configuration = configuration;
         _jwtService = jwtService;
@@ -80,7 +74,7 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
             }
 
             // Recherche de l'utilisateur existant
-            var user = await _userRepository.GetByEmailAsync(request.Email);
+            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
                 return ApiResponseDto<LoginResponseDto>.ValidationError(new Dictionary<string, string>
@@ -99,20 +93,36 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
             }
 
             // Mise à jour du profil utilisateur
-            user.UpdateProfile(request.FirstName, request.LastName, request.PhoneNumber);
+            user.FirstName = request.FirstName;
+            user.LastName = request.LastName;
+            user.PhoneNumber = request.PhoneNumber;
             
             if (request.AcceptConsent)
             {
-                user.AcceptConsent();
+                user.ConsentAccepted = true;
+                user.ConsentAcceptedAt = DateTime.UtcNow;
             }
 
             // Mise à jour de l'utilisateur
-            var updatedUser = await _userRepository.UpdateAsync(user);
+            var updateResult = await _userManager.UpdateAsync(user);
+            if (!updateResult.Succeeded)
+            {
+                return ApiResponseDto<LoginResponseDto>.Error("Echec de mise à jour utilisateur");
+            }
+            var updatedUser = user;
 
             // Hashage et sauvegarde du mot de passe
-            var passwordHash = _passwordService.HashPassword(request.Password, out var passwordSalt);
-            var userPassword = new UserPassword(user.Id, passwordHash, passwordSalt);
-            await _userPasswordRepository.CreateAsync(userPassword);
+            var pwdResult = await _userManager.AddPasswordAsync(user, request.Password);
+            if (!pwdResult.Succeeded)
+            {
+                return ApiResponseDto<LoginResponseDto>.Error("Echec de définition du mot de passe");
+            }
+
+            // Ajouter rôle par défaut Tenant
+            if (!await _userManager.IsInRoleAsync(user, "Tenant"))
+            {
+                await _userManager.AddToRoleAsync(user, "Tenant");
+            }
 
             // Envoi de l'email de bienvenue
             try
@@ -130,7 +140,7 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
             catch { /* ignore send failures */ }
 
             // Création du DTO utilisateur
-            var userDto = new UserDto
+            var userDto = new ApplicationUserDto
             {
                 Id = updatedUser.Id,
                 Email = updatedUser.Email,
@@ -148,11 +158,15 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
             };
 
             // Ajouter les rôles au DTO et générer le token via service
-            var roles = (await _userRepository.GetUserRolesAsync(updatedUser.Id)).ToList();
+            var roles = (await _userManager.GetRolesAsync(updatedUser)).ToList();
             userDto.Roles = roles;
 
             // Générer le token et renvoyer LoginResponseDto (le contrôleur posera le cookie et videra le token)
-            var token = _jwtService.GenerateToken(updatedUser, roles);
+            var token = _jwtService.GenerateToken(updatedUser.Id, updatedUser.Email!, updatedUser.GetFullName(), roles, new Dictionary<string,string>
+            {
+                ["EmailConfirmed"] = updatedUser.EmailConfirmed.ToString(),
+                ["IsActive"] = updatedUser.IsActive.ToString()
+            });
             var loginResponse = new LoginResponseDto
             {
                 Token = token,

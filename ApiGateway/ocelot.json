@@ -27,6 +27,36 @@
       "SwaggerKey": "auth"
     },
     {
+      "DownstreamPathTemplate": "/api/roles",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        { "Host": "auth-microservice", "Port": 80 }
+      ],
+      "UpstreamPathTemplate": "/api/roles",
+      "UpstreamHttpMethod": ["POST"],
+      "SwaggerKey": "auth"
+    },
+    {
+      "DownstreamPathTemplate": "/api/roles/assign",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        { "Host": "auth-microservice", "Port": 80 }
+      ],
+      "UpstreamPathTemplate": "/api/roles/assign",
+      "UpstreamHttpMethod": ["POST"],
+      "SwaggerKey": "auth"
+    },
+    {
+      "DownstreamPathTemplate": "/api/roles/remove",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        { "Host": "auth-microservice", "Port": 80 }
+      ],
+      "UpstreamPathTemplate": "/api/roles/remove",
+      "UpstreamHttpMethod": ["POST"],
+      "SwaggerKey": "auth"
+    },
+    {
       "DownstreamPathTemplate": "/api/email/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [

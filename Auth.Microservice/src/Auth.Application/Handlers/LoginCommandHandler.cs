@@ -1,35 +1,28 @@
 using MediatR;
 using Auth.Application.Commands;
 using Auth.Application.DTOs.Response;
-using Auth.Domain.Interfaces;
-using Auth.Domain.Entities;
 using Auth.Domain.Services;
 using Microsoft.Extensions.Configuration;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.IdentityModel.Tokens;
-using System.Security.Claims;
-using System.Text;
+using Microsoft.AspNetCore.Identity;
+using Auth.Domain.Identity;
 
 namespace Auth.Application.Handlers;
 
 public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<LoginResponseDto>>
 {
-    private readonly IUserRepository _userRepository;
-    private readonly IUserPasswordRepository _userPasswordRepository;
-    private readonly IPasswordService _passwordService;
+    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly SignInManager<ApplicationUser> _signInManager;
     private readonly IConfiguration _configuration;
     private readonly IJwtService _jwtService;
 
     public LoginCommandHandler(
-        IUserRepository userRepository,
-        IUserPasswordRepository userPasswordRepository,
-        IPasswordService passwordService,
+        UserManager<ApplicationUser> userManager,
+        SignInManager<ApplicationUser> signInManager,
         IConfiguration configuration,
         IJwtService jwtService)
     {
-        _userRepository = userRepository;
-        _userPasswordRepository = userPasswordRepository;
-        _passwordService = passwordService;
+        _userManager = userManager;
+        _signInManager = signInManager;
         _configuration = configuration;
         _jwtService = jwtService;
     }
@@ -55,8 +48,8 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
                 return ApiResponseDto<LoginResponseDto>.ValidationError(errors);
             }
 
-            // Recherche de l'utilisateur par email
-            var user = await _userRepository.GetByEmailAsync(request.Email);
+            // Recherche de l'utilisateur par email via Identity
+            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
                 // Email inexistant => message spécifique
@@ -66,10 +59,9 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
                 return ApiResponseDto<LoginResponseDto>.ValidationError(errors);
             }
 
-            // Vérification du mot de passe
-            var userPassword = await _userPasswordRepository.GetByUserIdAsync(user.Id);
-            var isPasswordValid = userPassword != null && _passwordService.VerifyPassword(request.Password, userPassword.PasswordHash, userPassword.PasswordSalt);
-            if (!isPasswordValid)
+            // Vérification du mot de passe via SignInManager
+            var signInResult = await _signInManager.CheckPasswordSignInAsync(user, request.Password, lockoutOnFailure: false);
+            if (!signInResult.Succeeded)
             {
                 errors["password"] = "Mot de passe incorrect";
             }
@@ -86,18 +78,22 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
             }
 
             // Mise à jour de la dernière connexion
-            user.UpdateLastLogin();
-            await _userRepository.UpdateAsync(user);
+            user.LastLoginAt = DateTime.UtcNow;
+            await _userManager.UpdateAsync(user);
 
             // Récupération des rôles et génération du token JWT via service
-            var roles = (await _userRepository.GetUserRolesAsync(user.Id)).ToList();
-            var token = _jwtService.GenerateToken(user, roles);
+            var roles = (await _userManager.GetRolesAsync(user)).ToList();
+            var token = _jwtService.GenerateToken(user.Id, user.Email!, user.GetFullName(), roles, new Dictionary<string,string>
+            {
+                ["EmailConfirmed"] = user.EmailConfirmed.ToString(),
+                ["IsActive"] = user.IsActive.ToString()
+            });
 
             // Création du DTO utilisateur
-            var userDto = new UserDto
+            var userDto = new ApplicationUserDto
             {
                 Id = user.Id,
-                Email = user.Email,
+                Email = user.Email!,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 FullName = user.GetFullName(),

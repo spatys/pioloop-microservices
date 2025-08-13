@@ -1,18 +1,18 @@
 using MediatR;
 using Auth.Application.Commands;
 using Auth.Application.DTOs.Response;
-using Auth.Domain.Interfaces;
-using Auth.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Auth.Domain.Identity;
 
 namespace Auth.Application.Handlers;
 
 public class RegisterVerifyEmailCommandHandler : IRequestHandler<RegisterVerifyEmailCommand, ApiResponseDto<RegisterVerifyEmailResponseDto>>
 {
-    private readonly IUserRepository _userRepository;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public RegisterVerifyEmailCommandHandler(IUserRepository userRepository)
+    public RegisterVerifyEmailCommandHandler(UserManager<ApplicationUser> userManager)
     {
-        _userRepository = userRepository;
+        _userManager = userManager;
     }
 
     public async Task<ApiResponseDto<RegisterVerifyEmailResponseDto>> Handle(RegisterVerifyEmailCommand request, CancellationToken cancellationToken)
@@ -37,7 +37,7 @@ public class RegisterVerifyEmailCommandHandler : IRequestHandler<RegisterVerifyE
             }
 
             // Recherche de l'utilisateur
-            var user = await _userRepository.GetByEmailAsync(request.Email);
+            var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
                 return ApiResponseDto<RegisterVerifyEmailResponseDto>.ValidationError(new Dictionary<string, string>
@@ -50,11 +50,9 @@ public class RegisterVerifyEmailCommandHandler : IRequestHandler<RegisterVerifyE
             if (user.IsEmailCodeValid(request.Code))
             {
                 // Confirmation de l'email
-                user.ConfirmEmail();
+                user.EmailConfirmed = true;
                 user.ResetEmailCodeAttempts();
-                
-                // Mise à jour de l'utilisateur
-                await _userRepository.UpdateAsync(user);
+                await _userManager.UpdateAsync(user);
 
                 var responseDto = new RegisterVerifyEmailResponseDto
                 {
@@ -69,7 +67,7 @@ public class RegisterVerifyEmailCommandHandler : IRequestHandler<RegisterVerifyE
             {
                 // Incrémentation des tentatives
                 user.IncrementEmailCodeAttempts();
-                await _userRepository.UpdateAsync(user);
+                await _userManager.UpdateAsync(user);
 
                 return ApiResponseDto<RegisterVerifyEmailResponseDto>.ValidationError(new Dictionary<string, string>
                 {

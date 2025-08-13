@@ -1,8 +1,8 @@
 using MediatR;
 using Auth.Application.Commands;
 using Auth.Application.DTOs.Response;
-using Auth.Domain.Interfaces;
-using Auth.Domain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Auth.Domain.Identity;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Configuration;
 
@@ -10,15 +10,15 @@ namespace Auth.Application.Handlers;
 
 public class RegisterEmailCommandHandler : IRequestHandler<RegisterEmailCommand, ApiResponseDto<RegisterEmailResponseDto>>
 {
-    private readonly IUserRepository _userRepository;
+    private readonly UserManager<ApplicationUser> _userManager;
     private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
 
     public RegisterEmailCommandHandler(
-        IUserRepository userRepository,
+        UserManager<ApplicationUser> userManager,
         IConfiguration configuration)
     {
-        _userRepository = userRepository;
+        _userManager = userManager;
         _httpClient = new HttpClient();
         _configuration = configuration;
     }
@@ -45,7 +45,8 @@ public class RegisterEmailCommandHandler : IRequestHandler<RegisterEmailCommand,
             }
 
             // Vérification si l'email existe déjà
-            if (await _userRepository.EmailExistsAsync(request.Email))
+            var existing = await _userManager.FindByEmailAsync(request.Email);
+            if (existing != null)
             {
                 return ApiResponseDto<RegisterEmailResponseDto>.ValidationError(new Dictionary<string, string>
                 {
@@ -54,16 +55,21 @@ public class RegisterEmailCommandHandler : IRequestHandler<RegisterEmailCommand,
             }
 
             // Création d'un utilisateur temporaire avec email uniquement
-            var user = new User(request.Email, "", "");
+            var user = new ApplicationUser { UserName = request.Email, Email = request.Email };
             user.GenerateEmailVerificationCode();
 
             // Sauvegarde de l'utilisateur temporaire
-            var createdUser = await _userRepository.CreateAsync(user);
+            var createResult = await _userManager.CreateAsync(user);
+            if (!createResult.Succeeded)
+            {
+                return ApiResponseDto<RegisterEmailResponseDto>.Error("Echec de création d'utilisateur");
+            }
+            var createdUser = user;
 
             // Appel Email MS pour envoyer le code
             try
             {
-                var emailApiUrl = _configuration["EmailApi:BaseUrl"] ?? "http://localhost:5002";
+                var emailApiUrl = _configuration["EmailApi:BaseUrl"] ?? "http://email-microservice";
                 var payload = new
                 {
                     Email = createdUser.Email,

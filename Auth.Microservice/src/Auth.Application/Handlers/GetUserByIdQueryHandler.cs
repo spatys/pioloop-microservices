@@ -1,33 +1,34 @@
 using MediatR;
 using Auth.Application.Queries;
 using Auth.Application.DTOs.Response;
-using Auth.Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Auth.Domain.Identity;
 
 namespace Auth.Application.Handlers;
 
-public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, ApiResponseDto<UserDto>>
+public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, ApiResponseDto<ApplicationUserDto>>
 {
-    private readonly IUserRepository _userRepository;
+    private readonly UserManager<ApplicationUser> _userManager;
 
-    public GetUserByIdQueryHandler(IUserRepository userRepository)
+    public GetUserByIdQueryHandler(UserManager<ApplicationUser> userManager)
     {
-        _userRepository = userRepository;
+        _userManager = userManager;
     }
 
-    public async Task<ApiResponseDto<UserDto>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
+    public async Task<ApiResponseDto<ApplicationUserDto>> Handle(GetUserByIdQuery request, CancellationToken cancellationToken)
     {
         try
         {
-            var user = await _userRepository.GetByIdAsync(request.Id);
+            var user = await _userManager.FindByIdAsync(request.Id.ToString());
             if (user == null)
             {
-                return ApiResponseDto<UserDto>.Error("Utilisateur non trouvé");
+                return ApiResponseDto<ApplicationUserDto>.Error("Utilisateur non trouvé");
             }
 
-            var userDto = new UserDto
+            var userDto = new ApplicationUserDto
             {
                 Id = user.Id,
-                Email = user.Email,
+                Email = user.Email!,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
                 FullName = user.GetFullName(),
@@ -38,14 +39,14 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, ApiResp
                 EmailConfirmed = user.EmailConfirmed,
                 ConsentAccepted = user.ConsentAccepted,
                 ConsentAcceptedAt = user.ConsentAcceptedAt,
-                Roles = new List<string>() // TODO: Ajouter les rôles
+                Roles = new List<string>()
             };
 
-            return ApiResponseDto<UserDto>.FromSuccess(userDto, "Utilisateur trouvé");
+            return ApiResponseDto<ApplicationUserDto>.FromSuccess(userDto, "Utilisateur trouvé");
         }
         catch (Exception ex)
         {
-            return ApiResponseDto<UserDto>.Error("Erreur interne du serveur");
+            return ApiResponseDto<ApplicationUserDto>.Error("Erreur interne du serveur");
         }
     }
 }

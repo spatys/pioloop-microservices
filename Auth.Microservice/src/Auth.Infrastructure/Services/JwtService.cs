@@ -3,7 +3,6 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
-using Auth.Domain.Entities;
 using Auth.Domain.Services;
 
 namespace Auth.Infrastructure.Services;
@@ -17,18 +16,22 @@ public class JwtService : IJwtService
         _configuration = configuration;
     }
 
-    public string GenerateToken(User user, IEnumerable<string> roles)
+    public string GenerateToken(Guid userId, string email, string fullName, IEnumerable<string> roles, IDictionary<string,string>? extraClaims = null)
     {
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new Claim(ClaimTypes.Email, user.Email),
-            new Claim(ClaimTypes.Name, user.GetFullName()),
-            new Claim("FirstName", user.FirstName),
-            new Claim("LastName", user.LastName),
-            new Claim("IsActive", user.IsActive.ToString()),
-            new Claim("EmailConfirmed", user.EmailConfirmed.ToString())
+            new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+            new Claim(ClaimTypes.Email, email),
+            new Claim(ClaimTypes.Name, fullName)
         };
+
+        if (extraClaims != null)
+        {
+            foreach (var kvp in extraClaims)
+            {
+                claims.Add(new Claim(kvp.Key, kvp.Value));
+            }
+        }
 
         foreach (var role in roles)
         {

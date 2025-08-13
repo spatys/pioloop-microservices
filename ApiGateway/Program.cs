@@ -165,9 +165,6 @@ app.UseAuthorization();
 // Routes API classiques (doivent être AVANT Ocelot pour ne pas être interceptées)
 app.MapControllers();
 
-// Endpoint de santé local (hors Ocelot)
-app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Service = "API Gateway", Timestamp = DateTime.UtcNow }));
-
 // Ocelot + SwaggerForOcelot (terminal)
 app.UseSwaggerForOcelotUI().UseOcelot().Wait();
 

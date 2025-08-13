@@ -6,6 +6,8 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MediatR;
 using Auth.Infrastructure.Data;
+using Microsoft.AspNetCore.Identity;
+using Auth.Domain.Identity;
 using Auth.Infrastructure.Repositories;
 using Auth.Domain.Interfaces;
 using Auth.Domain.Services;
@@ -81,6 +83,19 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddDbContext<AuthDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Identity
+builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
+{
+    options.User.RequireUniqueEmail = true;
+    options.Password.RequireDigit = false;
+    options.Password.RequireLowercase = false;
+    options.Password.RequireUppercase = false;
+    options.Password.RequireNonAlphanumeric = false;
+    options.Password.RequiredLength = 8;
+})
+    .AddEntityFrameworkStores<AuthDbContext>()
+    .AddDefaultTokenProviders();
+
 // JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("Jwt");
 var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"] ?? "default-secret-key-32-chars-long");
@@ -123,10 +138,7 @@ builder.Services.AddAuthentication(options =>
 // MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(LoginCommandHandler).Assembly));
 
-// Repositories
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserPasswordRepository, UserPasswordRepository>();
-builder.Services.AddScoped<IRoleRepository, RoleRepository>();
+// Repositories - supprimés (on passera par Identity)
 
             // Enable CORS for API Gateway only
             builder.Services.AddCors(options =>
@@ -144,7 +156,6 @@ builder.Services.AddScoped<IRoleRepository, RoleRepository>();
             });
 
 // Services
-builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 
 var app = builder.Build();
@@ -173,11 +184,21 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Ensure database is created
+// Ensure database is migrated and seed roles
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    context.Database.EnsureCreated();
+    context.Database.Migrate();
+
+    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+    var requiredRoles = new[] { "Tenant", "Owner", "Manager", "Admin" };
+    foreach (var role in requiredRoles)
+    {
+        if (!await roleManager.RoleExistsAsync(role))
+        {
+            await roleManager.CreateAsync(new IdentityRole<Guid>(role));
+        }
+    }
 }
 
 app.Run();
