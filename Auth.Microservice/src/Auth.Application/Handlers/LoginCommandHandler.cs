@@ -122,7 +122,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
         }
         catch (Exception ex)
         {
-            return ApiResponseDto<LoginResponseDto>.Error("Erreur interne du serveur");
+            return ApiResponseDto<LoginResponseDto>.Error(ex.Message);
         }
     }
 

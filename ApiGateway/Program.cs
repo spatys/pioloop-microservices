@@ -162,14 +162,13 @@ app.UseCors("Policy");
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Ocelot + SwaggerForOcelot
-// Important: SwaggerForOcelot doit être avant les MapControllers
-app.UseSwaggerForOcelotUI().UseOcelot().Wait();
-
-// Routes API classiques
+// Routes API classiques (doivent être AVANT Ocelot pour ne pas être interceptées)
 app.MapControllers();
 
-// Endpoint de santé
+// Endpoint de santé local (hors Ocelot)
 app.MapGet("/health", () => Results.Ok(new { Status = "Healthy", Service = "API Gateway", Timestamp = DateTime.UtcNow }));
+
+// Ocelot + SwaggerForOcelot (terminal)
+app.UseSwaggerForOcelotUI().UseOcelot().Wait();
 
 app.Run();
