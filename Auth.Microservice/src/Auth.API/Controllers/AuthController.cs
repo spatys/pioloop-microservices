@@ -7,7 +7,6 @@ using Auth.Application.Commands;
 using Auth.Application.Queries;
 using Auth.Application.DTOs.Request;
 using Auth.Application.DTOs.Response;
-using Auth.Domain.Interfaces;
 
 namespace Auth.API.Controllers;
 

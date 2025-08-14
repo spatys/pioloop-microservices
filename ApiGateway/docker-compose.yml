@@ -37,6 +37,20 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - ConnectionStrings__DefaultConnection=Host=auth-db;Database=pioloop_auth;Username=pioloop12345;Password=piolOOP_&!?12345
       - EmailApi__BaseUrl=http://email-microservice
+      # JWT Settings
+      - JwtSettings__SecretKey=Pioloop2025SecretKey32CharsLong!@#
+      - JwtSettings__Issuer=Pioloop
+      - JwtSettings__Audience=PioloopUsers
+      - JwtSettings__ExpirationHours=24
+      # Email Settings
+      - EmailSettings__SmtpServer=smtp.gmail.com
+      - EmailSettings__SmtpPort=587
+      - EmailSettings__SmtpUsername=nanyim.alain@gmail.com
+      - EmailSettings__SmtpPassword=ekcc pfre ybmb iuol
+      - EmailSettings__FromEmail=noreply@pioloop.com
+      - EmailSettings__FromName=Pioloop
+      # Auth Settings
+      - Auth__EmailVerificationExpiration=1
     # No file logs mounted; logs via Docker stdout
     networks:
       - pioloop-network

@@ -3,15 +3,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 using MediatR;
 using Auth.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using Auth.Domain.Identity;
-using Auth.Infrastructure.Repositories;
-using Auth.Domain.Interfaces;
 using Auth.Domain.Services;
 using Auth.Infrastructure.Services;
+using Auth.Infrastructure.Extensions;
 using Auth.Application.Handlers;
 using System.Reflection;
 
@@ -97,7 +95,7 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
     .AddDefaultTokenProviders();
 
 // JWT Authentication
-var jwtSettings = builder.Configuration.GetSection("Jwt");
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"] ?? "default-secret-key-32-chars-long");
 
 builder.Services.AddAuthentication(options =>
@@ -157,6 +155,7 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Login
 
 // Services
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IDatabaseSeedService, DatabaseSeedService>();
 
 var app = builder.Build();
 
@@ -184,21 +183,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Ensure database is migrated and seed roles
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
-    context.Database.Migrate();
-
-    var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
-    var requiredRoles = new[] { "Tenant", "Owner", "Manager", "Admin" };
-    foreach (var role in requiredRoles)
-    {
-        if (!await roleManager.RoleExistsAsync(role))
-        {
-            await roleManager.CreateAsync(new IdentityRole<Guid>(role));
-        }
-    }
-}
+// Initialize database (migrations + seed)
+await app.InitializeDatabaseAsync();
 
 app.Run();
