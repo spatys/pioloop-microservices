@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 using Microsoft.Extensions.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Auth.Domain.Identity;
+using Auth.Application.Utils;
 
 namespace Auth.Application.Handlers;
 
@@ -107,7 +108,8 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
             var updateResult = await _userManager.UpdateAsync(user);
             if (!updateResult.Succeeded)
             {
-                return ApiResponseDto<LoginResponseDto>.Error("Echec de mise à jour utilisateur");
+                var mappedErrors = UserManagerErrorMapper.MapUserErrors(updateResult.Errors);
+                return ApiResponseDto<LoginResponseDto>.ValidationError(mappedErrors);
             }
             var updatedUser = user;
 
@@ -115,7 +117,8 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
             var pwdResult = await _userManager.AddPasswordAsync(user, request.Password);
             if (!pwdResult.Succeeded)
             {
-                return ApiResponseDto<LoginResponseDto>.Error("Echec de définition du mot de passe");
+                var mappedErrors = UserManagerErrorMapper.MapPasswordErrors(pwdResult.Errors);
+                return ApiResponseDto<LoginResponseDto>.ValidationError(mappedErrors);
             }
 
             // Ajouter rôle par défaut Tenant

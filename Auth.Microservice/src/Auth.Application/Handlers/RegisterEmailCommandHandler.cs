@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Auth.Domain.Identity;
 using System.Net.Http.Json;
 using Microsoft.Extensions.Configuration;
+using Auth.Application.Utils;
 
 namespace Auth.Application.Handlers;
 
@@ -62,7 +63,8 @@ public class RegisterEmailCommandHandler : IRequestHandler<RegisterEmailCommand,
             var createResult = await _userManager.CreateAsync(user);
             if (!createResult.Succeeded)
             {
-                return ApiResponseDto<RegisterEmailResponseDto>.Error("Echec de création d'utilisateur");
+                var mappedErrors = UserManagerErrorMapper.MapUserErrors(createResult.Errors);
+                return ApiResponseDto<RegisterEmailResponseDto>.ValidationError(mappedErrors);
             }
             var createdUser = user;
 

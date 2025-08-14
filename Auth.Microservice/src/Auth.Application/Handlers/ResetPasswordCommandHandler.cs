@@ -3,6 +3,7 @@ using Auth.Application.Commands;
 using Auth.Application.DTOs.Response;
 using Microsoft.AspNetCore.Identity;
 using Auth.Domain.Identity;
+using Auth.Application.Utils;
 
 namespace Auth.Application.Handlers;
 
@@ -87,10 +88,8 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand,
             var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
             if (!result.Succeeded)
             {
-                return ApiResponseDto<object>.ValidationError(new Dictionary<string, string>
-                {
-                    ["token"] = "Token de réinitialisation invalide ou expiré"
-                });
+                var mappedErrors = UserManagerErrorMapper.MapPasswordErrors(result.Errors);
+                return ApiResponseDto<object>.ValidationError(mappedErrors);
             }
 
             return ApiResponseDto<object>.FromSuccess(null, "Mot de passe réinitialisé avec succès");

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Auth.Domain.Identity;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
+using Auth.Application.Utils;
 
 namespace Auth.Application.Handlers;
 
@@ -100,11 +101,8 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
             var result = await _userManager.ChangePasswordAsync(user, request.CurrentPassword, request.NewPassword);
             if (!result.Succeeded)
             {
-                var errors = result.Errors.Select(e => e.Description).ToList();
-                return ApiResponseDto<object>.ValidationError(new Dictionary<string, string>
-                {
-                    ["newPassword"] = string.Join(", ", errors)
-                });
+                var mappedErrors = UserManagerErrorMapper.MapPasswordErrors(result.Errors);
+                return ApiResponseDto<object>.ValidationError(mappedErrors);
             }
 
             return ApiResponseDto<object>.FromSuccess(null, "Mot de passe changé avec succès");
