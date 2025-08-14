@@ -4,6 +4,7 @@ using Auth.Application.DTOs.Response;
 using Microsoft.AspNetCore.Identity;
 using Auth.Domain.Identity;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace Auth.Application.Handlers;
 

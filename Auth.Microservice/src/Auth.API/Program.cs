@@ -156,6 +156,7 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Login
 // Services
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IDatabaseSeedService, DatabaseSeedService>();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 
