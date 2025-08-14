@@ -40,6 +40,71 @@
       "SwaggerKey": "auth"
     },
     {
+      "DownstreamPathTemplate": "/api/auth/me",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "auth-microservice",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/auth/me",
+      "UpstreamHttpMethod": ["GET"],
+      "SwaggerKey": "auth"
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/logout",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "auth-microservice",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/auth/logout",
+      "UpstreamHttpMethod": ["POST"],
+      "SwaggerKey": "auth"
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/change-password",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "auth-microservice",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/auth/change-password",
+      "UpstreamHttpMethod": ["POST"],
+      "SwaggerKey": "auth"
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/request-password-reset",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "auth-microservice",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/auth/request-password-reset",
+      "UpstreamHttpMethod": ["POST"],
+      "SwaggerKey": "auth"
+    },
+    {
+      "DownstreamPathTemplate": "/api/auth/reset-password",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "auth-microservice",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/auth/reset-password",
+      "UpstreamHttpMethod": ["POST"],
+      "SwaggerKey": "auth"
+    },
+    {
       "DownstreamPathTemplate": "/api/roles",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [

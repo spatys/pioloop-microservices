@@ -239,6 +239,121 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Get current user information
+    /// </summary>
+    /// <returns>Current user data</returns>
+    [HttpGet("me")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<ApplicationUserDto>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ApiResponseDto<ApplicationUserDto>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<ApplicationUserDto>))]
+    public async Task<IActionResult> GetCurrentUser()
+    {
+        var query = new GetCurrentUserQuery();
+        var result = await _mediator.Send(query);
+        
+        if (result.Success)
+        {
+            return Ok(result);
+        }
+        
+        return Unauthorized(result);
+    }
+
+    /// <summary>
+    /// Logout user
+    /// </summary>
+    /// <returns>Logout confirmation</returns>
+    [HttpPost("logout")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<object>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<object>))]
+    public async Task<IActionResult> Logout()
+    {
+        var command = new LogoutCommand();
+        var result = await _mediator.Send(command);
+        
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Change user password
+    /// </summary>
+    /// <param name="request">Password change request</param>
+    /// <returns>Password change confirmation</returns>
+    [HttpPost("change-password")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<object>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponseDto<object>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ApiResponseDto<object>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<object>))]
+    public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequest request)
+    {
+        var command = new ChangePasswordCommand
+        {
+            CurrentPassword = request.CurrentPassword,
+            NewPassword = request.NewPassword,
+            ConfirmNewPassword = request.ConfirmNewPassword
+        };
+
+        var result = await _mediator.Send(command);
+        
+        if (result.Success)
+        {
+            return Ok(result);
+        }
+        
+        return BadRequest(result);
+    }
+
+    /// <summary>
+    /// Request password reset
+    /// </summary>
+    /// <param name="request">Password reset request</param>
+    /// <returns>Password reset email sent confirmation</returns>
+    [HttpPost("request-password-reset")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<object>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponseDto<object>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<object>))]
+    public async Task<IActionResult> RequestPasswordReset([FromBody] RequestPasswordResetRequest request)
+    {
+        var command = new RequestPasswordResetCommand
+        {
+            Email = request.Email
+        };
+
+        var result = await _mediator.Send(command);
+        
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Reset password with token
+    /// </summary>
+    /// <param name="request">Password reset with token request</param>
+    /// <returns>Password reset confirmation</returns>
+    [HttpPost("reset-password")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<object>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponseDto<object>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<object>))]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        var command = new ResetPasswordCommand
+        {
+            Email = request.Email,
+            Token = request.Token,
+            NewPassword = request.NewPassword,
+            ConfirmNewPassword = request.ConfirmNewPassword
+        };
+
+        var result = await _mediator.Send(command);
+        
+        if (result.Success)
+        {
+            return Ok(result);
+        }
+        
+        return BadRequest(result);
+    }
+
+    /// <summary>
     /// Health check endpoint
     /// </summary>
     /// <returns>Health status</returns>
