@@ -17,10 +17,11 @@ public class RegisterEmailCommandHandler : IRequestHandler<RegisterEmailCommand,
 
     public RegisterEmailCommandHandler(
         UserManager<ApplicationUser> userManager,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        HttpClient httpClient)
     {
         _userManager = userManager;
-        _httpClient = new HttpClient();
+        _httpClient = httpClient;
         _configuration = configuration;
     }
 

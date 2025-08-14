@@ -20,10 +20,11 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
     public RegisterCompleteCommandHandler(
         UserManager<ApplicationUser> userManager,
         IConfiguration configuration,
-        IJwtService jwtService)
+        IJwtService jwtService,
+        HttpClient httpClient)
     {
         _userManager = userManager;
-        _httpClient = new HttpClient();
+        _httpClient = httpClient;
         _configuration = configuration;
         _jwtService = jwtService;
     }

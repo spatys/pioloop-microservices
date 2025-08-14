@@ -158,6 +158,9 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IDatabaseSeedService, DatabaseSeedService>();
 builder.Services.AddHttpContextAccessor();
 
+// HttpClient for Email Microservice communication
+builder.Services.AddHttpClient();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
