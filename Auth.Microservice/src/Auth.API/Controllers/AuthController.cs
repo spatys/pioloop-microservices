@@ -81,6 +81,33 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Resend email verification code
+    /// Sends a new verification code to user's email if the previous one expired or was lost
+    /// </summary>
+    /// <param name="request">Email address</param>
+    /// <returns>New verification code sent successfully</returns>
+    [HttpPost("register/resend-email-code")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<ResendEmailCodeResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponseDto<ResendEmailCodeResponseDto>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<ResendEmailCodeResponseDto>))]
+    public async Task<IActionResult> ResendEmailCode([FromBody] ResendEmailCodeRequest request)
+    {
+        var command = new ResendEmailCodeCommand
+        {
+            Email = request.Email
+        };
+
+        var result = await _mediator.Send(command);
+        
+        if (result.Success)
+        {
+            return Ok(result);
+        }
+        
+        return BadRequest(result);
+    }
+
+    /// <summary>
     /// Step 3: Complete registration with profile details
     /// Finalizes user registration with personal information and password
     /// Requires email to be verified from Step 2

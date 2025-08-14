@@ -27,6 +27,19 @@
       "SwaggerKey": "auth"
     },
     {
+      "DownstreamPathTemplate": "/api/auth/register/resend-email-code",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "auth-microservice",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/auth/register/resend-email-code",
+      "UpstreamHttpMethod": ["POST"],
+      "SwaggerKey": "auth"
+    },
+    {
       "DownstreamPathTemplate": "/api/roles",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
