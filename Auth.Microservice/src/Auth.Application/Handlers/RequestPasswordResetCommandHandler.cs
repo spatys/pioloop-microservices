@@ -3,8 +3,8 @@ using Auth.Application.Commands;
 using Auth.Application.DTOs.Response;
 using Microsoft.AspNetCore.Identity;
 using Auth.Domain.Identity;
-using System.Net.Http.Json;
 using Microsoft.Extensions.Configuration;
+using System.Net.Http.Json;
 
 namespace Auth.Application.Handlers;
 
@@ -16,11 +16,12 @@ public class RequestPasswordResetCommandHandler : IRequestHandler<RequestPasswor
 
     public RequestPasswordResetCommandHandler(
         UserManager<ApplicationUser> userManager,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        HttpClient httpClient)
     {
         _userManager = userManager;
-        _httpClient = new HttpClient();
         _configuration = configuration;
+        _httpClient = httpClient;
     }
 
     public async Task<ApiResponseDto<object>> Handle(RequestPasswordResetCommand request, CancellationToken cancellationToken)
@@ -72,7 +73,7 @@ public class RequestPasswordResetCommandHandler : IRequestHandler<RequestPasswor
 
             return ApiResponseDto<object>.FromSuccess(null, "Si cet email existe, un lien de réinitialisation a été envoyé");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return ApiResponseDto<object>.Error("Erreur interne du serveur");
         }

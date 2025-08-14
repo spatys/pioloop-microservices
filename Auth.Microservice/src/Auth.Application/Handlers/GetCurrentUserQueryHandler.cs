@@ -3,7 +3,6 @@ using Auth.Application.Queries;
 using Auth.Application.DTOs.Response;
 using Microsoft.AspNetCore.Identity;
 using Auth.Domain.Identity;
-using Auth.Domain.Services;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 
@@ -12,16 +11,13 @@ namespace Auth.Application.Handlers;
 public class GetCurrentUserQueryHandler : IRequestHandler<GetCurrentUserQuery, ApiResponseDto<ApplicationUserDto>>
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly IJwtService _jwtService;
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public GetCurrentUserQueryHandler(
         UserManager<ApplicationUser> userManager,
-        IJwtService jwtService,
         IHttpContextAccessor httpContextAccessor)
     {
         _userManager = userManager;
-        _jwtService = jwtService;
         _httpContextAccessor = httpContextAccessor;
     }
 
@@ -29,11 +25,18 @@ public class GetCurrentUserQueryHandler : IRequestHandler<GetCurrentUserQuery, A
     {
         try
         {
-            // Extraire l'ID utilisateur du token JWT
-            var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            // L'utilisateur est déjà authentifié via le cookie HttpOnly
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
             {
                 return ApiResponseDto<ApplicationUserDto>.Error("Utilisateur non authentifié");
+            }
+
+            // Extraire l'ID utilisateur depuis les claims
+            var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                return ApiResponseDto<ApplicationUserDto>.Error("Token d'authentification invalide");
             }
 
             // Récupérer l'utilisateur
@@ -65,7 +68,7 @@ public class GetCurrentUserQueryHandler : IRequestHandler<GetCurrentUserQuery, A
 
             return ApiResponseDto<ApplicationUserDto>.FromSuccess(userDto, "Utilisateur récupéré avec succès");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return ApiResponseDto<ApplicationUserDto>.Error("Erreur interne du serveur");
         }

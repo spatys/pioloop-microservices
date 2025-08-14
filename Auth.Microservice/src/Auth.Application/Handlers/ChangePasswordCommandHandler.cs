@@ -66,11 +66,18 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
                 });
             }
 
-            // Récupérer l'utilisateur connecté
-            var userIdClaim = _httpContextAccessor.HttpContext?.User.FindFirst(ClaimTypes.NameIdentifier);
-            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            // L'utilisateur est déjà authentifié via le cookie HttpOnly
+            var httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext?.User?.Identity?.IsAuthenticated != true)
             {
                 return ApiResponseDto<object>.Error("Utilisateur non authentifié");
+            }
+
+            // Extraire l'ID utilisateur depuis les claims
+            var userIdClaim = httpContext.User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !Guid.TryParse(userIdClaim.Value, out var userId))
+            {
+                return ApiResponseDto<object>.Error("Token d'authentification invalide");
             }
 
             var user = await _userManager.FindByIdAsync(userId.ToString());
@@ -102,7 +109,7 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
 
             return ApiResponseDto<object>.FromSuccess(null, "Mot de passe changé avec succès");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return ApiResponseDto<object>.Error("Erreur interne du serveur");
         }

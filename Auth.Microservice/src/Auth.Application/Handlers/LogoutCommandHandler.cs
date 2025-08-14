@@ -27,7 +27,7 @@ public class LogoutCommandHandler : IRequestHandler<LogoutCommand, ApiResponseDt
 
             return ApiResponseDto<object>.FromSuccess(null, "Déconnexion réussie");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return ApiResponseDto<object>.Error("Erreur lors de la déconnexion");
         }

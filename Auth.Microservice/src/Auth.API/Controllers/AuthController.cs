@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Authorization;
 using MediatR;
 using Auth.Application.Commands;
 using Auth.Application.Queries;
@@ -243,6 +244,7 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <returns>Current user data</returns>
     [HttpGet("me")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<ApplicationUserDto>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ApiResponseDto<ApplicationUserDto>))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<ApplicationUserDto>))]
@@ -264,6 +266,7 @@ public class AuthController : ControllerBase
     /// </summary>
     /// <returns>Logout confirmation</returns>
     [HttpPost("logout")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<object>))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<object>))]
     public async Task<IActionResult> Logout()
@@ -280,6 +283,7 @@ public class AuthController : ControllerBase
     /// <param name="request">Password change request</param>
     /// <returns>Password change confirmation</returns>
     [HttpPost("change-password")]
+    [Authorize]
     [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<object>))]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponseDto<object>))]
     [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ApiResponseDto<object>))]

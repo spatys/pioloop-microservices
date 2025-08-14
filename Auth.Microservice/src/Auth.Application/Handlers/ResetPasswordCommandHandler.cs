@@ -87,7 +87,6 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand,
             var result = await _userManager.ResetPasswordAsync(user, request.Token, request.NewPassword);
             if (!result.Succeeded)
             {
-                var errors = result.Errors.Select(e => e.Description).ToList();
                 return ApiResponseDto<object>.ValidationError(new Dictionary<string, string>
                 {
                     ["token"] = "Token de réinitialisation invalide ou expiré"
@@ -96,7 +95,7 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand,
 
             return ApiResponseDto<object>.FromSuccess(null, "Mot de passe réinitialisé avec succès");
         }
-        catch (Exception ex)
+        catch (Exception)
         {
             return ApiResponseDto<object>.Error("Erreur interne du serveur");
         }
