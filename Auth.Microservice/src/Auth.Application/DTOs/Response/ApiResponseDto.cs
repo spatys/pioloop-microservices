@@ -28,10 +28,13 @@ public class ApiResponseDto<T>
 
     public static ApiResponseDto<T> ValidationError(Dictionary<string, string> errors)
     {
+        // Utiliser le premier message d'erreur spécifique au lieu du message générique
+        var firstError = errors.Values.FirstOrDefault() ?? "Validation failed";
+        
         return new ApiResponseDto<T>
         {
             Success = false,
-            Message = "Validation failed",
+            Message = firstError,
             ValidationErrors = errors
         };
     }

@@ -61,8 +61,6 @@ public class GetCurrentUserQueryHandler : IRequestHandler<GetCurrentUserQuery, A
                 CreatedAt = user.CreatedAt,
                 LastLoginAt = user.LastLoginAt,
                 EmailConfirmed = user.EmailConfirmed,
-                ConsentAccepted = user.ConsentAccepted,
-                ConsentAcceptedAt = user.ConsentAcceptedAt,
                 Roles = roles.ToList()
             };
 

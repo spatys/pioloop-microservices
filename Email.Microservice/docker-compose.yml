@@ -15,7 +15,6 @@ services:
       - EmailSettings__SmtpPassword=ekcc pfre ybmb iuol
       - EmailSettings__FromEmail=noreply@pioloop.com
       - EmailSettings__FromName=Pioloop
-      - Auth__EmailVerificationExpiration=1
     networks:
       - email-network
 

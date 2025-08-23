@@ -122,7 +122,8 @@ builder.Services.AddCors(options =>
                 "https://www.pioloop.com"
               )
               .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH")
-              .AllowAnyHeader();
+              .AllowAnyHeader()
+              .AllowCredentials();
     });
 });
 

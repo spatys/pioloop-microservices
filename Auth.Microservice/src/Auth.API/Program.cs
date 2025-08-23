@@ -12,6 +12,7 @@ using Auth.Infrastructure.Services;
 using Auth.Infrastructure.Extensions;
 using Auth.Application.Handlers;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 

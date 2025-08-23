@@ -9,9 +9,7 @@ public class ApplicationUser : IdentityUser<Guid>
 
     public bool IsActive { get; set; } = true;
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-    public DateTime? LastLoginAt { get; set; }
-    public bool ConsentAccepted { get; set; }
-    public DateTime? ConsentAcceptedAt { get; set; }
+            public DateTime? LastLoginAt { get; set; }
 
     // Email verification
     public string? EmailVerificationCode { get; set; }
@@ -20,11 +18,11 @@ public class ApplicationUser : IdentityUser<Guid>
 
     public string GetFullName() => string.Join(' ', new[] { FirstName, LastName }.Where(s => !string.IsNullOrWhiteSpace(s)));
 
-    public void GenerateEmailVerificationCode(int expirationMinutes = 10)
+    public void GenerateEmailVerificationCode()
     {
         var random = new Random();
         EmailVerificationCode = random.Next(100000, 999999).ToString();
-        EmailCodeExpiry = DateTime.UtcNow.AddMinutes(expirationMinutes);
+        EmailCodeExpiry = DateTime.UtcNow.AddMinutes(10);
         EmailCodeAttempts = 0;
     }
 

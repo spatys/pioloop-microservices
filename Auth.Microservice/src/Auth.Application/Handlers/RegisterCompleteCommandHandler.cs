@@ -65,10 +65,7 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
                 fieldErrors["confirmPassword"] = "Les mots de passe ne correspondent pas";
             }
 
-            if (!request.AcceptConsent)
-            {
-                fieldErrors["acceptConsent"] = "Vous devez accepter les conditions d'utilisation";
-            }
+
 
             if (fieldErrors.Count > 0)
             {
@@ -98,12 +95,6 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
             user.FirstName = request.FirstName;
             user.LastName = request.LastName;
             user.PhoneNumber = request.PhoneNumber;
-            
-            if (request.AcceptConsent)
-            {
-                user.ConsentAccepted = true;
-                user.ConsentAcceptedAt = DateTime.UtcNow;
-            }
 
             // Mise à jour de l'utilisateur
             var updateResult = await _userManager.UpdateAsync(user);
@@ -156,8 +147,6 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
                 CreatedAt = updatedUser.CreatedAt,
                 LastLoginAt = updatedUser.LastLoginAt,
                 EmailConfirmed = updatedUser.EmailConfirmed,
-                ConsentAccepted = updatedUser.ConsentAccepted,
-                ConsentAcceptedAt = updatedUser.ConsentAcceptedAt,
                 Roles = new List<string>()
             };
 

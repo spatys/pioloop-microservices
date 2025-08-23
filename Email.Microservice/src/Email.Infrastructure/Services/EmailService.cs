@@ -113,7 +113,6 @@ public class EmailService : IEmailService
 
     public async Task SendEmailVerificationAsync(string to, string confirmationCode)
     {
-        var expirationMinutes = _configuration.GetValue<int>("Auth:EmailVerificationExpiration", 1);
         var subject = "Confirmez votre email - Pioloop";
         var body = $@"
             <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;'>
@@ -129,9 +128,6 @@ public class EmailService : IEmailService
                     <div style='background: #f8f9fa; border: 2px dashed #dee2e6; border-radius: 8px; padding: 20px; text-align: center; margin: 25px 0;'>
                         <span style='font-size: 32px; font-weight: bold; color: #667eea; letter-spacing: 8px;'>{confirmationCode}</span>
                     </div>
-                    <p style='color: #666; font-size: 14px; margin-top: 20px;'>
-                        Ce code expirera dans <strong>{expirationMinutes} minute{(expirationMinutes > 1 ? "s" : "")}</strong>.
-                    </p>
                     <hr style='border: none; border-top: 1px solid #eee; margin: 25px 0;'>
                     <p style='color: #999; font-size: 12px; text-align: center;'>
                         Si vous n'avez pas créé de compte avec Pioloop, veuillez ignorer cet email.

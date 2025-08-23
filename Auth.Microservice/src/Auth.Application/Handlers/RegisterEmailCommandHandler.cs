@@ -83,12 +83,10 @@ public class RegisterEmailCommandHandler : IRequestHandler<RegisterEmailCommand,
             }
             catch { /* ignore send failures */ }
 
-            var expirationMinutes = _configuration.GetValue<int>("Auth:EmailVerificationExpiration", 10);
             var responseDto = new RegisterEmailResponseDto
             {
                 Message = "Code de vérification envoyé avec succès",
-                Email = createdUser.Email,
-                ExpirationMinutes = expirationMinutes
+                Email = createdUser.Email
             };
 
             return ApiResponseDto<RegisterEmailResponseDto>.FromSuccess(responseDto, "Code de vérification envoyé avec succès");

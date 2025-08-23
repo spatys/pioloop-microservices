@@ -102,8 +102,6 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
                 CreatedAt = user.CreatedAt,
                 LastLoginAt = user.LastLoginAt,
                 EmailConfirmed = user.EmailConfirmed,
-                ConsentAccepted = user.ConsentAccepted,
-                ConsentAcceptedAt = user.ConsentAcceptedAt,
                 Roles = new List<string>() // TODO: Ajouter les rôles
             };
 

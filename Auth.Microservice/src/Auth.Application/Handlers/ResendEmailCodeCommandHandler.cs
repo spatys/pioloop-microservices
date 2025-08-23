@@ -97,12 +97,10 @@ public class ResendEmailCodeCommandHandler : IRequestHandler<ResendEmailCodeComm
             }
             catch { /* ignore send failures */ }
 
-            var expirationMinutes = _configuration.GetValue<int>("Auth:EmailVerificationExpiration", 1);
             var responseDto = new ResendEmailCodeResponseDto
             {
                 Message = "Nouveau code de vérification envoyé avec succès",
-                Email = user.Email,
-                ExpirationMinutes = expirationMinutes
+                Email = user.Email
             };
 
             return ApiResponseDto<ResendEmailCodeResponseDto>.FromSuccess(responseDto, "Nouveau code de vérification envoyé avec succès");

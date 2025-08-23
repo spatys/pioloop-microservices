@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-
 namespace Auth.Application.DTOs.Request;
 
 public class ResendEmailCodeRequest

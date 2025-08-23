@@ -11,5 +11,4 @@ public class RegisterCompleteCommand : IRequest<ApiResponseDto<LoginResponseDto>
     public string Password { get; set; } = string.Empty;
     public string ConfirmPassword { get; set; } = string.Empty;
     public string? PhoneNumber { get; set; }
-    public bool AcceptConsent { get; set; }
 }

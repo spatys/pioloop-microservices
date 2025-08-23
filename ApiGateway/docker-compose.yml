@@ -49,8 +49,7 @@ services:
       - EmailSettings__SmtpPassword=ekcc pfre ybmb iuol
       - EmailSettings__FromEmail=noreply@pioloop.com
       - EmailSettings__FromName=Pioloop
-      # Auth Settings
-      - Auth__EmailVerificationExpiration=1
+
     # No file logs mounted; logs via Docker stdout
     networks:
       - pioloop-network

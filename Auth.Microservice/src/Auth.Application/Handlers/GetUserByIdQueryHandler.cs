@@ -37,8 +37,6 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, ApiResp
                 CreatedAt = user.CreatedAt,
                 LastLoginAt = user.LastLoginAt,
                 EmailConfirmed = user.EmailConfirmed,
-                ConsentAccepted = user.ConsentAccepted,
-                ConsentAcceptedAt = user.ConsentAcceptedAt,
                 Roles = new List<string>()
             };
 
