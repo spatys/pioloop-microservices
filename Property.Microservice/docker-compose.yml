@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  property-microservice:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "5003:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=property-db;Database=pioloop_property;Username=pioloop12345;Password=piolOOP_&!?12345;Port=5432
+      - Auth__Authority=http://auth-microservice
+      - Auth__Audience=pioloop-api
+    depends_on:
+      - property-db
+    networks:
+      - pioloop-network
+
+  property-db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: pioloop_property
+      POSTGRES_USER: pioloop12345
+      POSTGRES_PASSWORD: piolOOP_&!?12345
+    ports:
+      - "5434:5432"
+    volumes:
+      - property-db-data:/var/lib/postgresql/data
+    networks:
+      - pioloop-network
+
+volumes:
+  property-db-data:
+
+networks:
+  pioloop-network:
+    external: true

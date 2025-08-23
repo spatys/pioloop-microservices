@@ -17,6 +17,7 @@ services:
     depends_on:
       - auth-microservice
       - email-microservice
+      - property-microservice
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost/health"]
       interval: 30s
@@ -91,6 +92,33 @@ services:
       start_period: 40s
     restart: unless-stopped
 
+  property-microservice:
+    build:
+      context: ../Property.Microservice
+      dockerfile: Dockerfile
+    container_name: pioloop-property-microservice
+    ports:
+      - "5003:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://0.0.0.0:80
+      - ConnectionStrings__DefaultConnection=Host=property-db;Database=pioloop_property;Username=pioloop12345;Password=piolOOP_&!?12345;Port=5432
+      - Auth__Authority=http://auth-microservice
+      - Auth__Audience=pioloop-api
+    # No file logs mounted; logs via Docker stdout
+    networks:
+      - pioloop-network
+    depends_on:
+      - property-db
+      - auth-microservice
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+
   auth-db:
     image: postgres:15-alpine
     container_name: pioloop-auth-db
@@ -111,9 +139,30 @@ services:
       retries: 5
     restart: unless-stopped
 
+  property-db:
+    image: postgres:15-alpine
+    container_name: pioloop-property-db
+    ports:
+      - "5434:5432"
+    environment:
+      - POSTGRES_DB=pioloop_property
+      - POSTGRES_USER=pioloop12345
+      - POSTGRES_PASSWORD=piolOOP_&!?12345
+    volumes:
+      - property-db-data:/var/lib/postgresql/data
+    networks:
+      - pioloop-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pioloop12345 -d pioloop_property"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
 networks:
   pioloop-network:
     driver: bridge
 
 volumes:
   auth-db-data:
+  property-db-data:

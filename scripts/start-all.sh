@@ -15,6 +15,7 @@ declare -A SERVICE_DIRS=(
   [api-gateway]="$ROOT_DIR/ApiGateway"
   [auth-microservice]="$ROOT_DIR/Auth.Microservice"
   [email-microservice]="$ROOT_DIR/Email.Microservice"
+  [property-microservice]="$ROOT_DIR/Property.Microservice"
 )
 
 usage() {
