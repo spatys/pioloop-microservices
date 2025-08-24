@@ -1,6 +1,6 @@
 using MediatR;
 using Property.Application.Commands;
-using Property.Application.DTOs;
+using Property.Application.DTOs.Response;
 using Property.Domain.Entities;
 using Property.Domain.Interfaces;
 
@@ -35,8 +35,8 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
         existingProperty.Address = request.UpdatePropertyRequest.Address;
         existingProperty.City = request.UpdatePropertyRequest.City;
         existingProperty.PostalCode = request.UpdatePropertyRequest.PostalCode;
-        existingProperty.Latitude = request.UpdatePropertyRequest.Latitude;
-        existingProperty.Longitude = request.UpdatePropertyRequest.Longitude;
+        existingProperty.Latitude = request.UpdatePropertyRequest.Latitude ?? 0;
+        existingProperty.Longitude = request.UpdatePropertyRequest.Longitude ?? 0;
         existingProperty.PricePerNight = request.UpdatePropertyRequest.PricePerNight;
         existingProperty.CleaningFee = request.UpdatePropertyRequest.CleaningFee;
         existingProperty.ServiceFee = request.UpdatePropertyRequest.ServiceFee;
@@ -67,6 +67,10 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
             IsInstantBookable = updatedProperty.IsInstantBookable,
             Status = updatedProperty.Status.ToString(),
             OwnerId = updatedProperty.OwnerId,
+            OwnerName = string.Empty, // À récupérer depuis Auth.Microservice si nécessaire
+            OwnerEmail = string.Empty, // À récupérer depuis Auth.Microservice si nécessaire
+            ImageUrls = updatedProperty.Images.OrderBy(i => i.DisplayOrder).Select(i => i.Url).ToList(),
+            Amenities = updatedProperty.Amenities.OrderBy(a => a.DisplayOrder).Select(a => a.Name).ToList(),
             CreatedAt = updatedProperty.CreatedAt,
             UpdatedAt = updatedProperty.UpdatedAt
         };

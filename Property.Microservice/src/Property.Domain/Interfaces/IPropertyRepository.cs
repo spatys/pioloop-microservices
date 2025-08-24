@@ -1,21 +1,21 @@
 using Property.Domain.Entities;
-using Property.Application.DTOs.Request;
-using Property.Application.DTOs.Response;
+using Property.Domain.Models;
+using PropertyEntity = Property.Domain.Entities.Property;
 
 namespace Property.Domain.Interfaces;
 
 public interface IPropertyRepository
 {
-    // Recherche avec filtres (comme Airbnb)
-    Task<PropertySearchResponse> SearchAsync(PropertySearchCriteriaRequest criteria);
+    // Recherche avec filtres
+    Task<PropertySearchResult> SearchAsync(PropertySearchCriteria criteria);
     
     // Opérations CRUD de base
-    Task<Property?> GetByIdAsync(Guid id);
-    Task<Property> AddAsync(Property property);
-    Task<Property> UpdateAsync(Property property);
+    Task<PropertyEntity?> GetByIdAsync(Guid id);
+    Task<PropertyEntity> AddAsync(PropertyEntity property);
+    Task<PropertyEntity> UpdateAsync(PropertyEntity property);
     Task<bool> DeleteAsync(Guid id);
     
     // Opérations spécifiques
-    Task<IEnumerable<Property>> GetByOwnerIdAsync(Guid ownerId);
+    Task<IEnumerable<PropertyEntity>> GetByOwnerIdAsync(Guid ownerId);
     Task<bool> UpdateStatusAsync(Guid id, PropertyStatus status);
 }

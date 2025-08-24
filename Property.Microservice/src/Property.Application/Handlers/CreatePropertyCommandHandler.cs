@@ -4,6 +4,7 @@ using Property.Application.DTOs.Request;
 using Property.Application.DTOs.Response;
 using Property.Domain.Entities;
 using Property.Domain.Interfaces;
+using PropertyEntity = Property.Domain.Entities.Property;
 
 namespace Property.Application.Handlers;
 
@@ -18,7 +19,7 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
 
     public async Task<PropertyResponse> Handle(CreatePropertyCommand request, CancellationToken cancellationToken)
     {
-        var property = new Property
+        var property = new PropertyEntity
         {
             Id = Guid.NewGuid(),
             Title = request.CreatePropertyRequest.Title,
@@ -32,8 +33,8 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             Address = request.CreatePropertyRequest.Address,
             City = request.CreatePropertyRequest.City,
             PostalCode = request.CreatePropertyRequest.PostalCode,
-            Latitude = request.CreatePropertyRequest.Latitude,
-            Longitude = request.CreatePropertyRequest.Longitude,
+            Latitude = request.CreatePropertyRequest.Latitude ?? 0,
+            Longitude = request.CreatePropertyRequest.Longitude ?? 0,
             PricePerNight = request.CreatePropertyRequest.PricePerNight,
             CleaningFee = request.CreatePropertyRequest.CleaningFee,
             ServiceFee = request.CreatePropertyRequest.ServiceFee,

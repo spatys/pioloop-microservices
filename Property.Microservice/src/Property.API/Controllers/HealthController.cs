@@ -3,21 +3,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace Property.API.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class HealthController : ControllerBase
 {
     /// <summary>
-    /// Health check endpoint for monitoring
+    /// Health check endpoint
     /// </summary>
     [HttpGet]
-    public IActionResult Get()
+    public ActionResult Get()
     {
-        return Ok(new
-        {
-            status = "Healthy",
-            service = "Property Microservice",
-            timestamp = DateTime.UtcNow,
-            version = "1.0.0"
-        });
+        return Ok(new { Status = "Healthy", Service = "Property Microservice", Timestamp = DateTime.UtcNow });
     }
 }

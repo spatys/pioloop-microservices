@@ -4,6 +4,7 @@ using Property.Domain.Interfaces;
 using Property.Infrastructure.Data;
 using Property.Infrastructure.Repositories;
 using System.Reflection;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,7 +15,31 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("property", new() { Title = "Property API", Version = "v1" });
+    c.SwaggerDoc("v1", new OpenApiInfo 
+    { 
+        Title = "Property Microservice API", 
+        Version = "1.0.0",
+        Description = "API pour la gestion des propriétés dans l'écosystème Pioloop",
+        Contact = new OpenApiContact
+        {
+            Name = "Pioloop Team",
+            Email = "support@pioloop.com",
+            Url = new Uri("https://www.pioloop.com")
+        },
+        License = new OpenApiLicense
+        {
+            Name = "MIT",
+            Url = new Uri("https://opensource.org/licenses/MIT")
+        }
+    });
+    
+    // Inclure la documentation XML si elle existe
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    if (File.Exists(xmlPath))
+    {
+        c.IncludeXmlComments(xmlPath);
+    }
 });
 
 // Database
@@ -30,11 +55,14 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Searc
 // CORS
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAll", policy =>
+    options.AddPolicy("AllowApiGateway", policy =>
     {
-        policy.AllowAnyOrigin()
-              .AllowAnyMethod()
-              .AllowAnyHeader();
+        policy.WithOrigins(
+                     "https://www.api.pioloop.com",      // Production API Gateway
+                     "http://localhost:5000"              // Local API Gateway (HTTP)
+                   )
+                  .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH")
+                  .AllowAnyHeader();
     });
 });
 
@@ -46,13 +74,15 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {
-        c.SwaggerEndpoint("/swagger/property/swagger.json", "Property API V1");
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Property API V1");
     });
 }
 
 app.UseHttpsRedirection();
 
-app.UseCors("AllowAll");
+app.UseCors("AllowApiGateway");
+
+app.UseRouting();
 
 app.UseAuthorization();
 

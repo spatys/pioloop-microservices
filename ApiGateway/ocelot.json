@@ -165,7 +165,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "property-api",
+          "Host": "property-microservice",
           "Port": 80
         }
       ],
@@ -178,7 +178,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "property-api",
+          "Host": "property-microservice",
           "Port": 80
         }
       ],
@@ -191,12 +191,51 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "property-api",
+          "Host": "property-microservice",
           "Port": 80
         }
       ],
       "UpstreamPathTemplate": "/api/property/{id}",
       "UpstreamHttpMethod": ["GET"],
+      "SwaggerKey": "property"
+    },
+    {
+      "DownstreamPathTemplate": "/api/property/create",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "property-microservice",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/property/create",
+      "UpstreamHttpMethod": ["POST"],
+      "SwaggerKey": "property"
+    },
+    {
+      "DownstreamPathTemplate": "/api/property/update/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "property-microservice",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/property/update/{id}",
+      "UpstreamHttpMethod": ["PUT"],
+      "SwaggerKey": "property"
+    },
+    {
+      "DownstreamPathTemplate": "/api/property/delete/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "property-microservice",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/property/delete/{id}",
+      "UpstreamHttpMethod": ["DELETE"],
       "SwaggerKey": "property"
     }
   ],
@@ -227,7 +266,7 @@
         {
           "Name": "Property Service",
           "Version": "v1",
-          "Url": "http://property-api/swagger/v1/swagger.json"
+          "Url": "http://property-microservice/swagger/v1/swagger.json"
         }
       ]
     }

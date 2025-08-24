@@ -1,6 +1,6 @@
-namespace Property.Application.DTOs.Request;
+namespace Property.Domain.Models;
 
-public class PropertySearchCriteriaRequest
+public class PropertySearchCriteria
 {
     public string? Location { get; set; }
     public DateTime? CheckInDate { get; set; }

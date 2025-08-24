@@ -145,7 +145,7 @@ builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Login
                 options.AddPolicy("AllowApiGateway", policy =>
                 {
                     policy.WithOrigins(
-                            "https://api.pioloop.com",  // Production API Gateway
+                            "https://www.api.pioloop.com",  // Production API Gateway
                             "http://localhost:5000" // Local API Gateway (HTTP)
                           )
                           .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH")

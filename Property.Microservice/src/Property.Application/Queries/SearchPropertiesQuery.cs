@@ -1,13 +1,14 @@
 using MediatR;
-using Property.Application.DTOs;
+using Property.Application.DTOs.Request;
+using Property.Application.DTOs.Response;
 
 namespace Property.Application.Queries;
 
-public class SearchPropertiesQuery : IRequest<PropertySearchResultDto>
+public class SearchPropertiesQuery : IRequest<PropertySearchResponse>
 {
-    public PropertySearchDto SearchCriteria { get; }
+    public PropertySearchCriteriaRequest SearchCriteria { get; }
 
-    public SearchPropertiesQuery(PropertySearchDto searchCriteria)
+    public SearchPropertiesQuery(PropertySearchCriteriaRequest searchCriteria)
     {
         SearchCriteria = searchCriteria;
     }

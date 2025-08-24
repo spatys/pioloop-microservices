@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Property.Domain.Entities;
+using PropertyEntity = Property.Domain.Entities.Property;
 
 namespace Property.Infrastructure.Data;
 
@@ -9,18 +10,17 @@ public class PropertyDbContext : DbContext
     {
     }
 
-    public DbSet<Property> Properties { get; set; }
+    public DbSet<PropertyEntity> Properties { get; set; }
     public DbSet<PropertyImage> PropertyImages { get; set; }
     public DbSet<PropertyAmenity> PropertyAmenities { get; set; }
     public DbSet<PropertyAvailability> PropertyAvailabilities { get; set; }
-    public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         // Configuration de Property
-        modelBuilder.Entity<Property>(entity =>
+        modelBuilder.Entity<PropertyEntity>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
@@ -34,11 +34,7 @@ public class PropertyDbContext : DbContext
             entity.Property(e => e.CleaningFee).HasColumnType("decimal(18,2)");
             entity.Property(e => e.ServiceFee).HasColumnType("decimal(18,2)");
             
-            // Relations
-            entity.HasOne(e => e.Owner)
-                  .WithMany(e => e.Properties)
-                  .HasForeignKey(e => e.OwnerId)
-                  .OnDelete(DeleteBehavior.Restrict);
+
         });
 
         // Configuration de PropertyImage
@@ -81,14 +77,6 @@ public class PropertyDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // Configuration de ApplicationUser
-        modelBuilder.Entity<ApplicationUser>(entity =>
-        {
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.FirstName).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.LastName).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.Email).IsRequired().HasMaxLength(256);
-            entity.Property(e => e.PhoneNumber).HasMaxLength(20);
-        });
+
     }
 }

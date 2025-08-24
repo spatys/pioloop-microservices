@@ -11,13 +11,24 @@ public class Property
     public string Title { get; set; } = string.Empty;
     
     [Required]
-    [MaxLength(1000)]
+    [MaxLength(2000)]
     public string Description { get; set; } = string.Empty;
     
     [Required]
-    public decimal Price { get; set; }
+    [MaxLength(100)]
+    public string PropertyType { get; set; } = string.Empty;
     
     [Required]
+    [MaxLength(100)]
+    public string RoomType { get; set; } = string.Empty;
+    
+    public int MaxGuests { get; set; }
+    public int Bedrooms { get; set; }
+    public int Beds { get; set; }
+    public int Bathrooms { get; set; }
+    
+    [Required]
+    [MaxLength(500)]
     public string Address { get; set; } = string.Empty;
     
     [Required]
@@ -25,19 +36,19 @@ public class Property
     public string City { get; set; } = string.Empty;
     
     [Required]
-    [MaxLength(10)]
+    [MaxLength(20)]
     public string PostalCode { get; set; } = string.Empty;
     
-    [Required]
-    [MaxLength(100)]
-    public string Country { get; set; } = string.Empty;
-    
-    public int Bedrooms { get; set; }
-    public int Bathrooms { get; set; }
-    public int SquareMeters { get; set; }
+    public double Latitude { get; set; }
+    public double Longitude { get; set; }
     
     [Required]
-    public PropertyType Type { get; set; }
+    public decimal PricePerNight { get; set; }
+    
+    public decimal CleaningFee { get; set; }
+    public decimal ServiceFee { get; set; }
+    
+    public bool IsInstantBookable { get; set; }
     
     [Required]
     public PropertyStatus Status { get; set; }
@@ -45,25 +56,19 @@ public class Property
     public Guid OwnerId { get; set; }
     
     public DateTime CreatedAt { get; set; }
-    public DateTime? UpdatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
     
     // Navigation properties
     public virtual ICollection<PropertyImage> Images { get; set; } = new List<PropertyImage>();
     public virtual ICollection<PropertyAmenity> Amenities { get; set; } = new List<PropertyAmenity>();
-}
-
-public enum PropertyType
-{
-    Apartment,
-    House,
-    Villa,
-    Studio,
-    Duplex
+    public virtual ICollection<PropertyAvailability> Availability { get; set; } = new List<PropertyAvailability>();
 }
 
 public enum PropertyStatus
 {
-    Available,
+    Draft,
+    Published,
     Rented,
-    Maintenance
+    Maintenance,
+    Deleted
 }

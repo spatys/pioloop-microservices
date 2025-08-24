@@ -21,8 +21,8 @@ public class PropertyController : ControllerBase
     /// <summary>
     /// Search properties with filters and pagination
     /// </summary>
-    [HttpGet]
-    public async Task<ActionResult<PropertySearchResponse>> Search([FromQuery] PropertySearchRequest searchCriteria)
+    [HttpGet("search")]
+    public async Task<ActionResult<PropertySearchResponse>> Search([FromQuery] PropertySearchCriteriaRequest searchCriteria)
     {
         var result = await _mediator.Send(new SearchPropertiesQuery(searchCriteria));
         return Ok(result);
@@ -31,7 +31,7 @@ public class PropertyController : ControllerBase
     /// <summary>
     /// Get property by ID
     /// </summary>
-    [HttpGet("{id}")]
+    [HttpGet("{id:guid}")]
     public async Task<ActionResult<PropertyResponse>> GetById(Guid id)
     {
         var property = await _mediator.Send(new GetPropertyByIdQuery(id));
@@ -62,17 +62,5 @@ public class PropertyController : ControllerBase
         return Ok(property);
     }
 
-    /// <summary>
-    /// Delete a property
-    /// </summary>
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(Guid id)
-    {
-        var result = await _mediator.Send(new DeletePropertyCommand(id));
-        if (!result)
-        {
-            return NotFound();
-        }
-        return NoContent();
-    }
+
 }

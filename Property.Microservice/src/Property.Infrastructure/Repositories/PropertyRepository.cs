@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
 using Property.Domain.Entities;
 using Property.Domain.Interfaces;
-using Property.Application.DTOs.Request;
-using Property.Application.DTOs.Response;
+using Property.Domain.Models;
 using Property.Infrastructure.Data;
+using PropertyEntity = Property.Domain.Entities.Property;
 
 namespace Property.Infrastructure.Repositories;
 
@@ -16,10 +16,9 @@ public class PropertyRepository : IPropertyRepository
         _context = context;
     }
 
-    public async Task<PropertySearchResponse> SearchAsync(PropertySearchCriteriaRequest criteria)
+    public async Task<PropertySearchResult> SearchAsync(PropertySearchCriteria criteria)
     {
         var query = _context.Properties
-            .Include(p => p.Owner)
             .Include(p => p.Images.OrderBy(i => i.DisplayOrder))
             .Include(p => p.Amenities.OrderBy(a => a.DisplayOrder))
             .Where(p => p.Status == PropertyStatus.Published); // Seulement les propriétés publiées
@@ -38,34 +37,14 @@ public class PropertyRepository : IPropertyRepository
         if (criteria.Guests.HasValue)
             query = query.Where(p => p.MaxGuests >= criteria.Guests.Value);
 
-        if (criteria.MinPrice.HasValue)
-            query = query.Where(p => p.PricePerNight >= criteria.MinPrice.Value);
 
-        if (criteria.MaxPrice.HasValue)
-            query = query.Where(p => p.PricePerNight <= criteria.MaxPrice.Value);
-
-        if (!string.IsNullOrEmpty(criteria.PropertyType))
-            query = query.Where(p => p.PropertyType.ToLower().Contains(criteria.PropertyType.ToLower()));
-
-        if (!string.IsNullOrEmpty(criteria.RoomType))
-            query = query.Where(p => p.RoomType.ToLower().Contains(criteria.RoomType.ToLower()));
-
-        // Filtre par équipements
-        if (criteria.Amenities != null && criteria.Amenities.Any())
-        {
-            foreach (var amenity in criteria.Amenities)
-            {
-                query = query.Where(p => p.Amenities.Any(a => 
-                    a.Name.ToLower().Contains(amenity.ToLower())));
-            }
-        }
 
         // Filtre par disponibilité (si dates fournies)
-        if (criteria.CheckIn.HasValue && criteria.CheckOut.HasValue)
+        if (criteria.CheckInDate.HasValue && criteria.CheckOutDate.HasValue)
         {
             query = query.Where(p => !p.Availability.Any(a => 
-                a.CheckInDate <= criteria.CheckOut.Value && 
-                a.CheckOutDate >= criteria.CheckIn.Value && 
+                a.CheckInDate <= criteria.CheckOutDate.Value && 
+                a.CheckOutDate >= criteria.CheckInDate.Value && 
                 !a.IsAvailable));
         }
 
@@ -82,37 +61,9 @@ public class PropertyRepository : IPropertyRepository
         // Calculer le nombre total de pages
         var totalPages = (int)Math.Ceiling((double)totalCount / criteria.PageSize);
 
-        return new PropertySearchResponse
+        return new PropertySearchResult
         {
-            Properties = properties.Select(p => new PropertyResponse
-            {
-                Id = p.Id,
-                Title = p.Title,
-                Description = p.Description,
-                PropertyType = p.PropertyType,
-                RoomType = p.RoomType,
-                MaxGuests = p.MaxGuests,
-                Bedrooms = p.Bedrooms,
-                Beds = p.Beds,
-                Bathrooms = p.Bathrooms,
-                Address = p.Address,
-                City = p.City,
-                PostalCode = p.PostalCode,
-                Latitude = p.Latitude,
-                Longitude = p.Longitude,
-                PricePerNight = p.PricePerNight,
-                CleaningFee = p.CleaningFee,
-                ServiceFee = p.ServiceFee,
-                IsInstantBookable = p.IsInstantBookable,
-                Status = p.Status.ToString(),
-                OwnerId = p.OwnerId,
-                OwnerName = $"{p.Owner?.FirstName} {p.Owner?.LastName}",
-                OwnerEmail = p.Owner?.Email ?? string.Empty,
-                ImageUrls = p.Images.OrderBy(i => i.DisplayOrder).Select(i => i.Url).ToList(),
-                Amenities = p.Amenities.OrderBy(a => a.DisplayOrder).Select(a => a.Name).ToList(),
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt
-            }).ToList(),
+            Properties = properties,
             TotalCount = totalCount,
             Page = criteria.Page,
             PageSize = criteria.PageSize,
@@ -120,23 +71,24 @@ public class PropertyRepository : IPropertyRepository
         };
     }
 
-    public async Task<Property?> GetByIdAsync(Guid id)
+
+
+    public async Task<PropertyEntity?> GetByIdAsync(Guid id)
     {
         return await _context.Properties
-            .Include(p => p.Owner)
             .Include(p => p.Images.OrderBy(i => i.DisplayOrder))
             .Include(p => p.Amenities.OrderBy(a => a.DisplayOrder))
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
-    public async Task<Property> AddAsync(Property property)
+    public async Task<PropertyEntity> AddAsync(PropertyEntity property)
     {
         _context.Properties.Add(property);
         await _context.SaveChangesAsync();
         return property;
     }
 
-    public async Task<Property> UpdateAsync(Property property)
+    public async Task<PropertyEntity> UpdateAsync(PropertyEntity property)
     {
         property.UpdatedAt = DateTime.UtcNow;
         _context.Properties.Update(property);
@@ -154,7 +106,7 @@ public class PropertyRepository : IPropertyRepository
         return true;
     }
 
-    public async Task<IEnumerable<Property>> GetByOwnerIdAsync(Guid ownerId)
+    public async Task<IEnumerable<PropertyEntity>> GetByOwnerIdAsync(Guid ownerId)
     {
         return await _context.Properties
             .Include(p => p.Images.OrderBy(i => i.DisplayOrder))
