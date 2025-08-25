@@ -47,6 +47,7 @@ public class SearchPropertiesQueryHandler : IRequestHandler<SearchPropertiesQuer
                 Bathrooms = p.Bathrooms,
                 SquareMeters = p.SquareMeters,
                 Address = p.Address,
+                Neighborhood = p.Neighborhood,
                 City = p.City,
                 PostalCode = p.PostalCode,
                 Latitude = p.Latitude,

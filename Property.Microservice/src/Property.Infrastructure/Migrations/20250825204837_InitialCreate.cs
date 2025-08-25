@@ -25,6 +25,7 @@ namespace Property.Infrastructure.Migrations
                     Bathrooms = table.Column<int>(type: "integer", nullable: false),
                     SquareMeters = table.Column<int>(type: "integer", nullable: false),
                     Address = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    Neighborhood = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     City = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     PostalCode = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
                     Latitude = table.Column<double>(type: "double precision", nullable: false),

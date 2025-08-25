@@ -32,9 +32,10 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
         existingProperty.Beds = request.UpdatePropertyRequest.Beds;
         existingProperty.Bathrooms = request.UpdatePropertyRequest.Bathrooms;
         existingProperty.SquareMeters = request.UpdatePropertyRequest.SquareMeters;
-        existingProperty.Address = request.UpdatePropertyRequest.Address;
-        existingProperty.City = request.UpdatePropertyRequest.City;
-        existingProperty.PostalCode = request.UpdatePropertyRequest.PostalCode;
+                    existingProperty.Address = request.UpdatePropertyRequest.Address;
+            existingProperty.Neighborhood = request.UpdatePropertyRequest.Neighborhood;
+            existingProperty.City = request.UpdatePropertyRequest.City;
+            existingProperty.PostalCode = request.UpdatePropertyRequest.PostalCode;
         existingProperty.Latitude = request.UpdatePropertyRequest.Latitude ?? 0;
         existingProperty.Longitude = request.UpdatePropertyRequest.Longitude ?? 0;
         existingProperty.PricePerNight = request.UpdatePropertyRequest.PricePerNight;
@@ -55,9 +56,10 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
             Beds = updatedProperty.Beds,
             Bathrooms = updatedProperty.Bathrooms,
             SquareMeters = updatedProperty.SquareMeters,
-            Address = updatedProperty.Address,
-            City = updatedProperty.City,
-            PostalCode = updatedProperty.PostalCode,
+                            Address = updatedProperty.Address,
+                Neighborhood = updatedProperty.Neighborhood,
+                City = updatedProperty.City,
+                PostalCode = updatedProperty.PostalCode,
             Latitude = updatedProperty.Latitude,
             Longitude = updatedProperty.Longitude,
             PricePerNight = updatedProperty.PricePerNight,

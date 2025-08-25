@@ -67,6 +67,11 @@ namespace Property.Infrastructure.Migrations
                     b.Property<int>("MaxGuests")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Neighborhood")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uuid");
 

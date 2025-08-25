@@ -27,6 +27,7 @@ public class PropertyDbContext : DbContext
             entity.Property(e => e.Description).IsRequired().HasMaxLength(2000);
             entity.Property(e => e.PropertyType).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Address).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.Neighborhood).IsRequired().HasMaxLength(100);
             entity.Property(e => e.City).IsRequired().HasMaxLength(100);
             entity.Property(e => e.PostalCode).IsRequired().HasMaxLength(20);
             entity.Property(e => e.PricePerNight).HasColumnType("decimal(18,2)");

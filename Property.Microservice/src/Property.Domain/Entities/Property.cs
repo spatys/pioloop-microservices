@@ -30,6 +30,10 @@ public class Property
     
     [Required]
     [MaxLength(100)]
+    public string Neighborhood { get; set; } = string.Empty;
+    
+    [Required]
+    [MaxLength(100)]
     public string City { get; set; } = string.Empty;
     
     [Required]

@@ -17,6 +17,7 @@ PAYLOAD='{
   "bathrooms": 2,
   "squareMeters": 120,
   "address": "123 Avenue de l'\''Independance",
+  "neighborhood": "Akwa",
   "city": "Douala",
   "postalCode": "237",
   "latitude": 4.0511,
