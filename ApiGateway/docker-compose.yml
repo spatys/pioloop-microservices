@@ -143,7 +143,7 @@ services:
     image: postgres:15-alpine
     container_name: pioloop-property-db
     ports:
-      - "5434:5432"
+      - "5435:5432"
     environment:
       - POSTGRES_DB=pioloop_property
       - POSTGRES_USER=pioloop12345

@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "5003:80"
+      - "5004:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=property-db;Database=pioloop_property;Username=pioloop12345;Password=piolOOP_&!?12345;Port=5432
@@ -24,7 +24,7 @@ services:
       POSTGRES_USER: pioloop12345
       POSTGRES_PASSWORD: piolOOP_&!?12345
     ports:
-      - "5434:5432"
+      - "5435:5432"
     volumes:
       - property-db-data:/var/lib/postgresql/data
     networks:

@@ -3,6 +3,7 @@ using Property.Application.Handlers;
 using Property.Domain.Interfaces;
 using Property.Infrastructure.Data;
 using Property.Infrastructure.Repositories;
+using Property.Infrastructure.Extensions;
 using System.Reflection;
 using Microsoft.OpenApi.Models;
 
@@ -88,11 +89,7 @@ app.UseAuthorization();
 
 app.MapControllers();
 
-// Ensure database is created
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<PropertyDbContext>();
-    context.Database.EnsureCreated();
-}
+// Initialize database with migrations
+await app.InitializeDatabaseAsync();
 
 app.Run();
