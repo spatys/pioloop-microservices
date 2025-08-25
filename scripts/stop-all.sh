@@ -1,88 +1,100 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Pioloop Microservices - Script d'arrêt Docker Compose
-# Ce script arrête l'écosystème complet avec Docker Compose
+# Modular stop for Pioloop microservices using individual Docker Compose files.
 
-set -e  # Arrêter en cas d'erreur
+# This script lives in pioloop-microservices/scripts
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"  # -> pioloop-microservices
 
-echo "🛑 Arrêt de l'écosystème Pioloop Docker Compose..."
-echo "=================================================="
+# Define services in reverse order (dependencies last)
+SERVICES=(
+  "ApiGateway"
+  "Property.Microservice"
+  "Email.Microservice"
+  "Auth.Microservice"
+)
 
-# Couleurs pour les messages
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+usage() {
+  cat <<EOF
+Usage: $0 [--service SERVICE_NAME]
 
-print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1"
+Options:
+  --service NAME   Stop only the specified service (e.g., Auth.Microservice)
+
+Available services:
+  - ApiGateway
+  - Auth.Microservice
+  - Email.Microservice
+  - Property.Microservice
+
+Notes:
+  - Services are stopped in reverse dependency order
+  - Each service manages its own containers
+EOF
 }
 
-print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
-}
+SERVICE_FILTER=""
 
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --service)
+      SERVICE_FILTER="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1"
+      usage
+      exit 1
+      ;;
+  esac
+done
 
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Vérifier que Docker Compose est installé
-print_status "Vérification de Docker Compose..."
-if ! command -v docker-compose &> /dev/null; then
-    print_error "Docker Compose n'est pas installé"
-    exit 1
-fi
-
-# Vérifier que le répertoire ApiGateway existe
-if [ ! -d "ApiGateway" ]; then
-    print_error "Le répertoire ApiGateway n'existe pas"
-    exit 1
-fi
-
-# Arrêter les services
-print_status "Arrêt des services Docker Compose..."
-cd ApiGateway
-
-# Arrêter les services en cours d'exécution
-if docker-compose ps | grep -q "Up"; then
-    print_status "Arrêt des conteneurs en cours d'exécution..."
+stop_service() {
+  local service_dir="$1"
+  local service_name=$(basename "$service_dir")
+  
+  echo "==> Stopping $service_name..."
+  cd "$service_dir"
+  
+  if docker-compose ps | grep -q "Up"; then
     docker-compose down
-    print_success "Services arrêtés"
-else
-    print_warning "Aucun service en cours d'exécution"
+    echo "  - ✅ $service_name stopped"
+  else
+    echo "  - ⏭️  $service_name already stopped"
+  fi
+}
+
+# Filter services if specified
+if [[ -n "$SERVICE_FILTER" ]]; then
+  if [[ ! " ${SERVICES[*]} " =~ " $SERVICE_FILTER " ]]; then
+    echo "❌ Unknown service: $SERVICE_FILTER"
+    echo "Available services: ${SERVICES[*]}"
+    exit 1
+  fi
+  SERVICES=("$SERVICE_FILTER")
 fi
 
-# Supprimer les volumes (optionnel)
-read -p "Voulez-vous supprimer les volumes de données ? (y/N): " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    print_status "Suppression des volumes..."
-    docker-compose down -v
-    print_success "Volumes supprimés"
-fi
+echo "==> Stopping Pioloop microservices..."
+echo "Services to stop: ${SERVICES[*]}"
+echo ""
 
-# Nettoyer les images non utilisées
-read -p "Voulez-vous nettoyer les images Docker non utilisées ? (y/N): " -n 1 -r
-echo
-if [[ $REPLY =~ ^[Yy]$ ]]; then
-    print_status "Nettoyage des images Docker..."
-    docker system prune -f
-    print_success "Images nettoyées"
-fi
-
-cd ..
+# Stop services in reverse order
+for service in "${SERVICES[@]}"; do
+  service_dir="$ROOT_DIR/$service"
+  if [[ -d "$service_dir" ]]; then
+    stop_service "$service_dir"
+  else
+    echo "❌ Service directory not found: $service_dir"
+  fi
+done
 
 echo ""
-print_success "🎉 Écosystème Pioloop arrêté avec succès !"
+echo "==> All services stopped!"
 echo ""
-echo "💡 Pour redémarrer :"
-echo "  • ./start-all.sh"
-echo ""
-echo "💡 Pour voir les conteneurs :"
-echo "  • docker ps -a"
-echo ""
+echo "🔧 To start services again:"
+echo "  • Start all:       ./scripts/start-all-modular.sh"
+echo "  • Start specific:  ./scripts/start-all-modular.sh --service SERVICE_NAME"

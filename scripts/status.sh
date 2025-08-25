@@ -1,98 +1,126 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Pioloop Microservices - Script de statut
-# Ce script affiche le statut de tous les microservices
+# Modular status for Pioloop microservices using individual Docker Compose files.
 
-echo "📊 Statut des microservices Pioloop..."
-echo "====================================="
+# This script lives in pioloop-microservices/scripts
+ROOT_DIR="$(cd "$(dirname "$0")/.." && pwd)"  # -> pioloop-microservices
 
-# Couleurs pour les messages
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
+# Define services
+SERVICES=(
+  "Auth.Microservice"
+  "Email.Microservice"
+  "Property.Microservice"
+  "ApiGateway"
+)
 
-# Fonction pour afficher les messages colorés
-print_status() {
-    echo -e "${BLUE}[INFO]${NC} $1"
+# Service ports mapping
+declare -A SERVICE_PORTS=(
+  ["Auth.Microservice"]="5001"
+  ["Email.Microservice"]="5002"
+  ["Property.Microservice"]="5003"
+  ["ApiGateway"]="5000"
+)
+
+usage() {
+  cat <<EOF
+Usage: $0 [--service SERVICE_NAME]
+
+Options:
+  --service NAME   Show status for only the specified service
+
+Available services:
+  - Auth.Microservice
+  - Email.Microservice
+  - Property.Microservice
+  - ApiGateway
+EOF
 }
 
-print_success() {
-    echo -e "${GREEN}[SUCCESS]${NC} $1"
+SERVICE_FILTER=""
+
+while [[ $# -gt 0 ]]; do
+  case $1 in
+    --service)
+      SERVICE_FILTER="$2"
+      shift 2
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1"
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+check_service_status() {
+  local service_dir="$1"
+  local service_name=$(basename "$service_dir")
+  local port="${SERVICE_PORTS[$service_name]}"
+  
+  echo "🔍 $service_name :"
+  echo "----------------------"
+  
+  cd "$service_dir"
+  
+  if docker-compose ps | grep -q "Up"; then
+    echo "[SUCCESS] ✅ $service_name is running"
+    
+    # Test connectivity
+    if [[ -n "$port" ]]; then
+      if curl -s -f "http://localhost:$port/health" >/dev/null 2>&1; then
+        echo "[SUCCESS] ✅ API accessible on http://localhost:$port"
+      else
+        echo "[WARNING] ⚠️  API not responding on http://localhost:$port"
+      fi
+    fi
+  else
+    echo "[WARNING] ⚠️  $service_name is not running"
+  fi
+  
+  echo ""
 }
 
-print_warning() {
-    echo -e "${YELLOW}[WARNING]${NC} $1"
-}
-
-print_error() {
-    echo -e "${RED}[ERROR]${NC} $1"
-}
-
-# Vérifier que les répertoires existent
-if [ ! -d "Email.Microservice" ]; then
-    print_error "Le répertoire Email.Microservice n'existe pas"
+# Filter services if specified
+if [[ -n "$SERVICE_FILTER" ]]; then
+  if [[ ! " ${SERVICES[*]} " =~ " $SERVICE_FILTER " ]]; then
+    echo "❌ Unknown service: $SERVICE_FILTER"
+    echo "Available services: ${SERVICES[*]}"
     exit 1
+  fi
+  SERVICES=("$SERVICE_FILTER")
 fi
 
-if [ ! -d "Auth.Microservice" ]; then
-    print_error "Le répertoire Auth.Microservice n'existe pas"
-    exit 1
-fi
-
+echo "📊 Statut des microservices Pioloop (Architecture Modulaire)..."
+echo "================================================================"
 echo ""
-echo "🔍 Email Microservice :"
-echo "----------------------"
-cd Email.Microservice
-if docker-compose ps | grep -q "Up"; then
-    print_success "✅ Email Microservice est en cours d'exécution"
-    docker-compose ps
-else
-    print_warning "⚠️  Email Microservice n'est pas en cours d'exécution"
-fi
-cd ..
 
-echo ""
-echo "🔍 Auth Microservice :"
-echo "---------------------"
-cd Auth.Microservice
-if docker-compose ps | grep -q "Up"; then
-    print_success "✅ Auth Microservice est en cours d'exécution"
-    docker-compose ps
-else
-    print_warning "⚠️  Auth Microservice n'est pas en cours d'exécution"
-fi
-cd ..
+# Check each service
+for service in "${SERVICES[@]}"; do
+  service_dir="$ROOT_DIR/$service"
+  if [[ -d "$service_dir" ]]; then
+    check_service_status "$service_dir"
+  else
+    echo "❌ Service directory not found: $service_dir"
+  fi
+done
 
-echo ""
-echo "🌐 Test de connectivité :"
-echo "------------------------"
-
-# Test Email API
-if curl -s http://localhost:5002/health > /dev/null 2>&1; then
-    print_success "✅ Email API accessible sur http://localhost:5002"
-else
-    print_warning "⚠️  Email API non accessible sur http://localhost:5002"
-fi
-
-# Test Auth API
-if curl -s http://localhost:5001/health > /dev/null 2>&1; then
-    print_success "✅ Auth API accessible sur http://localhost:5001"
-else
-    print_warning "⚠️  Auth API non accessible sur http://localhost:5001"
-fi
-
-echo ""
 echo "📋 URLs des services :"
-echo "  • Auth API:     http://localhost:5001"
-echo "  • Auth Swagger: http://localhost:5001/swagger"
-echo "  • Email API:    http://localhost:5002"
-echo "  • Email Swagger: http://localhost:5002/swagger"
-echo "  • PostgreSQL:   localhost:5433"
+echo "  • ApiGateway:     http://localhost:5000"
+echo "  • Auth API:       http://localhost:5001"
+echo "  • Email API:      http://localhost:5002"
+echo "  • Property API:   http://localhost:5003"
+echo ""
+echo "🗄️  Database URLs :"
+echo "  • Auth DB:        localhost:5433"
+echo "  • Property DB:    localhost:5435"
 echo ""
 echo "🔧 Commandes utiles :"
-echo "  • Démarrer tous:        ./start-all.sh"
-echo "  • Arrêter tous:         ./stop-all.sh"
-echo "  • Logs Auth:            cd Auth.Microservice && docker-compose logs -f"
-echo "  • Logs Email:           cd Email.Microservice && docker-compose logs -f"
+echo "  • Démarrer tous:        ./scripts/start-all.sh"
+echo "  • Arrêter tous:         ./scripts/stop-all.sh"
+echo "  • Démarrer spécifique:  ./scripts/start-all.sh --service SERVICE_NAME"
+echo "  • Logs:                 cd SERVICE_DIR && docker-compose logs -f"

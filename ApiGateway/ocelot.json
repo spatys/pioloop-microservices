@@ -5,7 +5,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "auth-microservice",
+          "Host": "auth-api",
           "Port": 80
         }
       ],
@@ -18,7 +18,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "auth-microservice",
+          "Host": "auth-api",
           "Port": 80
         }
       ],
@@ -31,7 +31,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "auth-microservice",
+          "Host": "auth-api",
           "Port": 80
         }
       ],
@@ -44,7 +44,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "auth-microservice",
+          "Host": "auth-api",
           "Port": 80
         }
       ],
@@ -57,7 +57,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "auth-microservice",
+          "Host": "auth-api",
           "Port": 80
         }
       ],
@@ -70,7 +70,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "auth-microservice",
+          "Host": "auth-api",
           "Port": 80
         }
       ],
@@ -83,7 +83,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "auth-microservice",
+          "Host": "auth-api",
           "Port": 80
         }
       ],
@@ -96,7 +96,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "auth-microservice",
+          "Host": "auth-api",
           "Port": 80
         }
       ],
@@ -108,7 +108,7 @@
       "DownstreamPathTemplate": "/api/roles",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "auth-microservice", "Port": 80 }
+        { "Host": "auth-api", "Port": 80 }
       ],
       "UpstreamPathTemplate": "/api/roles",
       "UpstreamHttpMethod": ["POST"],
@@ -118,7 +118,7 @@
       "DownstreamPathTemplate": "/api/roles/assign",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "auth-microservice", "Port": 80 }
+        { "Host": "auth-api", "Port": 80 }
       ],
       "UpstreamPathTemplate": "/api/roles/assign",
       "UpstreamHttpMethod": ["POST"],
@@ -128,7 +128,7 @@
       "DownstreamPathTemplate": "/api/roles/remove",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
-        { "Host": "auth-microservice", "Port": 80 }
+        { "Host": "auth-api", "Port": 80 }
       ],
       "UpstreamPathTemplate": "/api/roles/remove",
       "UpstreamHttpMethod": ["POST"],
@@ -139,7 +139,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "email-microservice",
+          "Host": "email-api",
           "Port": 80
         }
       ],
@@ -152,7 +152,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "email-microservice",
+          "Host": "email-api",
           "Port": 80
         }
       ],
@@ -165,7 +165,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "property-microservice",
+          "Host": "property-api",
           "Port": 80
         }
       ],
@@ -178,7 +178,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "property-microservice",
+          "Host": "property-api",
           "Port": 80
         }
       ],
@@ -191,7 +191,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "property-microservice",
+          "Host": "property-api",
           "Port": 80
         }
       ],
@@ -204,7 +204,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "property-microservice",
+          "Host": "property-api",
           "Port": 80
         }
       ],
@@ -217,7 +217,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "property-microservice",
+          "Host": "property-api",
           "Port": 80
         }
       ],
@@ -230,7 +230,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "property-microservice",
+          "Host": "property-api",
           "Port": 80
         }
       ],
@@ -246,7 +246,7 @@
         {
           "Name": "Auth Service",
           "Version": "v1",
-          "Url": "http://auth-microservice/swagger/v1/swagger.json"
+          "Url": "http://auth-api/swagger/v1/swagger.json"
         }
       ]
     },
@@ -256,7 +256,7 @@
         {
           "Name": "Email Service",
           "Version": "v1",
-          "Url": "http://email-microservice/swagger/v1/swagger.json"
+          "Url": "http://email-api/swagger/v1/swagger.json"
         }
       ]
     },
@@ -266,7 +266,7 @@
         {
           "Name": "Property Service",
           "Version": "v1",
-          "Url": "http://property-microservice/swagger/v1/swagger.json"
+          "Url": "http://property-api/swagger/v1/swagger.json"
         }
       ]
     }

@@ -5,6 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: email-api
     ports:
       - "5002:80"
     environment:
@@ -16,8 +17,8 @@ services:
       - EmailSettings__FromEmail=noreply@pioloop.com
       - EmailSettings__FromName=Pioloop
     networks:
-      - email-network
+      - pioloop-network
 
 networks:
-  email-network:
-    driver: bridge
+  pioloop-network:
+    external: true
