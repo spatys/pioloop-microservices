@@ -19,7 +19,6 @@ namespace Property.Infrastructure.Migrations
                     Title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
                     Description = table.Column<string>(type: "character varying(2000)", maxLength: 2000, nullable: false),
                     PropertyType = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    RoomType = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     MaxGuests = table.Column<int>(type: "integer", nullable: false),
                     Bedrooms = table.Column<int>(type: "integer", nullable: false),
                     Beds = table.Column<int>(type: "integer", nullable: false),

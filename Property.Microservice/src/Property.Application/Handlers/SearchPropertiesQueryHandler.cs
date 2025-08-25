@@ -41,7 +41,6 @@ public class SearchPropertiesQueryHandler : IRequestHandler<SearchPropertiesQuer
                 Title = p.Title,
                 Description = p.Description,
                 PropertyType = p.PropertyType,
-                RoomType = p.RoomType,
                 MaxGuests = p.MaxGuests,
                 Bedrooms = p.Bedrooms,
                 Beds = p.Beds,

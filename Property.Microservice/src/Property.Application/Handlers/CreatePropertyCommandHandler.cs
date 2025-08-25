@@ -30,13 +30,17 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             throw new UnauthorizedAccessException("Utilisateur non authentifié");
         }
 
+        if (!Guid.TryParse(userId, out var ownerId))
+        {
+            throw new InvalidOperationException("Invalid user ID format");
+        }
+
         var property = new PropertyEntity
         {
             Id = Guid.NewGuid(),
             Title = request.CreatePropertyRequest.Title,
             Description = request.CreatePropertyRequest.Description,
             PropertyType = request.CreatePropertyRequest.PropertyType,
-            RoomType = request.CreatePropertyRequest.RoomType,
             MaxGuests = request.CreatePropertyRequest.MaxGuests,
             Bedrooms = request.CreatePropertyRequest.Bedrooms,
             Beds = request.CreatePropertyRequest.Beds,
@@ -51,7 +55,7 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             CleaningFee = request.CreatePropertyRequest.CleaningFee,
             ServiceFee = request.CreatePropertyRequest.ServiceFee,
             Status = PropertyStatus.Draft,
-            OwnerId = userId, // Utiliser l'ID de l'utilisateur connecté
+            OwnerId = ownerId, // Utiliser l'ID de l'utilisateur connecté
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -101,7 +105,6 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             Title = createdProperty.Title,
             Description = createdProperty.Description,
             PropertyType = createdProperty.PropertyType,
-            RoomType = createdProperty.RoomType,
             MaxGuests = createdProperty.MaxGuests,
             Bedrooms = createdProperty.Bedrooms,
             Beds = createdProperty.Beds,
@@ -122,7 +125,7 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
         };
     }
 
-    private string GetCurrentUserId()
+    private string? GetCurrentUserId()
     {
         var user = _httpContextAccessor.HttpContext?.User;
         if (user?.Identity?.IsAuthenticated == true)

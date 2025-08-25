@@ -83,11 +83,6 @@ namespace Property.Infrastructure.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
-                    b.Property<string>("RoomType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
                     b.Property<decimal>("ServiceFee")
                         .HasColumnType("decimal(18,2)");
 

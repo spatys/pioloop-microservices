@@ -12,7 +12,7 @@ using Property.Infrastructure.Data;
 namespace Property.Infrastructure.Migrations
 {
     [DbContext(typeof(PropertyDbContext))]
-    [Migration("20250825170433_InitialCreate")]
+    [Migration("20250825190259_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -82,11 +82,6 @@ namespace Property.Infrastructure.Migrations
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("PropertyType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("RoomType")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");

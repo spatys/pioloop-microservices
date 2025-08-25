@@ -27,7 +27,6 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
         existingProperty.Title = request.UpdatePropertyRequest.Title;
         existingProperty.Description = request.UpdatePropertyRequest.Description;
         existingProperty.PropertyType = request.UpdatePropertyRequest.PropertyType;
-        existingProperty.RoomType = request.UpdatePropertyRequest.RoomType;
         existingProperty.MaxGuests = request.UpdatePropertyRequest.MaxGuests;
         existingProperty.Bedrooms = request.UpdatePropertyRequest.Bedrooms;
         existingProperty.Beds = request.UpdatePropertyRequest.Beds;
@@ -51,7 +50,6 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
             Title = updatedProperty.Title,
             Description = updatedProperty.Description,
             PropertyType = updatedProperty.PropertyType,
-            RoomType = updatedProperty.RoomType,
             MaxGuests = updatedProperty.MaxGuests,
             Bedrooms = updatedProperty.Bedrooms,
             Beds = updatedProperty.Beds,

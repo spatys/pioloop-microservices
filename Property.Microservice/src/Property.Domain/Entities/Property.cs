@@ -18,10 +18,6 @@ public class Property
     [MaxLength(100)]
     public string PropertyType { get; set; } = string.Empty;
     
-    [Required]
-    [MaxLength(100)]
-    public string RoomType { get; set; } = string.Empty;
-    
     public int MaxGuests { get; set; }
     public int Bedrooms { get; set; }
     public int Beds { get; set; }

@@ -6,7 +6,6 @@ public class PropertyResponse
     public string Title { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string PropertyType { get; set; } = string.Empty;
-    public string RoomType { get; set; } = string.Empty;
     public int MaxGuests { get; set; }
     public int Bedrooms { get; set; }
     public int Beds { get; set; }

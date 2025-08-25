@@ -11,7 +11,6 @@ PAYLOAD='{
   "title": "Appartement moderne a Douala",
   "description": "Magnifique appartement 3 chambres avec vue sur la ville, entierement meuble et equipe. Ideal pour famille ou professionnel.",
   "propertyType": "Appartement",
-  "roomType": "Logement entier",
   "maxGuests": 6,
   "bedrooms": 3,
   "beds": 4,
