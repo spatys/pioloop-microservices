@@ -17,7 +17,7 @@ services:
       - JwtSettings__Audience=PioloopUsers
       - JwtSettings__ExpirationHours=24
       # Email Settings
-      - EmailApi__BaseUrl=http://localhost:5002
+      - EmailApi__BaseUrl=http://email-api
       - EmailSettings__SmtpServer=smtp.gmail.com
       - EmailSettings__SmtpPort=587
       - EmailSettings__SmtpUsername=nanyim.alain@gmail.com
