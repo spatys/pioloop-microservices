@@ -26,6 +26,7 @@ public class Property
     public int Bedrooms { get; set; }
     public int Beds { get; set; }
     public int Bathrooms { get; set; }
+    public int SquareMeters { get; set; }
     
     [Required]
     [MaxLength(500)]
@@ -47,8 +48,6 @@ public class Property
     
     public decimal CleaningFee { get; set; }
     public decimal ServiceFee { get; set; }
-    
-    public bool IsInstantBookable { get; set; }
     
     [Required]
     public PropertyStatus Status { get; set; }

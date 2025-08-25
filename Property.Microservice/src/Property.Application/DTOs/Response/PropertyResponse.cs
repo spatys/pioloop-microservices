@@ -11,6 +11,7 @@ public class PropertyResponse
     public int Bedrooms { get; set; }
     public int Beds { get; set; }
     public int Bathrooms { get; set; }
+    public int SquareMeters { get; set; }
     public string Address { get; set; } = string.Empty;
     public string City { get; set; } = string.Empty;
     public string PostalCode { get; set; } = string.Empty;
@@ -19,7 +20,6 @@ public class PropertyResponse
     public decimal PricePerNight { get; set; }
     public decimal CleaningFee { get; set; }
     public decimal ServiceFee { get; set; }
-    public bool IsInstantBookable { get; set; }
     public string Status { get; set; } = string.Empty;
     public Guid OwnerId { get; set; }
     public string OwnerName { get; set; } = string.Empty;

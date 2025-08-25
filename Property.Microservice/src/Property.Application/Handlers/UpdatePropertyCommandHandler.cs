@@ -32,6 +32,7 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
         existingProperty.Bedrooms = request.UpdatePropertyRequest.Bedrooms;
         existingProperty.Beds = request.UpdatePropertyRequest.Beds;
         existingProperty.Bathrooms = request.UpdatePropertyRequest.Bathrooms;
+        existingProperty.SquareMeters = request.UpdatePropertyRequest.SquareMeters;
         existingProperty.Address = request.UpdatePropertyRequest.Address;
         existingProperty.City = request.UpdatePropertyRequest.City;
         existingProperty.PostalCode = request.UpdatePropertyRequest.PostalCode;
@@ -40,7 +41,6 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
         existingProperty.PricePerNight = request.UpdatePropertyRequest.PricePerNight;
         existingProperty.CleaningFee = request.UpdatePropertyRequest.CleaningFee;
         existingProperty.ServiceFee = request.UpdatePropertyRequest.ServiceFee;
-        existingProperty.IsInstantBookable = request.UpdatePropertyRequest.IsInstantBookable;
         existingProperty.UpdatedAt = DateTime.UtcNow;
 
         var updatedProperty = await _propertyRepository.UpdateAsync(existingProperty);
@@ -56,6 +56,7 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
             Bedrooms = updatedProperty.Bedrooms,
             Beds = updatedProperty.Beds,
             Bathrooms = updatedProperty.Bathrooms,
+            SquareMeters = updatedProperty.SquareMeters,
             Address = updatedProperty.Address,
             City = updatedProperty.City,
             PostalCode = updatedProperty.PostalCode,
@@ -64,12 +65,11 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
             PricePerNight = updatedProperty.PricePerNight,
             CleaningFee = updatedProperty.CleaningFee,
             ServiceFee = updatedProperty.ServiceFee,
-            IsInstantBookable = updatedProperty.IsInstantBookable,
             Status = updatedProperty.Status.ToString(),
             OwnerId = updatedProperty.OwnerId,
             OwnerName = string.Empty, // À récupérer depuis Auth.Microservice si nécessaire
             OwnerEmail = string.Empty, // À récupérer depuis Auth.Microservice si nécessaire
-            ImageUrls = updatedProperty.Images.OrderBy(i => i.DisplayOrder).Select(i => i.Url).ToList(),
+            ImageUrls = updatedProperty.Images.OrderBy(i => i.DisplayOrder).Select(i => i.ImageUrl).ToList(),
             Amenities = updatedProperty.Amenities.OrderBy(a => a.DisplayOrder).Select(a => a.Name).ToList(),
             CreatedAt = updatedProperty.CreatedAt,
             UpdatedAt = updatedProperty.UpdatedAt

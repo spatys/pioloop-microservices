@@ -12,14 +12,14 @@ public class PropertyImage
     
     [Required]
     [MaxLength(500)]
-    public string Url { get; set; } = string.Empty;
+    public string ImageUrl { get; set; } = string.Empty;
     
     [MaxLength(200)]
     public string AltText { get; set; } = string.Empty;
     
-    public int DisplayOrder { get; set; } = 0;
+    public bool IsMainImage { get; set; } = false;
     
-    public bool IsPrimary { get; set; } = false;
+    public int DisplayOrder { get; set; } = 0;
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }

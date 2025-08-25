@@ -30,6 +30,7 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             Bedrooms = request.CreatePropertyRequest.Bedrooms,
             Beds = request.CreatePropertyRequest.Beds,
             Bathrooms = request.CreatePropertyRequest.Bathrooms,
+            SquareMeters = request.CreatePropertyRequest.SquareMeters,
             Address = request.CreatePropertyRequest.Address,
             City = request.CreatePropertyRequest.City,
             PostalCode = request.CreatePropertyRequest.PostalCode,
@@ -38,12 +39,48 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             PricePerNight = request.CreatePropertyRequest.PricePerNight,
             CleaningFee = request.CreatePropertyRequest.CleaningFee,
             ServiceFee = request.CreatePropertyRequest.ServiceFee,
-            IsInstantBookable = request.CreatePropertyRequest.IsInstantBookable,
             Status = PropertyStatus.Draft,
             OwnerId = request.CreatePropertyRequest.OwnerId,
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
+
+        // Add amenities if provided
+        if (request.CreatePropertyRequest.Amenities?.Any() == true)
+        {
+            property.Amenities = request.CreatePropertyRequest.Amenities.Select(a => new PropertyAmenity
+            {
+                Id = Guid.NewGuid(),
+                PropertyId = property.Id,
+                Name = a.Name,
+                Description = a.Description,
+                Type = a.Type,
+                Category = a.Category,
+                IsAvailable = a.IsAvailable,
+                IsIncludedInRent = a.IsIncludedInRent,
+                AdditionalCost = a.AdditionalCost,
+                Icon = a.Icon,
+                Priority = a.Priority,
+                DisplayOrder = a.Priority,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            }).ToList();
+        }
+
+        // Add images if provided
+        if (request.CreatePropertyRequest.Images?.Any() == true)
+        {
+            property.Images = request.CreatePropertyRequest.Images.Select(i => new PropertyImage
+            {
+                Id = Guid.NewGuid(),
+                PropertyId = property.Id,
+                ImageUrl = i.ImageUrl,
+                AltText = i.AltText,
+                IsMainImage = i.IsMainImage,
+                DisplayOrder = i.DisplayOrder,
+                CreatedAt = DateTime.UtcNow
+            }).ToList();
+        }
 
         var createdProperty = await _propertyRepository.AddAsync(property);
 
@@ -58,6 +95,7 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             Bedrooms = createdProperty.Bedrooms,
             Beds = createdProperty.Beds,
             Bathrooms = createdProperty.Bathrooms,
+            SquareMeters = createdProperty.SquareMeters,
             Address = createdProperty.Address,
             City = createdProperty.City,
             PostalCode = createdProperty.PostalCode,
@@ -66,7 +104,6 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             PricePerNight = createdProperty.PricePerNight,
             CleaningFee = createdProperty.CleaningFee,
             ServiceFee = createdProperty.ServiceFee,
-            IsInstantBookable = createdProperty.IsInstantBookable,
             Status = createdProperty.Status.ToString(),
             OwnerId = createdProperty.OwnerId,
             CreatedAt = createdProperty.CreatedAt,

@@ -45,7 +45,7 @@ public class PropertyController : ControllerBase
     /// <summary>
     /// Create a new property
     /// </summary>
-    [HttpPost]
+    [HttpPost("create")]
     public async Task<ActionResult<PropertyResponse>> Create([FromBody] CreatePropertyRequest createPropertyRequest)
     {
         var property = await _mediator.Send(new CreatePropertyCommand(createPropertyRequest));

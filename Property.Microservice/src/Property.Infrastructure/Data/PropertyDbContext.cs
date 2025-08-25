@@ -41,7 +41,7 @@ public class PropertyDbContext : DbContext
         modelBuilder.Entity<PropertyImage>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.Url).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.ImageUrl).IsRequired().HasMaxLength(500);
             entity.Property(e => e.AltText).HasMaxLength(200);
             
             entity.HasOne(e => e.Property)
@@ -56,7 +56,10 @@ public class PropertyDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Description).HasMaxLength(200);
-            entity.Property(e => e.Type).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Type).IsRequired();
+            entity.Property(e => e.Category).IsRequired();
+            entity.Property(e => e.Icon).HasMaxLength(50);
+            entity.Property(e => e.AdditionalCost).HasColumnType("decimal(18,2)");
             
             entity.HasOne(e => e.Property)
                   .WithMany(e => e.Amenities)
