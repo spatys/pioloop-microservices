@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Property.Application.Commands;
 using Property.Application.DTOs.Request;
 using Property.Application.DTOs.Response;
@@ -46,6 +47,7 @@ public class PropertyController : ControllerBase
     /// Create a new property
     /// </summary>
     [HttpPost("create")]
+    [Authorize]
     public async Task<ActionResult<PropertyResponse>> Create([FromBody] CreatePropertyRequest createPropertyRequest)
     {
         var property = await _mediator.Send(new CreatePropertyCommand(createPropertyRequest));

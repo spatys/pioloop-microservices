@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 using Property.Application.Handlers;
 using Property.Domain.Interfaces;
 using Property.Infrastructure.Data;
@@ -6,6 +8,7 @@ using Property.Infrastructure.Repositories;
 using Property.Infrastructure.Extensions;
 using System.Reflection;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +53,27 @@ builder.Services.AddDbContext<PropertyDbContext>(options =>
 // Repositories
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 
+// HttpContext Accessor pour récupérer l'utilisateur connecté
+builder.Services.AddHttpContextAccessor();
+
+// Authentication JWT
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+            ValidAudience = builder.Configuration["JwtSettings:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured"))
+            )
+        };
+    });
+
 // MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SearchPropertiesQueryHandler).Assembly));
 
@@ -85,6 +109,7 @@ app.UseCors("AllowApiGateway");
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

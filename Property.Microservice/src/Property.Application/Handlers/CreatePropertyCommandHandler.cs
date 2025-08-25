@@ -1,24 +1,35 @@
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Property.Application.Commands;
 using Property.Application.DTOs.Request;
 using Property.Application.DTOs.Response;
 using Property.Domain.Entities;
 using Property.Domain.Interfaces;
 using PropertyEntity = Property.Domain.Entities.Property;
+using System.Security.Claims;
 
 namespace Property.Application.Handlers;
 
 public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyCommand, PropertyResponse>
 {
     private readonly IPropertyRepository _propertyRepository;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public CreatePropertyCommandHandler(IPropertyRepository propertyRepository)
+    public CreatePropertyCommandHandler(IPropertyRepository propertyRepository, IHttpContextAccessor httpContextAccessor)
     {
         _propertyRepository = propertyRepository;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<PropertyResponse> Handle(CreatePropertyCommand request, CancellationToken cancellationToken)
     {
+        // Récupérer l'utilisateur connecté depuis le token JWT
+        var userId = GetCurrentUserId();
+        if (string.IsNullOrEmpty(userId))
+        {
+            throw new UnauthorizedAccessException("Utilisateur non authentifié");
+        }
+
         var property = new PropertyEntity
         {
             Id = Guid.NewGuid(),
@@ -40,7 +51,7 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             CleaningFee = request.CreatePropertyRequest.CleaningFee,
             ServiceFee = request.CreatePropertyRequest.ServiceFee,
             Status = PropertyStatus.Draft,
-            OwnerId = request.CreatePropertyRequest.OwnerId,
+            OwnerId = userId, // Utiliser l'ID de l'utilisateur connecté
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
         };
@@ -109,5 +120,16 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             CreatedAt = createdProperty.CreatedAt,
             UpdatedAt = createdProperty.UpdatedAt
         };
+    }
+
+    private string GetCurrentUserId()
+    {
+        var user = _httpContextAccessor.HttpContext?.User;
+        if (user?.Identity?.IsAuthenticated == true)
+        {
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier) ?? user.FindFirst("sub");
+            return userIdClaim?.Value;
+        }
+        return null;
     }
 }

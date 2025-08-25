@@ -12,10 +12,17 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - ConnectionStrings__DefaultConnection=Host=property-db;Database=pioloop_property;Username=pioloop12345;Password=piolOOP_&!?12345;Port=5432
+      # JWT Settings (même configuration que Auth.Microservice)
+      - JwtSettings__SecretKey=Pioloop2025SecretKey32CharsLong!@#
+      - JwtSettings__Issuer=Pioloop
+      - JwtSettings__Audience=PioloopUsers
+      - JwtSettings__ExpirationHours=24
     depends_on:
-      - property-db
+      property-db:
+        condition: service_healthy
     networks:
       - pioloop-network
+    restart: unless-stopped
 
   property-db:
     image: postgres:15-alpine
@@ -30,6 +37,12 @@ services:
       - property-db-data:/var/lib/postgresql/data
     networks:
       - pioloop-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pioloop12345 -d pioloop_property"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
 volumes:
   property-db-data:
