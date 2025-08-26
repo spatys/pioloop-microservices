@@ -86,7 +86,7 @@ public class ResendEmailCodeCommandHandler : IRequestHandler<ResendEmailCodeComm
             // Appel Email MS pour envoyer le nouveau code
             try
             {
-                var emailApiUrl = _configuration["EmailApi:BaseUrl"] ?? "http://email-microservice";
+                var emailApiUrl = _configuration["EmailApi:BaseUrl"]; // ?? "http://email-api";
                 var payload = new
                 {
                     Email = user.Email,

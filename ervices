@@ -1,0 +1,13 @@
+[1mdiff --git a/Auth.Microservice/src/Auth.Application/Handlers/ResendEmailCodeCommandHandler.cs b/Auth.Microservice/src/Auth.Application/Handlers/ResendEmailCodeCommandHandler.cs[m
+[1mindex cea680c..ec12ec3 100644[m
+[1m--- a/Auth.Microservice/src/Auth.Application/Handlers/ResendEmailCodeCommandHandler.cs[m
+[1m+++ b/Auth.Microservice/src/Auth.Application/Handlers/ResendEmailCodeCommandHandler.cs[m
+[36m@@ -86,7 +86,7 @@[m [mpublic class ResendEmailCodeCommandHandler : IRequestHandler<ResendEmailCodeComm[m
+             // Appel Email MS pour envoyer le nouveau code[m
+             try[m
+             {[m
+[31m-                var emailApiUrl = _configuration["EmailApi:BaseUrl"] ?? "http://email-microservice";[m
+[32m+[m[32m                var emailApiUrl = _configuration["EmailApi:BaseUrl"] ?? "http://email-api";[m
+                 var payload = new[m
+                 {[m
+                     Email = user.Email,[m

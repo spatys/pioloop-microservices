@@ -72,7 +72,7 @@ public class RegisterEmailCommandHandler : IRequestHandler<RegisterEmailCommand,
             // Appel Email MS pour envoyer le code
             try
             {
-                var emailApiUrl = _configuration["EmailApi:BaseUrl"] ?? "http://email-microservice";
+                var emailApiUrl = _configuration["EmailApi:BaseUrl"] ?? "http://email-api";
                 var payload = new
                 {
                     Email = createdUser.Email,
