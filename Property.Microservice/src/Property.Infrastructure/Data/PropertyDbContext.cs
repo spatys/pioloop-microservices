@@ -33,9 +33,9 @@ public class PropertyDbContext : DbContext
             entity.Property(e => e.PricePerNight).HasColumnType("decimal(18,2)");
             entity.Property(e => e.CleaningFee).HasColumnType("decimal(18,2)");
             entity.Property(e => e.ServiceFee).HasColumnType("decimal(18,2)");
-            
-
         });
+
+
 
         // Configuration de PropertyImage
         modelBuilder.Entity<PropertyImage>(entity =>

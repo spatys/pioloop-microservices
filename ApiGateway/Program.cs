@@ -123,12 +123,18 @@ builder.Services.AddCors(options =>
               )
               .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH")
               .AllowAnyHeader()
-              .AllowCredentials();
+              .AllowCredentials()
+              .SetIsOriginAllowed(origin => true); // Pour le développement
     });
 });
 
-// Configuration des services HTTP
-builder.Services.AddHttpClient();
+// Configuration des services HTTP avec transmission des cookies
+builder.Services.AddHttpClient("OcelotClient")
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        UseCookies = true,
+        CookieContainer = new System.Net.CookieContainer()
+    });
 
 // Configuration de la validation des modèles
 builder.Services.Configure<Microsoft.AspNetCore.Mvc.ApiBehaviorOptions>(options =>

@@ -21,7 +21,7 @@ public class PropertyRepository : IPropertyRepository
         var query = _context.Properties
             .Include(p => p.Images.OrderBy(i => i.DisplayOrder))
             .Include(p => p.Amenities.OrderBy(a => a.DisplayOrder))
-            .Where(p => p.Status == PropertyStatus.Published); // Seulement les propriétés publiées
+            .Where(p => p.Status == PropertyStatus.Verified); // Seulement les propriétés vérifiées
 
         // Filtre par localisation (ex: "Bonabéri, Douala, Littoral")
         if (!string.IsNullOrEmpty(criteria.Location))

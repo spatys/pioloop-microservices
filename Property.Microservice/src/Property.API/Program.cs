@@ -59,7 +59,7 @@ builder.Services.AddHttpContextAccessor();
 // HttpClient pour appeler les autres microservices
 builder.Services.AddHttpClient();
 
-// Authentication JWT
+// Authentication JWT avec support des cookies
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -75,6 +75,32 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured"))
             )
         };
+        
+        // Configuration pour lire le token depuis les cookies
+                                options.Events = new JwtBearerEvents
+                        {
+                            OnMessageReceived = context =>
+                            {
+                                // Essayer de récupérer le token depuis le header Authorization
+                                if (context.Request.Headers.ContainsKey("Authorization"))
+                                {
+                                    var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+                                    if (!string.IsNullOrEmpty(token))
+                                    {
+                                        context.Token = token;
+                                        return Task.CompletedTask;
+                                    }
+                                }
+                                
+                                // Fallback : essayer de récupérer le token depuis le cookie auth_token
+                                if (context.Request.Cookies.ContainsKey("auth_token"))
+                                {
+                                    context.Token = context.Request.Cookies["auth_token"];
+                                }
+                                
+                                return Task.CompletedTask;
+                            }
+                        };
     });
 
 // MediatR
@@ -90,7 +116,8 @@ builder.Services.AddCors(options =>
                      "http://localhost:5000"              // Local API Gateway (HTTP)
                    )
                   .WithMethods("GET", "POST", "PUT", "DELETE", "PATCH")
-                  .AllowAnyHeader();
+                  .AllowAnyHeader()
+                  .AllowCredentials(); // Important pour les cookies
     });
 });
 

@@ -160,19 +160,7 @@
       "UpstreamHttpMethod": ["GET"],
       "SwaggerKey": "email"
     },
-    {
-      "DownstreamPathTemplate": "/api/property/{everything}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "property-api",
-          "Port": 80
-        }
-      ],
-      "UpstreamPathTemplate": "/api/property/{everything}",
-      "UpstreamHttpMethod": ["GET", "POST", "PUT", "DELETE"],
-      "SwaggerKey": "property"
-    },
+
     {
       "DownstreamPathTemplate": "/api/property/search",
       "DownstreamScheme": "http",
@@ -183,19 +171,6 @@
         }
       ],
       "UpstreamPathTemplate": "/api/property/search",
-      "UpstreamHttpMethod": ["GET"],
-      "SwaggerKey": "property"
-    },
-    {
-      "DownstreamPathTemplate": "/api/property/{id}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "property-api",
-          "Port": 80
-        }
-      ],
-      "UpstreamPathTemplate": "/api/property/{id}",
       "UpstreamHttpMethod": ["GET"],
       "SwaggerKey": "property"
     },
@@ -237,6 +212,19 @@
       "UpstreamPathTemplate": "/api/property/delete/{id}",
       "UpstreamHttpMethod": ["DELETE"],
       "SwaggerKey": "property"
+    },
+    {
+      "DownstreamPathTemplate": "/api/property/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "property-api",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/property/{id}",
+      "UpstreamHttpMethod": ["GET"],
+      "SwaggerKey": "property"
     }
   ],
   "SwaggerEndPoints": [
@@ -272,6 +260,13 @@
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://api-gateway:80"
+    "BaseUrl": "http://api-gateway:80",
+    "DownstreamScheme": "http",
+    "DownstreamHttpVersion": "2.0",
+    "HttpHandlerOptions": {
+      "AllowAutoRedirect": false,
+      "UseCookieContainer": true,
+      "UseProxy": false
+    }
   }
 }
