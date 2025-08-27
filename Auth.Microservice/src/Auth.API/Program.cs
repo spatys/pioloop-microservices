@@ -95,9 +95,12 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole<Guid>>(options =>
     .AddEntityFrameworkStores<AuthDbContext>()
     .AddDefaultTokenProviders();
 
+// Explicitly register RoleManager
+builder.Services.AddScoped<RoleManager<IdentityRole<Guid>>>();
+
 // JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"] ?? "default-secret-key-32-chars-long");
+var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"]);
 
 builder.Services.AddAuthentication(options =>
 {

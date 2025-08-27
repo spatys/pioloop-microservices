@@ -357,6 +357,34 @@ public class AuthController : ControllerBase
     }
 
     /// <summary>
+    /// Update user role
+    /// Updates the role of a specific user (internal use by other microservices)
+    /// </summary>
+    /// <param name="request">User ID and new role</param>
+    /// <returns>Role updated successfully</returns>
+    [HttpPost("update-role")]
+    [ProducesResponseType(StatusCodes.Status200OK, Type = typeof(ApiResponseDto<object>))]
+    [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(ApiResponseDto<object>))]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ApiResponseDto<object>))]
+    public async Task<IActionResult> UpdateUserRole([FromBody] UpdateUserRoleRequest request)
+    {
+        var command = new UpdateUserRoleCommand
+        {
+            UserId = request.UserId,
+            NewRole = request.NewRole
+        };
+
+        var result = await _mediator.Send(command);
+        
+        if (result.Success)
+        {
+            return Ok(result);
+        }
+        
+        return BadRequest(result);
+    }
+
+    /// <summary>
     /// Health check endpoint
     /// </summary>
     /// <returns>Health status</returns>
