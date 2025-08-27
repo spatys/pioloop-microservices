@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Property.Application.Commands;
 using Property.Application.DTOs.Request;
 using Property.Application.DTOs.Response;
@@ -7,6 +8,7 @@ using Property.Domain.Entities;
 using Property.Domain.Interfaces;
 using PropertyEntity = Property.Domain.Entities.Property;
 using System.Security.Claims;
+using System.Text.Json;
 
 namespace Property.Application.Handlers;
 
@@ -14,17 +16,27 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
 {
     private readonly IPropertyRepository _propertyRepository;
     private readonly IHttpContextAccessor _httpContextAccessor;
+    private readonly IConfiguration _configuration;
+    private readonly HttpClient _httpClient;
 
-    public CreatePropertyCommandHandler(IPropertyRepository propertyRepository, IHttpContextAccessor httpContextAccessor)
+    public CreatePropertyCommandHandler(
+        IPropertyRepository propertyRepository, 
+        IHttpContextAccessor httpContextAccessor,
+        IConfiguration configuration,
+        HttpClient httpClient)
     {
         _propertyRepository = propertyRepository;
         _httpContextAccessor = httpContextAccessor;
+        _configuration = configuration;
+        _httpClient = httpClient;
     }
 
     public async Task<PropertyResponse> Handle(CreatePropertyCommand request, CancellationToken cancellationToken)
     {
-        // Récupérer l'utilisateur connecté depuis le token JWT
-        var userId = GetCurrentUserId();
+        try
+        {
+            // Récupérer l'utilisateur connecté depuis le token JWT
+            var userId = GetCurrentUserId();
         if (string.IsNullOrEmpty(userId))
         {
             throw new UnauthorizedAccessException("Utilisateur non authentifié");
@@ -55,7 +67,7 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             PricePerNight = request.CreatePropertyRequest.PricePerNight,
             CleaningFee = request.CreatePropertyRequest.CleaningFee,
             ServiceFee = request.CreatePropertyRequest.ServiceFee,
-            Status = PropertyStatus.Draft,
+            Status = PropertyStatus.PendingApproval,
             OwnerId = ownerId, // Utiliser l'ID de l'utilisateur connecté
             CreatedAt = DateTime.UtcNow,
             UpdatedAt = DateTime.UtcNow
@@ -100,6 +112,15 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
 
         var createdProperty = await _propertyRepository.AddAsync(property);
 
+        // Vérifier que la propriété a été créée avec succès
+        if (createdProperty == null)
+        {
+            throw new InvalidOperationException("La création de la propriété a échoué. Veuillez réessayer.");
+        }
+
+        // Mettre à jour le rôle de l'utilisateur vers "Owner" s'il était "Tenant"
+        await UpdateUserRoleToOwner(ownerId);
+
         return new PropertyResponse
         {
             Id = createdProperty.Id,
@@ -125,6 +146,15 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             CreatedAt = createdProperty.CreatedAt,
             UpdatedAt = createdProperty.UpdatedAt
         };
+        }
+        catch (Exception ex)
+        {
+            // Log l'erreur pour le debugging
+            Console.WriteLine($"Error creating property: {ex.Message}");
+            
+            // Relancer l'exception pour que l'interface puisse la gérer
+            throw new InvalidOperationException($"Erreur lors de la création de la propriété : {ex.Message}");
+        }
     }
 
     private string? GetCurrentUserId()
@@ -136,5 +166,38 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             return userIdClaim?.Value;
         }
         return null;
+    }
+
+    private async Task UpdateUserRoleToOwner(Guid userId)
+    {
+        try
+        {
+            // Récupérer l'URL de l'API d'authentification
+            var authApiUrl = _configuration["AuthApi:BaseUrl"] ?? "http://auth-api";
+            
+            // Créer la requête pour mettre à jour le rôle
+            var updateRoleRequest = new
+            {
+                UserId = userId,
+                NewRole = "Owner"
+            };
+
+            var jsonContent = JsonSerializer.Serialize(updateRoleRequest);
+            var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
+
+            // Appeler l'API d'authentification pour mettre à jour le rôle
+            var response = await _httpClient.PostAsync($"{authApiUrl}/api/auth/update-role", content);
+            
+            if (!response.IsSuccessStatusCode)
+            {
+                // Log l'erreur mais ne pas faire échouer la création de propriété
+                Console.WriteLine($"Failed to update user role to Owner for user {userId}. Status: {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log l'exception mais ne pas faire échouer la création de propriété
+            Console.WriteLine($"Error updating user role to Owner for user {userId}: {ex.Message}");
+        }
     }
 }

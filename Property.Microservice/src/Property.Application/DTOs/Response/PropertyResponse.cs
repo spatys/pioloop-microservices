@@ -22,8 +22,6 @@ public class PropertyResponse
     public decimal ServiceFee { get; set; }
     public string Status { get; set; } = string.Empty;
     public Guid OwnerId { get; set; }
-    public string OwnerName { get; set; } = string.Empty;
-    public string OwnerEmail { get; set; } = string.Empty;
     public List<string> ImageUrls { get; set; } = new();
     public List<string> Amenities { get; set; } = new();
     public DateTime CreatedAt { get; set; }

@@ -56,6 +56,9 @@ builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 // HttpContext Accessor pour récupérer l'utilisateur connecté
 builder.Services.AddHttpContextAccessor();
 
+// HttpClient pour appeler les autres microservices
+builder.Services.AddHttpClient();
+
 // Authentication JWT
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>

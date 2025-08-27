@@ -57,8 +57,6 @@ public class SearchPropertiesQueryHandler : IRequestHandler<SearchPropertiesQuer
                 ServiceFee = p.ServiceFee,
                 Status = p.Status.ToString(),
                 OwnerId = p.OwnerId,
-                OwnerName = string.Empty, // À récupérer depuis Auth.Microservice si nécessaire
-                OwnerEmail = string.Empty, // À récupérer depuis Auth.Microservice si nécessaire
                 ImageUrls = p.Images.OrderBy(i => i.DisplayOrder).Select(i => i.ImageUrl).ToList(),
                 Amenities = p.Amenities.OrderBy(a => a.DisplayOrder).Select(a => a.Name).ToList(),
                 CreatedAt = p.CreatedAt,

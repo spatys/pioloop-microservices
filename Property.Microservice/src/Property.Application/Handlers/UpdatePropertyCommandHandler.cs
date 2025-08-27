@@ -67,8 +67,6 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
             ServiceFee = updatedProperty.ServiceFee,
             Status = updatedProperty.Status.ToString(),
             OwnerId = updatedProperty.OwnerId,
-            OwnerName = string.Empty, // À récupérer depuis Auth.Microservice si nécessaire
-            OwnerEmail = string.Empty, // À récupérer depuis Auth.Microservice si nécessaire
             ImageUrls = updatedProperty.Images.OrderBy(i => i.DisplayOrder).Select(i => i.ImageUrl).ToList(),
             Amenities = updatedProperty.Amenities.OrderBy(a => a.DisplayOrder).Select(a => a.Name).ToList(),
             CreatedAt = updatedProperty.CreatedAt,

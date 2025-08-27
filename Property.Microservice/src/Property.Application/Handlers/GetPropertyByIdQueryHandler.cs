@@ -43,8 +43,6 @@ public class GetPropertyByIdQueryHandler : IRequestHandler<GetPropertyByIdQuery,
                 ServiceFee = property.ServiceFee,
                 Status = property.Status.ToString(),
             OwnerId = property.OwnerId,
-            OwnerName = string.Empty, // À récupérer depuis Auth.Microservice si nécessaire
-            OwnerEmail = string.Empty, // À récupérer depuis Auth.Microservice si nécessaire
             ImageUrls = property.Images.OrderBy(i => i.DisplayOrder).Select(i => i.ImageUrl).ToList(),
             Amenities = property.Amenities.OrderBy(a => a.DisplayOrder).Select(a => a.Name).ToList(),
             CreatedAt = property.CreatedAt,

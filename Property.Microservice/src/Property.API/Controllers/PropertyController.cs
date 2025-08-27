@@ -44,6 +44,17 @@ public class PropertyController : ControllerBase
     }
 
     /// <summary>
+    /// Get properties by owner ID
+    /// </summary>
+    [HttpGet("owner/{ownerId:guid}")]
+    [Authorize]
+    public async Task<ActionResult<IEnumerable<PropertyResponse>>> GetByOwnerId(Guid ownerId)
+    {
+        var properties = await _mediator.Send(new GetPropertiesByOwnerIdQuery(ownerId));
+        return Ok(properties);
+    }
+
+    /// <summary>
     /// Create a new property
     /// </summary>
     [HttpPost("create")]

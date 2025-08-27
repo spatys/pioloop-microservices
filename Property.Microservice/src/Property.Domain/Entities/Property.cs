@@ -65,7 +65,7 @@ public class Property
 
 public enum PropertyStatus
 {
-    Draft,
+    PendingApproval,
     Published,
     Rented,
     Maintenance,

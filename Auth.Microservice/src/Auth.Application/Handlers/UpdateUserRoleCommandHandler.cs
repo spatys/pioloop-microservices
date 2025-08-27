@@ -9,11 +9,11 @@ namespace Auth.Application.Handlers;
 public class UpdateUserRoleCommandHandler : IRequestHandler<UpdateUserRoleCommand, ApiResponseDto<object>>
 {
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly RoleManager<IdentityRole> _roleManager;
+    private readonly RoleManager<IdentityRole<Guid>> _roleManager;
 
     public UpdateUserRoleCommandHandler(
         UserManager<ApplicationUser> userManager,
-        RoleManager<IdentityRole> roleManager)
+        RoleManager<IdentityRole<Guid>> roleManager)
     {
         _userManager = userManager;
         _roleManager = roleManager;
