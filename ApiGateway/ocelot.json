@@ -188,6 +188,32 @@
       "SwaggerKey": "property"
     },
     {
+      "DownstreamPathTemplate": "/api/property/owner/{ownerId}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "property-api",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/property/owner/{ownerId}",
+      "UpstreamHttpMethod": ["GET"],
+      "SwaggerKey": "property"
+    },
+    {
+      "DownstreamPathTemplate": "/api/property/my-properties",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 3000
+        }
+      ],
+      "UpstreamPathTemplate": "/api/property/my-properties",
+      "UpstreamHttpMethod": ["GET"],
+      "SwaggerKey": "property"
+    },
+    {
       "DownstreamPathTemplate": "/api/property/update/{id}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [

@@ -175,18 +175,10 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             // Récupérer l'URL de l'API d'authentification
             var authApiUrl = _configuration["AuthApi:BaseUrl"] ?? "http://auth-api";
             
-            // Créer la requête pour mettre à jour le rôle
-            var updateRoleRequest = new
-            {
-                UserId = userId,
-                NewRole = "Owner"
-            };
 
-            var jsonContent = JsonSerializer.Serialize(updateRoleRequest);
-            var content = new StringContent(jsonContent, System.Text.Encoding.UTF8, "application/json");
 
             // Appeler l'API d'authentification pour mettre à jour le rôle
-            var response = await _httpClient.PostAsync($"{authApiUrl}/api/auth/update-role", content);
+            var response = await _httpClient.PostAsync($"{authApiUrl}/api/roles/assign?userId={userId}&roleName=Owner", null);
             
             if (!response.IsSuccessStatusCode)
             {
