@@ -1,0 +1,151 @@
+# Docker Compose configuration for Pioloop microservices
+
+services:
+  # API Gateway
+  api-gateway:
+    build:
+      context: ./ApiGateway
+      dockerfile: Dockerfile
+    container_name: api-gateway
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - JwtSettings__SecretKey=Pioloop2025SecretKey32CharsLong!@#
+      - JwtSettings__Issuer=Pioloop
+      - JwtSettings__Audience=PioloopUsers
+    depends_on:
+      - auth-api
+      - property-api
+      - email-api
+    networks:
+      - pioloop-network
+    restart: unless-stopped
+
+  # Auth Microservice
+  auth-api:
+    build:
+      context: ./Auth.Microservice
+      dockerfile: Dockerfile
+    container_name: auth-api
+    ports:
+      - "5001:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=auth-db;Database=pioloop_auth;Username=pioloop12345;Password=piolOOP_&!?12345;Port=5432
+      # JWT Settings
+      - JwtSettings__SecretKey=Pioloop2025SecretKey32CharsLong!@#
+      - JwtSettings__Issuer=Pioloop
+      - JwtSettings__Audience=PioloopUsers
+      - JwtSettings__ExpirationHours=24
+      # Email Settings
+      - EmailApi__BaseUrl=http://email-api
+      - EmailSettings__SmtpServer=smtp.gmail.com
+      - EmailSettings__SmtpPort=587
+      - EmailSettings__SmtpUsername=nanyim.alain@gmail.com
+      - EmailSettings__SmtpPassword=ekcc pfre ybmb iuol
+      - EmailSettings__FromEmail=noreply@pioloop.com
+      - EmailSettings__FromName=Pioloop
+      # Stripe Settings
+      - StripeSettings__SecretKey=your-stripe-secret-key
+      - StripeSettings__PublishableKey=your-stripe-publishable-key
+    depends_on:
+      auth-db:
+        condition: service_healthy
+    networks:
+      - pioloop-network
+    restart: unless-stopped
+
+  # Property Microservice
+  property-api:
+    build:
+      context: ./Property.Microservice
+      dockerfile: Dockerfile
+    container_name: property-api
+    ports:
+      - "5003:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=property-db;Database=pioloop_property;Username=pioloop12345;Password=piolOOP_&!?12345;Port=5432
+      # JWT Settings
+      - JwtSettings__SecretKey=Pioloop2025SecretKey32CharsLong!@#
+      - JwtSettings__Issuer=Pioloop
+      - JwtSettings__Audience=PioloopUsers
+      # Auth API Settings
+      - AuthApi__BaseUrl=http://auth-api
+    depends_on:
+      property-db:
+        condition: service_healthy
+    networks:
+      - pioloop-network
+    restart: unless-stopped
+
+  # Email Microservice
+  email-api:
+    build:
+      context: ./Email.Microservice
+      dockerfile: Dockerfile
+    container_name: email-api
+    ports:
+      - "5002:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - EmailSettings__SmtpServer=smtp.gmail.com
+      - EmailSettings__SmtpPort=587
+      - EmailSettings__SmtpUsername=nanyim.alain@gmail.com
+      - EmailSettings__SmtpPassword=ekcc pfre ybmb iuol
+      - EmailSettings__FromEmail=noreply@pioloop.com
+      - EmailSettings__FromName=Pioloop
+    networks:
+      - pioloop-network
+    restart: unless-stopped
+
+  # Auth Database
+  auth-db:
+    image: postgres:15
+    container_name: auth-db
+    environment:
+      - POSTGRES_DB=pioloop_auth
+      - POSTGRES_USER=pioloop12345
+      - POSTGRES_PASSWORD=piolOOP_&!?12345
+    ports:
+      - "5433:5432"
+    volumes:
+      - auth-db-data:/var/lib/postgresql/data
+    networks:
+      - pioloop-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pioloop12345 -d pioloop_auth"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+  # Property Database
+  property-db:
+    image: postgres:15
+    container_name: property-db
+    environment:
+      - POSTGRES_DB=pioloop_property
+      - POSTGRES_USER=pioloop12345
+      - POSTGRES_PASSWORD=piolOOP_&!?12345
+    ports:
+      - "5435:5432"
+    volumes:
+      - property-db-data:/var/lib/postgresql/data
+    networks:
+      - pioloop-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pioloop12345 -d pioloop_property"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  auth-db-data:
+  property-db-data:
+
+networks:
+  pioloop-network:
+    driver: bridge
