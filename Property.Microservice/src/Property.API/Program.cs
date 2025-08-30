@@ -2,10 +2,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Property.Application.Handlers;
+using Property.Application.Mapping;
 using Property.Domain.Interfaces;
 using Property.Infrastructure.Data;
 using Property.Infrastructure.Repositories;
 using Property.Infrastructure.Extensions;
+using Property.Infrastructure.Services;
 using System.Reflection;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -52,6 +54,9 @@ builder.Services.AddDbContext<PropertyDbContext>(options =>
 
 // Repositories
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
+
+// Services
+builder.Services.AddScoped<IImageService, ImageService>();
 
 // HttpContext Accessor pour récupérer l'utilisateur connecté
 builder.Services.AddHttpContextAccessor();
@@ -102,6 +107,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                             }
                         };
     });
+
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(PropertyMappingProfile));
 
 // MediatR
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SearchPropertiesQueryHandler).Assembly));

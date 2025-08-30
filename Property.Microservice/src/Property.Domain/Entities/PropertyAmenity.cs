@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Property.Domain.Enums;
 
 namespace Property.Domain.Entities;
 
@@ -18,10 +19,10 @@ public class PropertyAmenity
     public string Description { get; set; } = string.Empty;
     
     [Required]
-    public int Type { get; set; } // Enum: 1 = Essential, 2 = Comfort, 3 = Luxury, etc.
+    public AmenityType Type { get; set; }
     
     [Required]
-    public int Category { get; set; } // Enum: 1 = Basic, 2 = Service, 3 = Security, 4 = Entertainment, etc.
+    public AmenityCategory Category { get; set; }
     
     public bool IsAvailable { get; set; } = true;
     

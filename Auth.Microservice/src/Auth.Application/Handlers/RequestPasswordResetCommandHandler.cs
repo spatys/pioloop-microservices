@@ -49,8 +49,8 @@ public class RequestPasswordResetCommandHandler : IRequestHandler<RequestPasswor
             var user = await _userManager.FindByEmailAsync(request.Email);
             if (user == null)
             {
-                // Pour des raisons de sécurité, on ne révèle pas si l'email existe ou non
-                return ApiResponseDto<object>.FromSuccess(null, "Si cet email existe, un lien de réinitialisation a été envoyé");
+                            // Pour des raisons de sécurité, on ne révèle pas si l'email existe ou non
+            return ApiResponseDto<object>.FromSuccess(null);
             }
 
             // Générer le token de réinitialisation
@@ -71,7 +71,7 @@ public class RequestPasswordResetCommandHandler : IRequestHandler<RequestPasswor
             }
             catch { /* ignore send failures */ }
 
-            return ApiResponseDto<object>.FromSuccess(null, "Si cet email existe, un lien de réinitialisation a été envoyé");
+            return ApiResponseDto<object>.FromSuccess(null);
         }
         catch (Exception)
         {

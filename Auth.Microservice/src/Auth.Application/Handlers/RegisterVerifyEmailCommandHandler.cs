@@ -61,7 +61,7 @@ public class RegisterVerifyEmailCommandHandler : IRequestHandler<RegisterVerifyE
                     IsVerified = true
                 };
 
-                return ApiResponseDto<RegisterVerifyEmailResponseDto>.FromSuccess(responseDto, "Email vérifié avec succès");
+                return ApiResponseDto<RegisterVerifyEmailResponseDto>.FromSuccess(responseDto);
             }
             else
             {

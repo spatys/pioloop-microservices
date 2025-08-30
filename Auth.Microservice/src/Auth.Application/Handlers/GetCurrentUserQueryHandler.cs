@@ -64,7 +64,7 @@ public class GetCurrentUserQueryHandler : IRequestHandler<GetCurrentUserQuery, A
                 Roles = roles.ToList()
             };
 
-            return ApiResponseDto<ApplicationUserDto>.FromSuccess(userDto, "Utilisateur récupéré avec succès");
+            return ApiResponseDto<ApplicationUserDto>.FromSuccess(userDto);
         }
         catch (Exception)
         {

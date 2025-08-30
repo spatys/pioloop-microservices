@@ -27,24 +27,14 @@ public class UpdateUserRoleCommandHandler : IRequestHandler<UpdateUserRoleComman
             var user = await _userManager.FindByIdAsync(request.UserId.ToString());
             if (user == null)
             {
-                return new ApiResponseDto<object>
-                {
-                    Success = false,
-                    Message = "Utilisateur non trouvé",
-                    Data = null
-                };
+                return ApiResponseDto<object>.Error("Utilisateur non trouvé");
             }
 
             // Vérifier que le rôle existe
             var roleExists = await _roleManager.RoleExistsAsync(request.NewRole);
             if (!roleExists)
             {
-                return new ApiResponseDto<object>
-                {
-                    Success = false,
-                    Message = $"Le rôle '{request.NewRole}' n'existe pas",
-                    Data = null
-                };
+                return ApiResponseDto<object>.Error($"Le rôle '{request.NewRole}' n'existe pas");
             }
 
             // Récupérer les rôles actuels de l'utilisateur
@@ -56,12 +46,7 @@ public class UpdateUserRoleCommandHandler : IRequestHandler<UpdateUserRoleComman
                 var removeResult = await _userManager.RemoveFromRolesAsync(user, currentRoles);
                 if (!removeResult.Succeeded)
                 {
-                    return new ApiResponseDto<object>
-                    {
-                        Success = false,
-                        Message = "Erreur lors de la suppression des rôles actuels",
-                        Data = null
-                    };
+                    return ApiResponseDto<object>.Error("Erreur lors de la suppression des rôles actuels");
                 }
             }
 
@@ -69,29 +54,14 @@ public class UpdateUserRoleCommandHandler : IRequestHandler<UpdateUserRoleComman
             var addResult = await _userManager.AddToRoleAsync(user, request.NewRole);
             if (!addResult.Succeeded)
             {
-                return new ApiResponseDto<object>
-                {
-                    Success = false,
-                    Message = "Erreur lors de l'ajout du nouveau rôle",
-                    Data = null
-                };
+                return ApiResponseDto<object>.Error("Erreur lors de l'ajout du nouveau rôle");
             }
 
-            return new ApiResponseDto<object>
-            {
-                Success = true,
-                Message = $"Rôle mis à jour avec succès vers '{request.NewRole}'",
-                Data = null
-            };
+            return ApiResponseDto<object>.FromSuccess(null);
         }
         catch (Exception ex)
         {
-            return new ApiResponseDto<object>
-            {
-                Success = false,
-                Message = $"Erreur lors de la mise à jour du rôle: {ex.Message}",
-                Data = null
-            };
+            return ApiResponseDto<object>.Error($"Erreur lors de la mise à jour du rôle: {ex.Message}");
         }
     }
 }

@@ -71,9 +71,11 @@ public class PropertyController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<PropertyResponse>> Update(Guid id, [FromBody] UpdatePropertyRequest updatePropertyRequest)
     {
-                    var property = await _mediator.Send(new UpdatePropertyCommand(id, updatePropertyRequest));
+        var property = await _mediator.Send(new UpdatePropertyCommand(id, updatePropertyRequest));
         return Ok(property);
     }
+
+
 
 
 }

@@ -5,10 +5,13 @@ using Property.Application.Commands;
 using Property.Application.DTOs.Request;
 using Property.Application.DTOs.Response;
 using Property.Domain.Entities;
+using Property.Domain.Enums;
 using Property.Domain.Interfaces;
 using PropertyEntity = Property.Domain.Entities.Property;
 using System.Security.Claims;
 using System.Text.Json;
+using AutoMapper;
+using Property.Infrastructure.Services;
 
 namespace Property.Application.Handlers;
 
@@ -18,17 +21,23 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
     private readonly IHttpContextAccessor _httpContextAccessor;
     private readonly IConfiguration _configuration;
     private readonly HttpClient _httpClient;
+    private readonly IMapper _mapper;
+    private readonly IImageService _imageService;
 
     public CreatePropertyCommandHandler(
         IPropertyRepository propertyRepository, 
         IHttpContextAccessor httpContextAccessor,
         IConfiguration configuration,
-        HttpClient httpClient)
+        HttpClient httpClient,
+        IMapper mapper,
+        IImageService imageService)
     {
         _propertyRepository = propertyRepository;
         _httpContextAccessor = httpContextAccessor;
         _configuration = configuration;
         _httpClient = httpClient;
+        _mapper = mapper;
+        _imageService = imageService;
     }
 
     public async Task<PropertyResponse> Handle(CreatePropertyCommand request, CancellationToken cancellationToken)
@@ -82,8 +91,8 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
                 PropertyId = property.Id,
                 Name = a.Name,
                 Description = a.Description,
-                Type = a.Type,
-                Category = a.Category,
+                Type = (AmenityType)a.Type,
+                Category = (AmenityCategory)a.Category,
                 IsAvailable = a.IsAvailable,
                 IsIncludedInRent = a.IsIncludedInRent,
                 AdditionalCost = a.AdditionalCost,
@@ -98,17 +107,32 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
         // Add images if provided
         if (request.CreatePropertyRequest.Images?.Any() == true)
         {
-            property.Images = request.CreatePropertyRequest.Images.Select(i => new PropertyImage
+            var imageTasks = request.CreatePropertyRequest.Images.Select(async (img, index) =>
             {
-                Id = Guid.NewGuid(),
-                PropertyId = property.Id,
-                ImageUrl = i.ImageUrl,
-                AltText = i.AltText,
-                IsMainImage = i.IsMainImage,
-                DisplayOrder = i.DisplayOrder,
-                CreatedAt = DateTime.UtcNow
-            }).ToList();
+                // Convertir base64 en stream
+                var imageBytes = Convert.FromBase64String(img.ImageUrl);
+                var imageStream = new MemoryStream(imageBytes);
+                
+                // Upload vers Vercel Blob
+                var fileName = $"image_{index + 1}.jpg";
+                var imageUrl = await _imageService.UploadImageAsync(imageStream, fileName, property.Id.ToString());
+                
+                return new PropertyImage
+                {
+                    Id = Guid.NewGuid(),
+                    PropertyId = property.Id,
+                    ImageUrl = imageUrl,
+                    AltText = img.AltText,
+                    IsMainImage = img.IsMainImage,
+                    DisplayOrder = img.DisplayOrder,
+                    CreatedAt = DateTime.UtcNow
+                };
+            });
+
+            property.Images = (await Task.WhenAll(imageTasks)).ToList();
         }
+
+
 
         var createdProperty = await _propertyRepository.AddAsync(property);
 
@@ -121,31 +145,7 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
         // Mettre à jour le rôle de l'utilisateur vers "Owner" s'il était "Tenant"
         await UpdateUserRoleToOwner(ownerId);
 
-        return new PropertyResponse
-        {
-            Id = createdProperty.Id,
-            Title = createdProperty.Title,
-            Description = createdProperty.Description,
-            PropertyType = createdProperty.PropertyType,
-            MaxGuests = createdProperty.MaxGuests,
-            Bedrooms = createdProperty.Bedrooms,
-            Beds = createdProperty.Beds,
-            Bathrooms = createdProperty.Bathrooms,
-            SquareMeters = createdProperty.SquareMeters,
-                            Address = createdProperty.Address,
-                Neighborhood = createdProperty.Neighborhood,
-                City = createdProperty.City,
-                PostalCode = createdProperty.PostalCode,
-            Latitude = createdProperty.Latitude,
-            Longitude = createdProperty.Longitude,
-            PricePerNight = createdProperty.PricePerNight,
-            CleaningFee = createdProperty.CleaningFee,
-            ServiceFee = createdProperty.ServiceFee,
-            Status = createdProperty.Status.ToString(),
-            OwnerId = createdProperty.OwnerId,
-            CreatedAt = createdProperty.CreatedAt,
-            UpdatedAt = createdProperty.UpdatedAt
-        };
+        return _mapper.Map<PropertyResponse>(createdProperty);
         }
         catch (Exception ex)
         {

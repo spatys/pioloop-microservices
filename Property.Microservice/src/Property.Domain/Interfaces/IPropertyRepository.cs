@@ -1,4 +1,5 @@
 using Property.Domain.Entities;
+using Property.Domain.Enums;
 using Property.Domain.Models;
 using PropertyEntity = Property.Domain.Entities.Property;
 

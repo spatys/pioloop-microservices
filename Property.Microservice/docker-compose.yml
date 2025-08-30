@@ -17,6 +17,8 @@ services:
       - JwtSettings__Issuer=Pioloop
       - JwtSettings__Audience=PioloopUsers
       - JwtSettings__ExpirationHours=24
+      # Vercel Blob Storage
+      - BLOB_READ_WRITE_TOKEN=vercel_blob_rw_9OrGtoLUaCxOp7Hw_gqEGs5dpYmx8xPoTHt9kTcMUX8xsPn
     depends_on:
       property-db:
         condition: service_healthy

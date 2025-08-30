@@ -19,4 +19,5 @@ public class UpdatePropertyRequest
     public decimal PricePerNight { get; set; }
     public decimal CleaningFee { get; set; } = 0;
     public decimal ServiceFee { get; set; } = 0;
+    public List<PropertyImageRequest> Images { get; set; } = new();
 }

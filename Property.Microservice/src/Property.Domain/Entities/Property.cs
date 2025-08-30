@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Property.Domain.Enums;
 
 namespace Property.Domain.Entities;
 
@@ -61,13 +62,4 @@ public class Property
     public virtual ICollection<PropertyImage> Images { get; set; } = new List<PropertyImage>();
     public virtual ICollection<PropertyAmenity> Amenities { get; set; } = new List<PropertyAmenity>();
     public virtual ICollection<PropertyAvailability> Availability { get; set; } = new List<PropertyAvailability>();
-}
-
-public enum PropertyStatus
-{
-    PendingApproval,
-    Verified,
-    Rented,
-    Maintenance,
-    Deleted
 }

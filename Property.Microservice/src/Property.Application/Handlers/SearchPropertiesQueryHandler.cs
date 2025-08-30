@@ -4,16 +4,19 @@ using Property.Application.DTOs.Response;
 using Property.Application.Queries;
 using Property.Domain.Interfaces;
 using Property.Domain.Models;
+using AutoMapper;
 
 namespace Property.Application.Handlers;
 
 public class SearchPropertiesQueryHandler : IRequestHandler<SearchPropertiesQuery, PropertySearchResponse>
 {
     private readonly IPropertyRepository _propertyRepository;
+    private readonly IMapper _mapper;
 
-    public SearchPropertiesQueryHandler(IPropertyRepository propertyRepository)
+    public SearchPropertiesQueryHandler(IPropertyRepository propertyRepository, IMapper mapper)
     {
         _propertyRepository = propertyRepository;
+        _mapper = mapper;
     }
 
     public async Task<PropertySearchResponse> Handle(SearchPropertiesQuery request, CancellationToken cancellationToken)
@@ -35,33 +38,7 @@ public class SearchPropertiesQueryHandler : IRequestHandler<SearchPropertiesQuer
         // Conversion du résultat en DTO
         return new PropertySearchResponse
         {
-            Properties = result.Properties.Select(p => new PropertyResponse
-            {
-                Id = p.Id,
-                Title = p.Title,
-                Description = p.Description,
-                PropertyType = p.PropertyType,
-                MaxGuests = p.MaxGuests,
-                Bedrooms = p.Bedrooms,
-                Beds = p.Beds,
-                Bathrooms = p.Bathrooms,
-                SquareMeters = p.SquareMeters,
-                Address = p.Address,
-                Neighborhood = p.Neighborhood,
-                City = p.City,
-                PostalCode = p.PostalCode,
-                Latitude = p.Latitude,
-                Longitude = p.Longitude,
-                PricePerNight = p.PricePerNight,
-                CleaningFee = p.CleaningFee,
-                ServiceFee = p.ServiceFee,
-                Status = p.Status.ToString(),
-                OwnerId = p.OwnerId,
-                ImageUrls = p.Images.OrderBy(i => i.DisplayOrder).Select(i => i.ImageUrl).ToList(),
-                Amenities = p.Amenities.OrderBy(a => a.DisplayOrder).Select(a => a.Name).ToList(),
-                CreatedAt = p.CreatedAt,
-                UpdatedAt = p.UpdatedAt
-            }).ToList(),
+            Properties = _mapper.Map<List<PropertyResponse>>(result.Properties),
             TotalCount = result.TotalCount,
             Page = result.Page,
             PageSize = result.PageSize,

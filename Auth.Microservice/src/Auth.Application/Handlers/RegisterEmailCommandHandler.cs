@@ -89,7 +89,7 @@ public class RegisterEmailCommandHandler : IRequestHandler<RegisterEmailCommand,
                 Email = createdUser.Email
             };
 
-            return ApiResponseDto<RegisterEmailResponseDto>.FromSuccess(responseDto, "Code de vérification envoyé avec succès");
+            return ApiResponseDto<RegisterEmailResponseDto>.FromSuccess(responseDto);
         }
         catch (Exception ex)
         {

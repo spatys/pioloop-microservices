@@ -25,7 +25,7 @@ public class LogoutCommandHandler : IRequestHandler<LogoutCommand, ApiResponseDt
                 httpContext.Response.Cookies.Delete("auth_token");
             }
 
-            return ApiResponseDto<object>.FromSuccess(null, "Déconnexion réussie");
+            return ApiResponseDto<object>.FromSuccess(null);
         }
         catch (Exception)
         {

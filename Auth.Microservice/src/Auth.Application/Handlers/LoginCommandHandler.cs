@@ -112,7 +112,7 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, ApiResponseDto<
                 ExpiresAt = DateTime.UtcNow.AddHours(Convert.ToDouble(_configuration["JwtSettings:ExpirationHours"]))
             };
 
-            return ApiResponseDto<LoginResponseDto>.FromSuccess(loginResponse, "Connexion réussie");
+            return ApiResponseDto<LoginResponseDto>.FromSuccess(loginResponse);
         }
         catch (Exception ex)
         {

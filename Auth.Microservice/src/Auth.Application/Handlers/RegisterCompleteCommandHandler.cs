@@ -167,7 +167,7 @@ public class RegisterCompleteCommandHandler : IRequestHandler<RegisterCompleteCo
                 ExpiresAt = DateTime.UtcNow.AddHours(Convert.ToDouble(_configuration["JwtSettings:ExpirationHours"] ?? "24"))
             };
 
-            return ApiResponseDto<LoginResponseDto>.FromSuccess(loginResponse, "Inscription complétée avec succès");
+            return ApiResponseDto<LoginResponseDto>.FromSuccess(loginResponse);
         }
         catch (Exception ex)
         {

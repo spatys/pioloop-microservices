@@ -105,7 +105,7 @@ public class ChangePasswordCommandHandler : IRequestHandler<ChangePasswordComman
                 return ApiResponseDto<object>.ValidationError(mappedErrors);
             }
 
-            return ApiResponseDto<object>.FromSuccess(null, "Mot de passe changé avec succès");
+            return ApiResponseDto<object>.FromSuccess(null);
         }
         catch (Exception)
         {

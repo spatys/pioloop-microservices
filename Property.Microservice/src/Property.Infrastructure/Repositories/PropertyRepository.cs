@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Property.Domain.Entities;
+using Property.Domain.Enums;
 using Property.Domain.Interfaces;
 using Property.Domain.Models;
 using Property.Infrastructure.Data;

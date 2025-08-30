@@ -40,7 +40,7 @@ public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, ApiResp
                 Roles = new List<string>()
             };
 
-            return ApiResponseDto<ApplicationUserDto>.FromSuccess(userDto, "Utilisateur trouvé");
+            return ApiResponseDto<ApplicationUserDto>.FromSuccess(userDto);
         }
         catch (Exception ex)
         {

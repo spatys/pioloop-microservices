@@ -239,6 +239,7 @@
       "UpstreamHttpMethod": ["DELETE"],
       "SwaggerKey": "property"
     },
+
     {
       "DownstreamPathTemplate": "/api/property/{id}",
       "DownstreamScheme": "http",

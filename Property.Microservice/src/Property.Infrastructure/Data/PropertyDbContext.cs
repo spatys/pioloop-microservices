@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Property.Domain.Entities;
+using Property.Domain.Enums;
 using PropertyEntity = Property.Domain.Entities.Property;
 
 namespace Property.Infrastructure.Data;
@@ -33,6 +34,7 @@ public class PropertyDbContext : DbContext
             entity.Property(e => e.PricePerNight).HasColumnType("decimal(18,2)");
             entity.Property(e => e.CleaningFee).HasColumnType("decimal(18,2)");
             entity.Property(e => e.ServiceFee).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.Status).HasConversion<int>();
         });
 
 
@@ -56,8 +58,8 @@ public class PropertyDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Description).HasMaxLength(200);
-            entity.Property(e => e.Type).IsRequired();
-            entity.Property(e => e.Category).IsRequired();
+            entity.Property(e => e.Type).IsRequired().HasConversion<int>();
+            entity.Property(e => e.Category).IsRequired().HasConversion<int>();
             entity.Property(e => e.Icon).HasMaxLength(50);
             entity.Property(e => e.AdditionalCost).HasColumnType("decimal(18,2)");
             

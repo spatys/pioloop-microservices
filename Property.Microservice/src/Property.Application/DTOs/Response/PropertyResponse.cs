@@ -22,7 +22,7 @@ public class PropertyResponse
     public decimal ServiceFee { get; set; }
     public string Status { get; set; } = string.Empty;
     public Guid OwnerId { get; set; }
-    public List<string> ImageUrls { get; set; } = new();
+    public List<PropertyImageResponse> Images { get; set; } = new();
     public List<string> Amenities { get; set; } = new();
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }

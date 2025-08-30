@@ -40,7 +40,7 @@ public class GetUserByEmailQueryHandler : IRequestHandler<GetUserByEmailQuery, A
                 Roles = new List<string>()
             };
 
-            return ApiResponseDto<ApplicationUserDto>.FromSuccess(userDto, "Utilisateur trouvé");
+            return ApiResponseDto<ApplicationUserDto>.FromSuccess(userDto);
         }
         catch (Exception ex)
         {

@@ -92,7 +92,7 @@ public class ResetPasswordCommandHandler : IRequestHandler<ResetPasswordCommand,
                 return ApiResponseDto<object>.ValidationError(mappedErrors);
             }
 
-            return ApiResponseDto<object>.FromSuccess(null, "Mot de passe réinitialisé avec succès");
+            return ApiResponseDto<object>.FromSuccess(null);
         }
         catch (Exception)
         {

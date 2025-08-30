@@ -103,7 +103,7 @@ public class ResendEmailCodeCommandHandler : IRequestHandler<ResendEmailCodeComm
                 Email = user.Email
             };
 
-            return ApiResponseDto<ResendEmailCodeResponseDto>.FromSuccess(responseDto, "Nouveau code de vérification envoyé avec succès");
+            return ApiResponseDto<ResendEmailCodeResponseDto>.FromSuccess(responseDto);
         }
         catch (Exception ex)
         {
