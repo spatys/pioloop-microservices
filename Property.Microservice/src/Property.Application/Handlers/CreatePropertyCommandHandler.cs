@@ -96,16 +96,63 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
         // Add images if provided
         if (request.CreatePropertyRequest.Images?.Any() == true)
         {
-            property.Images = request.CreatePropertyRequest.Images.Select(img => new PropertyImage
+            Console.WriteLine($"Processing {request.CreatePropertyRequest.Images.Count()} images...");
+            var propertyImages = new List<PropertyImage>();
+            
+            foreach (var img in request.CreatePropertyRequest.Images)
             {
-                Id = Guid.NewGuid(),
-                PropertyId = property.Id,
-                ImageUrl = img.ImageUrl, // Utiliser directement l'URL fournie
-                AltText = img.AltText,
-                IsMainImage = img.IsMainImage,
-                DisplayOrder = img.DisplayOrder,
-                CreatedAt = DateTime.UtcNow
-            }).ToList();
+                try
+                {
+                    Console.WriteLine($"Processing image: {img.ImageUrl}");
+                    
+                    // Télécharger l'image depuis l'URL fournie
+                    var imageResponse = await _httpClient.GetAsync(img.ImageUrl);
+                    if (!imageResponse.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine($"Failed to download image from {img.ImageUrl}: {imageResponse.StatusCode}");
+                        continue;
+                    }
+                    
+                    Console.WriteLine($"Image downloaded successfully from {img.ImageUrl}");
+                    var imageStream = await imageResponse.Content.ReadAsStreamAsync();
+                    var fileName = $"property_{property.Id}_{Guid.NewGuid()}.jpg";
+                    
+                    Console.WriteLine($"Uploading image to Vercel Blob with filename: {fileName}");
+                    
+                    // Uploader l'image dans Vercel Blob
+                    var blobUrl = await _imageService.UploadImageAsync(imageStream, fileName, property.Id.ToString());
+                    
+                    Console.WriteLine($"Image uploaded successfully to Vercel Blob: {blobUrl}");
+                    
+                    // Créer l'entité PropertyImage avec l'URL Vercel Blob
+                    var propertyImage = new PropertyImage
+                    {
+                        Id = Guid.NewGuid(),
+                        PropertyId = property.Id,
+                        ImageUrl = blobUrl, // URL Vercel Blob au lieu de l'URL externe
+                        AltText = img.AltText,
+                        IsMainImage = img.IsMainImage,
+                        DisplayOrder = img.DisplayOrder,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    
+                    propertyImages.Add(propertyImage);
+                    Console.WriteLine($"PropertyImage entity created with blob URL: {blobUrl}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Error processing image {img.ImageUrl}: {ex.Message}");
+                    Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                    // Continuer avec les autres images
+                }
+            }
+            
+            Console.WriteLine($"Total images processed: {propertyImages.Count}");
+            property.Images = propertyImages;
+        }
+        else
+        {
+            Console.WriteLine("No images provided in request");
         }
 
         var createdProperty = await _propertyRepository.AddAsync(property);
