@@ -1,11 +1,8 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using Serilog;
 using System.Reflection;
-using System.Text;
 using ApiGateway.Middleware;
 using ApiGateway.Models;
 using MMLib.SwaggerForOcelot;
@@ -35,38 +32,8 @@ builder.Services.AddSwaggerForOcelot(builder.Configuration, opt => {
 });
 
 
-// Configuration de l'authentification JWT
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
-var key = Encoding.ASCII.GetBytes(jwtSettings["SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured"));
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.RequireHttpsMetadata = false;
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = true,
-        ValidIssuer = jwtSettings["Issuer"],
-        ValidateAudience = true,
-        ValidAudience = jwtSettings["Audience"],
-        ValidateLifetime = true,
-        ClockSkew = TimeSpan.Zero
-    };
-});
-
-// Configuration de l'autorisation
-builder.Services.AddAuthorization(options =>
-{
-    options.AddPolicy("RequireAuthenticatedUser", policy =>
-        policy.RequireAuthenticatedUser());
-});
+// L'API Gateway utilise le middleware JwtCookieMiddleware pour valider les JWT
+// et injecter les headers utilisateur pour les microservices
 
 // Configuration Swagger avec MMLib.SwaggerForOcelot
 builder.Services.AddSwaggerGen(c =>
@@ -161,13 +128,15 @@ app.UseMiddleware<RequestLoggingMiddleware>();
 
 // Middleware de gestion d'erreurs global
 app.UseMiddleware<ErrorHandlingMiddleware>();
-app.UseRouting();
+
 // CORS
 app.UseCors("Policy");
 
-// Authentification et autorisation
-app.UseAuthentication();
-app.UseAuthorization();
+// Middleware pour extraire le JWT du cookie et l'ajouter au header Authorization
+// DOIT être AVANT UseRouting() et UseOcelot() pour s'exécuter sur toutes les requêtes
+app.UseMiddleware<JwtCookieMiddleware>();
+
+app.UseRouting();
 
 // Routes API classiques (doivent être AVANT Ocelot pour ne pas être interceptées)
 app.MapControllers();

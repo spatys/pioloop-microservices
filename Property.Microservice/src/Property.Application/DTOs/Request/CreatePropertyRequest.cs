@@ -19,7 +19,6 @@ public class CreatePropertyRequest
     public decimal PricePerNight { get; set; }
     public decimal CleaningFee { get; set; } = 0;
     public decimal ServiceFee { get; set; } = 0;
-    public Guid? OwnerId { get; set; } // Optionnel, sera récupéré automatiquement depuis le token JWT
     public List<PropertyAmenityRequest> Amenities { get; set; } = new();
     public List<PropertyImageRequest> Images { get; set; } = new();
 }

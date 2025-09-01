@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
 using Property.Application.Handlers;
 using Property.Application.Mapping;
 using Property.Domain.Interfaces;
@@ -10,7 +8,6 @@ using Property.Infrastructure.Extensions;
 using Property.Infrastructure.Services;
 using System.Reflection;
 using Microsoft.OpenApi.Models;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -64,49 +61,8 @@ builder.Services.AddHttpContextAccessor();
 // HttpClient pour appeler les autres microservices
 builder.Services.AddHttpClient();
 
-// Authentication JWT avec support des cookies
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
-            ValidAudience = builder.Configuration["JwtSettings:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? throw new InvalidOperationException("JWT SecretKey not configured"))
-            )
-        };
-        
-        // Configuration pour lire le token depuis les cookies
-                                options.Events = new JwtBearerEvents
-                        {
-                            OnMessageReceived = context =>
-                            {
-                                // Essayer de récupérer le token depuis le header Authorization
-                                if (context.Request.Headers.ContainsKey("Authorization"))
-                                {
-                                    var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-                                    if (!string.IsNullOrEmpty(token))
-                                    {
-                                        context.Token = token;
-                                        return Task.CompletedTask;
-                                    }
-                                }
-                                
-                                // Fallback : essayer de récupérer le token depuis le cookie auth_token
-                                if (context.Request.Cookies.ContainsKey("auth_token"))
-                                {
-                                    context.Token = context.Request.Cookies["auth_token"];
-                                }
-                                
-                                return Task.CompletedTask;
-                            }
-                        };
-    });
+// Le Property Service fait confiance à l'API Gateway pour l'authentification
+// Il utilise les headers X-User-Id, X-User-Email, X-User-Roles injectés par l'API Gateway
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(PropertyMappingProfile));
@@ -147,8 +103,7 @@ app.UseCors("AllowApiGateway");
 
 app.UseRouting();
 
-app.UseAuthentication();
-app.UseAuthorization();
+// Le Property Service fait confiance à l'API Gateway pour l'authentification
 
 app.MapControllers();
 

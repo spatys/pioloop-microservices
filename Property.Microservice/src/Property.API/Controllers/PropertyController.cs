@@ -1,10 +1,10 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
 using Property.Application.Commands;
 using Property.Application.DTOs.Request;
 using Property.Application.DTOs.Response;
 using Property.Application.Queries;
+using System.Security.Claims;
 
 namespace Property.API.Controllers;
 
@@ -47,9 +47,16 @@ public class PropertyController : ControllerBase
     /// Get properties by owner ID
     /// </summary>
     [HttpGet("owner/{ownerId:guid}")]
-    [Authorize]
     public async Task<ActionResult<IEnumerable<PropertyResponse>>> GetByOwnerId(Guid ownerId)
     {
+        // Vérifier que l'utilisateur authentifié accède à ses propres propriétés
+        if (!Request.Headers.TryGetValue("X-User-Id", out var userIdHeader) || 
+            !Guid.TryParse(userIdHeader.FirstOrDefault(), out var userId) ||
+            userId != ownerId)
+        {
+            return Unauthorized("Accès non autorisé");
+        }
+
         var properties = await _mediator.Send(new GetPropertiesByOwnerIdQuery(ownerId));
         return Ok(properties);
     }
@@ -58,17 +65,39 @@ public class PropertyController : ControllerBase
     /// Create a new property
     /// </summary>
     [HttpPost("create")]
-    [Authorize]
     public async Task<ActionResult<PropertyResponse>> Create([FromBody] CreatePropertyRequest createPropertyRequest)
     {
-        var property = await _mediator.Send(new CreatePropertyCommand(createPropertyRequest));
+        // Récupérer l'ID utilisateur depuis le header X-User-Id injecté par l'API Gateway
+        if (!Request.Headers.TryGetValue("X-User-Id", out var userIdHeader) || 
+            !Guid.TryParse(userIdHeader.FirstOrDefault(), out var userId))
+        {
+            return Unauthorized("Utilisateur non authentifié");
+        }
+        
+        var property = await _mediator.Send(new CreatePropertyCommand(createPropertyRequest, userId));
         return CreatedAtAction(nameof(GetById), new { id = property.Id }, property);
+    }
+
+    /// <summary>
+    /// Get properties for the authenticated user
+    /// </summary>
+    [HttpGet("my-properties")]
+    public async Task<ActionResult<IEnumerable<PropertyResponse>>> GetMyProperties()
+    {
+        if (!Request.Headers.TryGetValue("X-User-Id", out var userIdHeader) || 
+            !Guid.TryParse(userIdHeader.FirstOrDefault(), out var userId))
+        {
+            return Unauthorized("Utilisateur non authentifié");
+        }
+
+        var properties = await _mediator.Send(new GetPropertiesByOwnerIdQuery(userId));
+        return Ok(properties);
     }
 
     /// <summary>
     /// Update an existing property
     /// </summary>
-    [HttpPut("{id}")]
+    [HttpPut("update/{id}")]
     public async Task<ActionResult<PropertyResponse>> Update(Guid id, [FromBody] UpdatePropertyRequest updatePropertyRequest)
     {
         var property = await _mediator.Send(new UpdatePropertyCommand(id, updatePropertyRequest));

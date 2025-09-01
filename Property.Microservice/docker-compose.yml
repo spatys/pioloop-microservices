@@ -12,11 +12,6 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - ConnectionStrings__DefaultConnection=Host=property-db;Database=pioloop_property;Username=pioloop12345;Password=piolOOP_&!?12345;Port=5432
-      # JWT Settings (même configuration que Auth.Microservice)
-      - JwtSettings__SecretKey=Pioloop2025SecretKey32CharsLong!@#
-      - JwtSettings__Issuer=Pioloop
-      - JwtSettings__Audience=PioloopUsers
-      - JwtSettings__ExpirationHours=24
       # Vercel Blob Storage
       - BLOB_READ_WRITE_TOKEN=vercel_blob_rw_9OrGtoLUaCxOp7Hw_gqEGs5dpYmx8xPoTHt9kTcMUX8xsPn
     depends_on:

@@ -7,9 +7,11 @@ namespace Property.Application.Commands;
 public class CreatePropertyCommand : IRequest<PropertyResponse>
 {
     public CreatePropertyRequest CreatePropertyRequest { get; }
+    public Guid UserId { get; }
 
-    public CreatePropertyCommand(CreatePropertyRequest createPropertyRequest)
+    public CreatePropertyCommand(CreatePropertyRequest createPropertyRequest, Guid userId)
     {
         CreatePropertyRequest = createPropertyRequest;
+        UserId = userId;
     }
 }

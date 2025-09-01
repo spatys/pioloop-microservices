@@ -82,6 +82,8 @@ public class PropertyRepository : IPropertyRepository
             .FirstOrDefaultAsync(p => p.Id == id);
     }
 
+
+
     public async Task<PropertyEntity> AddAsync(PropertyEntity property)
     {
         _context.Properties.Add(property);

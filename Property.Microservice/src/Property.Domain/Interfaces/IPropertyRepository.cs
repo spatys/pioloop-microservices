@@ -15,6 +15,7 @@ public interface IPropertyRepository
     Task<PropertyEntity> AddAsync(PropertyEntity property);
     Task<PropertyEntity> UpdateAsync(PropertyEntity property);
     Task<bool> DeleteAsync(Guid id);
+
     
     // Opérations spécifiques
     Task<IEnumerable<PropertyEntity>> GetByOwnerIdAsync(Guid ownerId);

@@ -174,6 +174,7 @@
       "UpstreamHttpMethod": ["GET"],
       "SwaggerKey": "property"
     },
+
     {
       "DownstreamPathTemplate": "/api/property/create",
       "DownstreamScheme": "http",
@@ -205,8 +206,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "localhost",
-          "Port": 3000
+          "Host": "property-api",
+          "Port": 80
         }
       ],
       "UpstreamPathTemplate": "/api/property/my-properties",
