@@ -58,6 +58,13 @@ public class Property
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     
+    // Métriques de popularité
+    public int ViewCount { get; set; } = 0;
+    public int ReservationCount { get; set; } = 0;
+    public double AverageRating { get; set; } = 0.0;
+    public int TotalReviews { get; set; } = 0;
+    public double PopularityScore { get; set; } = 0.0;
+    
     // Navigation properties
     public virtual ICollection<PropertyImage> Images { get; set; } = new List<PropertyImage>();
     public virtual ICollection<PropertyAmenity> Amenities { get; set; } = new List<PropertyAmenity>();

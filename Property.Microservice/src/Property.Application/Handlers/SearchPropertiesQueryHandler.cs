@@ -29,7 +29,9 @@ public class SearchPropertiesQueryHandler : IRequestHandler<SearchPropertiesQuer
             CheckOutDate = request.SearchCriteria.CheckOutDate,
             Guests = request.SearchCriteria.Guests,
             Page = request.SearchCriteria.Page,
-            PageSize = request.SearchCriteria.PageSize
+            PageSize = request.SearchCriteria.PageSize,
+            SortBy = request.SearchCriteria.SortBy,
+            SortOrder = request.SearchCriteria.SortOrder
         };
 
         // Appel au repository

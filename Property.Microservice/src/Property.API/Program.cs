@@ -54,6 +54,7 @@ builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 
 // Services
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<IPopularityService, PopularityService>();
 
 // HttpContext Accessor pour récupérer l'utilisateur connecté
 builder.Services.AddHttpContextAccessor();

@@ -52,9 +52,11 @@ public class PropertyRepository : IPropertyRepository
         // Compter le total avant pagination
         var totalCount = await query.CountAsync();
 
+        // Application du tri selon les critères
+        query = ApplySorting(query, criteria.SortBy, criteria.SortOrder);
+
         // Pagination
         var properties = await query
-            .OrderBy(p => p.CreatedAt)
             .Skip((criteria.Page - 1) * criteria.PageSize)
             .Take(criteria.PageSize)
             .ToListAsync();
@@ -69,6 +71,36 @@ public class PropertyRepository : IPropertyRepository
             Page = criteria.Page,
             PageSize = criteria.PageSize,
             TotalPages = totalPages
+        };
+    }
+
+    private static IQueryable<PropertyEntity> ApplySorting(IQueryable<PropertyEntity> query, SortBy sortBy, SortOrder sortOrder)
+    {
+        return sortBy switch
+        {
+            SortBy.PricePerNight => sortOrder == SortOrder.Ascending 
+                ? query.OrderBy(p => p.PricePerNight)
+                : query.OrderByDescending(p => p.PricePerNight),
+            
+            SortBy.Popularity => sortOrder == SortOrder.Ascending
+                ? query.OrderBy(p => p.PopularityScore)
+                : query.OrderByDescending(p => p.PopularityScore),
+            
+            SortBy.Rating => sortOrder == SortOrder.Ascending
+                ? query.OrderBy(p => p.AverageRating)
+                : query.OrderByDescending(p => p.AverageRating),
+            
+            SortBy.ViewCount => sortOrder == SortOrder.Ascending
+                ? query.OrderBy(p => p.ViewCount)
+                : query.OrderByDescending(p => p.ViewCount),
+            
+            SortBy.ReservationCount => sortOrder == SortOrder.Ascending
+                ? query.OrderBy(p => p.ReservationCount)
+                : query.OrderByDescending(p => p.ReservationCount),
+            
+            SortBy.CreatedAt or _ => sortOrder == SortOrder.Ascending
+                ? query.OrderBy(p => p.CreatedAt)
+                : query.OrderByDescending(p => p.CreatedAt)
         };
     }
 

@@ -35,6 +35,13 @@ public class PropertyDbContext : DbContext
             entity.Property(e => e.CleaningFee).HasColumnType("decimal(18,2)");
             entity.Property(e => e.ServiceFee).HasColumnType("decimal(18,2)");
             entity.Property(e => e.Status).HasConversion<int>();
+            
+            // Configuration des métriques de popularité
+            entity.Property(e => e.ViewCount).HasDefaultValue(0);
+            entity.Property(e => e.ReservationCount).HasDefaultValue(0);
+            entity.Property(e => e.AverageRating).HasDefaultValue(0.0);
+            entity.Property(e => e.TotalReviews).HasDefaultValue(0);
+            entity.Property(e => e.PopularityScore).HasDefaultValue(0.0);
         });
 
 

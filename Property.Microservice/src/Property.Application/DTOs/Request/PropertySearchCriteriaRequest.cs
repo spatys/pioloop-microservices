@@ -1,3 +1,5 @@
+using Property.Domain.Enums;
+
 namespace Property.Application.DTOs.Request;
 
 public class PropertySearchCriteriaRequest
@@ -8,4 +10,8 @@ public class PropertySearchCriteriaRequest
     public int? Guests { get; set; }
     public int Page { get; set; } = 1;
     public int PageSize { get; set; } = 20;
+    
+    // Critères de tri
+    public SortBy SortBy { get; set; } = SortBy.CreatedAt;
+    public SortOrder SortOrder { get; set; } = SortOrder.Descending;
 }

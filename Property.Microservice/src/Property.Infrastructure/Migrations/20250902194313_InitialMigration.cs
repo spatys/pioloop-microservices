@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Property.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigration : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -36,7 +36,12 @@ namespace Property.Infrastructure.Migrations
                     Status = table.Column<int>(type: "integer", nullable: false),
                     OwnerId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    ViewCount = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    ReservationCount = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    AverageRating = table.Column<double>(type: "double precision", nullable: false, defaultValue: 0.0),
+                    TotalReviews = table.Column<int>(type: "integer", nullable: false, defaultValue: 0),
+                    PopularityScore = table.Column<double>(type: "double precision", nullable: false, defaultValue: 0.0)
                 },
                 constraints: table =>
                 {
