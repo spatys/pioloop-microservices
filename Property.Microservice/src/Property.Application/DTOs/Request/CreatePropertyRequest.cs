@@ -38,7 +38,9 @@ public class PropertyAmenityRequest
 
 public class PropertyImageRequest
 {
-    public string ImageUrl { get; set; } = string.Empty;
+    public string ImageData { get; set; } = string.Empty; // Base64 encoded image data
+    public string FileName { get; set; } = string.Empty; // Original filename
+    public string ContentType { get; set; } = string.Empty; // MIME type (e.g., image/jpeg)
     public string AltText { get; set; } = string.Empty;
     public bool IsMainImage { get; set; } = false;
     public int DisplayOrder { get; set; } = 1;

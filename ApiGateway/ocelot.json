@@ -173,6 +173,45 @@
       "UpstreamPathTemplate": "/api/property/{everything}",
       "UpstreamHttpMethod": ["GET", "POST", "PUT", "DELETE"],
       "SwaggerKey": "property"
+    },
+    {
+      "DownstreamPathTemplate": "/api/property/create",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "property-api",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/property/create",
+      "UpstreamHttpMethod": ["POST"],
+      "SwaggerKey": "property"
+    },
+    {
+      "DownstreamPathTemplate": "/api/property/owner/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "property-api",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/property/owner/{everything}",
+      "UpstreamHttpMethod": ["GET"],
+      "SwaggerKey": "property"
+    },
+    {
+      "DownstreamPathTemplate": "/api/property/search",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "property-api",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/property/search",
+      "UpstreamHttpMethod": ["GET"],
+      "SwaggerKey": "property"
     }
   ],
   "SwaggerEndPoints": [

@@ -73,6 +73,9 @@ services:
       - JwtSettings__Audience=PioloopUsers
       # Auth API Settings
       - AuthApi__BaseUrl=http://auth-api
+      # Vercel Blob Settings
+      - VercelBlob__Token=vercel_blob_rw_0ezu1URIie8jxrLS_ZDlJ01yng2YXOATSPmUvIsdCZftlWB
+      - VercelBlob__Url=https://0ezu1uriie8jxrls.public.blob.vercel-storage.com
     depends_on:
       property-db:
         condition: service_healthy

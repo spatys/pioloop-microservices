@@ -53,8 +53,23 @@ builder.Services.AddDbContext<PropertyDbContext>(options =>
 builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 
 // Services
-builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<IPopularityService, PopularityService>();
+
+// Vercel Blob Storage Service
+builder.Services.AddScoped<IBlobStorageService>(provider =>
+{
+    var configuration = provider.GetRequiredService<IConfiguration>();
+    var httpClient = provider.GetRequiredService<HttpClient>();
+    var token = configuration["VercelBlob:Token"];
+    var blobUrl = configuration["VercelBlob:Url"];
+    
+    if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(blobUrl))
+    {
+        throw new InvalidOperationException("Vercel Blob configuration is missing. Please check VercelBlob:Token and VercelBlob:Url in appsettings.json");
+    }
+    
+    return new BlobStorageService(httpClient, token, blobUrl);
+});
 
 // HttpContext Accessor pour récupérer l'utilisateur connecté
 builder.Services.AddHttpContextAccessor();

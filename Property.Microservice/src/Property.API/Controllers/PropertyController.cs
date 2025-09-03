@@ -62,20 +62,29 @@ public class PropertyController : ControllerBase
     }
 
     /// <summary>
-    /// Create a new property
+    /// Create a new property (specific endpoint)
     /// </summary>
     [HttpPost("create")]
-    public async Task<ActionResult<PropertyResponse>> Create([FromBody] CreatePropertyRequest createPropertyRequest)
+    public async Task<ActionResult<PropertyResponse>> CreateProperty([FromBody] CreatePropertyRequest request)
     {
-        // Récupérer l'ID utilisateur depuis le header X-User-Id injecté par l'API Gateway
-        if (!Request.Headers.TryGetValue("X-User-Id", out var userIdHeader) || 
-            !Guid.TryParse(userIdHeader.FirstOrDefault(), out var userId))
+        try
         {
-            return Unauthorized("Utilisateur non authentifié");
+            // Récupérer l'ID utilisateur depuis le header X-User-Id injecté par l'API Gateway
+            if (!Request.Headers.TryGetValue("X-User-Id", out var userIdHeader) || 
+                !Guid.TryParse(userIdHeader.FirstOrDefault(), out var userId))
+            {
+                return Unauthorized("Utilisateur non authentifié");
+            }
+
+            var command = new CreatePropertyCommand(request, userId);
+
+            var result = await _mediator.Send(command);
+            return CreatedAtAction(nameof(GetById), new { id = result.Id }, result);
         }
-        
-        var property = await _mediator.Send(new CreatePropertyCommand(createPropertyRequest, userId));
-        return CreatedAtAction(nameof(GetById), new { id = property.Id }, property);
+        catch (Exception ex)
+        {
+            return BadRequest($"Erreur lors de la création de la propriété : {ex.Message}");
+        }
     }
 
     /// <summary>

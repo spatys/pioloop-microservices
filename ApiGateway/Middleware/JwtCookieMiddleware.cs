@@ -27,11 +27,29 @@ public class JwtCookieMiddleware
         {
             _logger.LogInformation("JwtCookieMiddleware: Début du traitement pour {Path}", context.Request.Path);
             
-            // Extraire le JWT du cookie auth_token
-            if (context.Request.Cookies.TryGetValue("auth_token", out var jwtToken) && !string.IsNullOrEmpty(jwtToken))
+            // Extraire le JWT du cookie auth_token (priorité aux cookies de la requête)
+            string? jwtToken = null;
+            
+            // 1. Essayer d'abord les cookies de la requête (méthode standard)
+            if (context.Request.Cookies.TryGetValue("auth_token", out var cookieToken) && !string.IsNullOrEmpty(cookieToken))
             {
-                _logger.LogInformation("JwtCookieMiddleware: Cookie auth_token trouvé, longueur: {Length}", jwtToken.Length);
-                
+                jwtToken = cookieToken;
+                _logger.LogInformation("JwtCookieMiddleware: Cookie auth_token trouvé dans Request.Cookies, longueur: {Length}", jwtToken.Length);
+            }
+            // 2. Essayer le header Cookie (pour credentials: 'include')
+            else if (context.Request.Headers.TryGetValue("Cookie", out var cookieHeader) && !string.IsNullOrEmpty(cookieHeader))
+            {
+                var cookieValue = cookieHeader.ToString();
+                var authTokenMatch = System.Text.RegularExpressions.Regex.Match(cookieValue, @"auth_token=([^;]+)");
+                if (authTokenMatch.Success)
+                {
+                    jwtToken = authTokenMatch.Groups[1].Value;
+                    _logger.LogInformation("JwtCookieMiddleware: Cookie auth_token extrait du header Cookie, longueur: {Length}", jwtToken.Length);
+                }
+            }
+            
+            if (!string.IsNullOrEmpty(jwtToken))
+            {
                 // Valider le JWT et extraire les claims
                 var userClaims = ValidateJwtAndExtractClaims(jwtToken);
                 
@@ -52,7 +70,7 @@ public class JwtCookieMiddleware
             }
             else
             {
-                _logger.LogInformation("JwtCookieMiddleware: Aucun cookie auth_token trouvé dans la requête");
+                _logger.LogInformation("JwtCookieMiddleware: Aucun cookie auth_token trouvé dans la requête (ni dans Request.Cookies ni dans header Cookie)");
             }
         }
         catch (Exception ex)
