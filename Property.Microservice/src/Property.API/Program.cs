@@ -60,12 +60,15 @@ builder.Services.AddScoped<IBlobStorageService>(provider =>
 {
     var configuration = provider.GetRequiredService<IConfiguration>();
     var httpClient = provider.GetRequiredService<HttpClient>();
-    var token = configuration["VercelBlob:Token"];
+    
+    // Check for token in environment variable first, then in configuration
+    var token = Environment.GetEnvironmentVariable("BLOB_READ_WRITE_TOKEN") 
+                ?? configuration["VercelBlob:Token"];
     var blobUrl = configuration["VercelBlob:Url"];
     
     if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(blobUrl))
     {
-        throw new InvalidOperationException("Vercel Blob configuration is missing. Please check VercelBlob:Token and VercelBlob:Url in appsettings.json");
+        throw new InvalidOperationException("Vercel Blob configuration is missing. Please check BLOB_READ_WRITE_TOKEN environment variable or VercelBlob:Token in appsettings.json");
     }
     
     return new BlobStorageService(httpClient, token, blobUrl);

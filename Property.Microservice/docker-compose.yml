@@ -13,7 +13,7 @@ services:
       - ASPNETCORE_URLS=http://0.0.0.0:80
       - ConnectionStrings__DefaultConnection=Host=property-db;Database=pioloop_property;Username=pioloop12345;Password=piolOOP_&!?12345;Port=5432
       # Vercel Blob Storage
-      - BLOB_READ_WRITE_TOKEN=vercel_blob_rw_9OrGtoLUaCxOp7Hw_gqEGs5dpYmx8xPoTHt9kTcMUX8xsPn
+      - BLOB_READ_WRITE_TOKEN=vercel_blob_rw_0ezu1URIie8jxrLS_ZDlJ01yng2YXOATSPmUvIsdCZftlWB
     depends_on:
       property-db:
         condition: service_healthy
