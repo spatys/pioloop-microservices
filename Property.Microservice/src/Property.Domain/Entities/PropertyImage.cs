@@ -11,8 +11,10 @@ public class PropertyImage
     public virtual Property Property { get; set; } = null!;
     
     [Required]
-    [MaxLength(500)]
-    public string ImageUrl { get; set; } = string.Empty;
+    public byte[] ImageData { get; set; } = Array.Empty<byte>();
+    
+    [MaxLength(50)]
+    public string ContentType { get; set; } = string.Empty;
     
     [MaxLength(200)]
     public string AltText { get; set; } = string.Empty;

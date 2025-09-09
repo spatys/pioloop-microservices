@@ -50,7 +50,8 @@ public class PropertyDbContext : DbContext
         modelBuilder.Entity<PropertyImage>(entity =>
         {
             entity.HasKey(e => e.Id);
-            entity.Property(e => e.ImageUrl).IsRequired().HasMaxLength(500);
+            entity.Property(e => e.ImageData).IsRequired();
+            entity.Property(e => e.ContentType).IsRequired().HasMaxLength(50);
             entity.Property(e => e.AltText).HasMaxLength(200);
             
             entity.HasOne(e => e.Property)

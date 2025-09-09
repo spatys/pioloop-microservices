@@ -20,20 +20,17 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
     private readonly IConfiguration _configuration;
     private readonly HttpClient _httpClient;
     private readonly IMapper _mapper;
-    private readonly IBlobStorageService _blobStorageService;
 
     public CreatePropertyCommandHandler(
         IPropertyRepository propertyRepository, 
         IConfiguration configuration,
         HttpClient httpClient,
-        IMapper mapper,
-        IBlobStorageService blobStorageService)
+        IMapper mapper)
     {
         _propertyRepository = propertyRepository;
         _configuration = configuration;
         _httpClient = httpClient;
         _mapper = mapper;
-        _blobStorageService = blobStorageService;
     }
 
     public async Task<PropertyResponse> Handle(CreatePropertyCommand request, CancellationToken cancellationToken)
@@ -92,51 +89,57 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
                 }).ToList();
             }
 
-            // Add images if provided - Upload to Vercel Blob
+            // Add images if provided - Images are stored as BLOB in database
             if (request.CreatePropertyRequest.Images?.Any() == true)
             {
+                Console.WriteLine($"Received {request.CreatePropertyRequest.Images.Count} images from frontend");
                 var propertyImages = new List<PropertyImage>();
                 
                 foreach (var img in request.CreatePropertyRequest.Images)
                 {
+                    Console.WriteLine($"Processing image with alt text: {img.AltText}");
+                    
+                    // Vérifier que les données base64 ne sont pas vides
+                    if (string.IsNullOrEmpty(img.ImageData))
+                    {
+                        Console.WriteLine("Skipping image with empty base64 data");
+                        continue;
+                    }
+                    
+                    // Convertir base64 en bytes
+                    byte[] imageBytes;
                     try
                     {
-                        // Convert base64 to stream
-                        var cleanImageData = img.ImageData;
-                        if (img.ImageData.Contains("data:"))
+                        // Supprimer le préfixe "data:image/...;base64," si présent
+                        var base64Data = img.ImageData;
+                        if (base64Data.Contains(','))
                         {
-                            cleanImageData = img.ImageData.Split(',')[1];
+                            base64Data = base64Data.Split(',')[1];
                         }
                         
-                        var imageBytes = Convert.FromBase64String(cleanImageData);
-                        var imageStream = new MemoryStream(imageBytes);
-                        
-                        // Generate unique filename
-                        var fileExtension = GetFileExtension(img.ContentType);
-                        var fileName = $"{Guid.NewGuid()}{fileExtension}";
-                        
-                        // Upload image to Vercel Blob
-                        var imageUrl = await _blobStorageService.UploadImageAsync(imageStream, fileName, property.Id.ToString());
-                        
-                        // Create PropertyImage entity with Vercel Blob URL
-                        var propertyImage = new PropertyImage
-                        {
-                            Id = Guid.NewGuid(),
-                            PropertyId = property.Id,
-                            ImageUrl = imageUrl, // URL Vercel Blob
-                            AltText = img.AltText,
-                            IsMainImage = img.IsMainImage,
-                            DisplayOrder = img.DisplayOrder,
-                            CreatedAt = DateTime.UtcNow
-                        };
-                        
-                        propertyImages.Add(propertyImage);
+                        imageBytes = Convert.FromBase64String(base64Data);
+                        Console.WriteLine($"Converted base64 to {imageBytes.Length} bytes");
                     }
                     catch (Exception ex)
                     {
-                        // Log error but continue with other images
-                        Console.WriteLine($"Error processing image: {ex.Message}");
+                        Console.WriteLine($"Error converting base64 to bytes: {ex.Message}");
+                        continue;
                     }
+                    
+                    // Create PropertyImage entity with BLOB data
+                    var propertyImage = new PropertyImage
+                    {
+                        Id = Guid.NewGuid(),
+                        PropertyId = property.Id,
+                        ImageData = imageBytes, // Store as BLOB
+                        ContentType = img.ContentType,
+                        AltText = img.AltText,
+                        IsMainImage = img.IsMainImage,
+                        DisplayOrder = img.DisplayOrder,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    
+                    propertyImages.Add(propertyImage);
                 }
                 
                 property.Images = propertyImages;

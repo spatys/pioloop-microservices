@@ -14,7 +14,8 @@ public class PropertyMappingProfile : Profile
                             src.Images.OrderBy(i => i.DisplayOrder).Select(img => new PropertyImageResponse
                             {
                                 Id = img.Id,
-                                ImageUrl = img.ImageUrl,
+                                ImageData = $"data:image/webp;base64,{Convert.ToBase64String(img.ImageData)}",
+                                ContentType = "image/webp",
                                 AltText = img.AltText,
                                 IsMainImage = img.IsMainImage,
                                 DisplayOrder = img.DisplayOrder
@@ -24,6 +25,7 @@ public class PropertyMappingProfile : Profile
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
         CreateMap<Property.Domain.Entities.PropertyImage, PropertyImageResponse>()
-            .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.ImageUrl));
+            .ForMember(dest => dest.ImageData, opt => opt.MapFrom(src => $"data:image/webp;base64,{Convert.ToBase64String(src.ImageData)}"))
+            .ForMember(dest => dest.ContentType, opt => opt.MapFrom(src => "image/webp"));
     }
 }

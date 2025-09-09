@@ -15,16 +15,13 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
 {
     private readonly IPropertyRepository _propertyRepository;
     private readonly IMapper _mapper;
-    private readonly IBlobStorageService _blobStorageService;
 
     public UpdatePropertyCommandHandler(
         IPropertyRepository propertyRepository, 
-        IMapper mapper,
-        IBlobStorageService blobStorageService)
+        IMapper mapper)
     {
         _propertyRepository = propertyRepository;
         _mapper = mapper;
-        _blobStorageService = blobStorageService;
     }
 
     public async Task<PropertyResponse> Handle(UpdatePropertyCommand request, CancellationToken cancellationToken)
@@ -55,80 +52,69 @@ public class UpdatePropertyCommandHandler : IRequestHandler<UpdatePropertyComman
         existingProperty.ServiceFee = request.UpdatePropertyRequest.ServiceFee > 0 ? request.UpdatePropertyRequest.ServiceFee : existingProperty.ServiceFee;
         existingProperty.UpdatedAt = DateTime.UtcNow;
 
-        // Update images if provided - Delete old images and upload new ones to Vercel Blob
+        // Update images if provided - Images are stored as BLOB in database
         if (request.UpdatePropertyRequest.Images?.Any() == true)
         {
-            // Delete existing images from Vercel Blob
-            if (existingProperty.Images?.Any() == true)
-            {
-                foreach (var existingImage in existingProperty.Images)
-                {
-                    try
-                    {
-                        // Extract file path from URL for deletion
-                        var urlParts = existingImage.ImageUrl.Split('/');
-                        if (urlParts.Length >= 3)
-                        {
-                            var filePath = $"{urlParts[^2]}/{urlParts[^1]}"; // images/{propertyId}/{fileName}
-                            await _blobStorageService.DeleteImageAsync(filePath);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        // Log error but continue
-                        Console.WriteLine($"Error deleting image from Vercel Blob: {ex.Message}");
-                    }
-                }
-            }
+            Console.WriteLine($"Updating property {existingProperty.Id} with {request.UpdatePropertyRequest.Images.Count} images");
             
             // Remove existing images from DB
-            existingProperty.Images?.Clear();
+            if (existingProperty.Images?.Any() == true)
+            {
+                Console.WriteLine($"Removing {existingProperty.Images.Count} existing images from DB");
+                existingProperty.Images.Clear();
+            }
             
             var propertyImages = new List<PropertyImage>();
             
             foreach (var img in request.UpdatePropertyRequest.Images)
             {
+                Console.WriteLine($"Adding image with alt text: {img.AltText}");
+                
+                // Vérifier que les données base64 ne sont pas vides
+                if (string.IsNullOrEmpty(img.ImageData))
+                {
+                    Console.WriteLine("Skipping image with empty base64 data");
+                    continue;
+                }
+                
+                // Convertir base64 en bytes
+                byte[] imageBytes;
                 try
                 {
-                    // Convert base64 to stream
-                    var cleanImageData = img.ImageData;
-                    if (img.ImageData.Contains("data:"))
+                    // Supprimer le préfixe "data:image/...;base64," si présent
+                    var base64Data = img.ImageData;
+                    if (base64Data.Contains(','))
                     {
-                        cleanImageData = img.ImageData.Split(',')[1];
+                        base64Data = base64Data.Split(',')[1];
                     }
                     
-                    var imageBytes = Convert.FromBase64String(cleanImageData);
-                    var imageStream = new MemoryStream(imageBytes);
-                    
-                    // Generate unique filename
-                    var fileExtension = GetFileExtension(img.ContentType);
-                    var fileName = $"{Guid.NewGuid()}{fileExtension}";
-                    
-                    // Upload new image to Vercel Blob
-                    var imageUrl = await _blobStorageService.UploadImageAsync(imageStream, fileName, existingProperty.Id.ToString());
-                    
-                    // Create PropertyImage entity with Vercel Blob URL
-                    var propertyImage = new PropertyImage
-                    {
-                        Id = Guid.NewGuid(),
-                        PropertyId = existingProperty.Id,
-                        ImageUrl = imageUrl, // URL Vercel Blob
-                        AltText = img.AltText,
-                        IsMainImage = img.IsMainImage,
-                        DisplayOrder = img.DisplayOrder,
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    
-                    propertyImages.Add(propertyImage);
+                    imageBytes = Convert.FromBase64String(base64Data);
+                    Console.WriteLine($"Converted base64 to {imageBytes.Length} bytes");
                 }
                 catch (Exception ex)
                 {
-                    // Log error but continue with other images
-                    Console.WriteLine($"Error processing image: {ex.Message}");
+                    Console.WriteLine($"Error converting base64 to bytes: {ex.Message}");
+                    continue;
                 }
+                
+                // Create PropertyImage entity with BLOB data
+                var propertyImage = new PropertyImage
+                {
+                    Id = Guid.NewGuid(),
+                    PropertyId = existingProperty.Id,
+                    ImageData = imageBytes, // Store as BLOB
+                    ContentType = img.ContentType,
+                    AltText = img.AltText,
+                    IsMainImage = img.IsMainImage,
+                    DisplayOrder = img.DisplayOrder,
+                    CreatedAt = DateTime.UtcNow
+                };
+                
+                propertyImages.Add(propertyImage);
             }
             
             existingProperty.Images = propertyImages;
+            Console.WriteLine($"Property {existingProperty.Id} updated with {propertyImages.Count} BLOB images");
         }
 
         var updatedProperty = await _propertyRepository.UpdateAsync(existingProperty);

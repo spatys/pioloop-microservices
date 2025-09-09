@@ -11,16 +11,13 @@ public class DeletePropertyCommandHandler : IRequestHandler<DeletePropertyComman
 {
     private readonly IPropertyRepository _propertyRepository;
     private readonly IMapper _mapper;
-    private readonly IBlobStorageService _blobStorageService;
 
     public DeletePropertyCommandHandler(
         IPropertyRepository propertyRepository, 
-        IMapper mapper,
-        IBlobStorageService blobStorageService)
+        IMapper mapper)
     {
         _propertyRepository = propertyRepository;
         _mapper = mapper;
-        _blobStorageService = blobStorageService;
     }
 
     public async Task<PropertyResponse> Handle(DeletePropertyCommand request, CancellationToken cancellationToken)
@@ -31,28 +28,7 @@ public class DeletePropertyCommandHandler : IRequestHandler<DeletePropertyComman
             throw new InvalidOperationException("Propriété non trouvée");
         }
 
-        // Delete images from Vercel Blob before marking property as deleted
-        if (property.Images?.Any() == true)
-        {
-            foreach (var image in property.Images)
-            {
-                try
-                {
-                    // Extract file path from URL for deletion
-                    var urlParts = image.ImageUrl.Split('/');
-                    if (urlParts.Length >= 3)
-                    {
-                        var filePath = $"{urlParts[^2]}/{urlParts[^1]}"; // images/{propertyId}/{fileName}
-                        await _blobStorageService.DeleteImageAsync(filePath);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Log error but continue
-                    Console.WriteLine($"Error deleting image from Vercel Blob: {ex.Message}");
-                }
-            }
-        }
+        // Images are stored as base64 in database, no need to delete from external storage
 
         // Marquer la propriété comme supprimée (soft delete)
         property.Status = Property.Domain.Enums.PropertyStatus.Deleted;

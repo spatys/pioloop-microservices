@@ -4,6 +4,7 @@ using Property.Application.Commands;
 using Property.Application.DTOs.Request;
 using Property.Application.DTOs.Response;
 using Property.Application.Queries;
+using Property.Domain.Interfaces;
 using System.Security.Claims;
 
 namespace Property.API.Controllers;
