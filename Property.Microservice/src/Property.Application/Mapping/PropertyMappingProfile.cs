@@ -27,5 +27,8 @@ public class PropertyMappingProfile : Profile
         CreateMap<Property.Domain.Entities.PropertyImage, PropertyImageResponse>()
             .ForMember(dest => dest.ImageData, opt => opt.MapFrom(src => $"data:image/webp;base64,{Convert.ToBase64String(src.ImageData)}"))
             .ForMember(dest => dest.ContentType, opt => opt.MapFrom(src => "image/webp"));
+
+        // Availability mappings
+        CreateMap<PropertyAvailability, PropertyAvailabilityResponse>();
     }
 }

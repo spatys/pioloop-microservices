@@ -20,4 +20,13 @@ public interface IPropertyRepository
     // Opérations spécifiques
     Task<IEnumerable<PropertyEntity>> GetByOwnerIdAsync(Guid ownerId);
     Task<bool> UpdateStatusAsync(Guid id, PropertyStatus status);
+    
+    // Opérations de disponibilité
+    Task<IEnumerable<PropertyAvailability>> GetPropertyAvailabilitiesAsync(Guid propertyId, DateTime? startDate = null, DateTime? endDate = null);
+    Task<PropertyAvailability?> GetAvailabilityByIdAsync(Guid id);
+    Task<PropertyAvailability> AddAvailabilityAsync(PropertyAvailability availability);
+    Task<PropertyAvailability> UpdateAvailabilityAsync(PropertyAvailability availability);
+    Task<bool> DeleteAvailabilityAsync(Guid id);
+    Task<bool> HasAvailabilityConflictAsync(Guid propertyId, DateTime checkIn, DateTime checkOut, Guid? excludeId = null);
+    Task SaveChangesAsync();
 }

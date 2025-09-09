@@ -162,4 +162,64 @@ public class PropertyRepository : IPropertyRepository
         
         return true;
     }
+
+    // Opérations de disponibilité
+    public async Task<IEnumerable<PropertyAvailability>> GetPropertyAvailabilitiesAsync(Guid propertyId, DateTime? startDate = null, DateTime? endDate = null)
+    {
+        var query = _context.PropertyAvailabilities
+            .Where(a => a.PropertyId == propertyId);
+
+        if (startDate.HasValue)
+            query = query.Where(a => a.CheckOutDate >= startDate.Value);
+
+        if (endDate.HasValue)
+            query = query.Where(a => a.CheckInDate <= endDate.Value);
+
+        return await query.OrderBy(a => a.CheckInDate).ToListAsync();
+    }
+
+    public async Task<PropertyAvailability?> GetAvailabilityByIdAsync(Guid id)
+    {
+        return await _context.PropertyAvailabilities.FindAsync(id);
+    }
+
+    public async Task<PropertyAvailability> AddAvailabilityAsync(PropertyAvailability availability)
+    {
+        _context.PropertyAvailabilities.Add(availability);
+        return availability;
+    }
+
+    public async Task<PropertyAvailability> UpdateAvailabilityAsync(PropertyAvailability availability)
+    {
+        availability.UpdatedAt = DateTime.UtcNow;
+        _context.PropertyAvailabilities.Update(availability);
+        return availability;
+    }
+
+    public async Task<bool> DeleteAvailabilityAsync(Guid id)
+    {
+        var availability = await _context.PropertyAvailabilities.FindAsync(id);
+        if (availability == null) return false;
+
+        _context.PropertyAvailabilities.Remove(availability);
+        return true;
+    }
+
+    public async Task<bool> HasAvailabilityConflictAsync(Guid propertyId, DateTime checkIn, DateTime checkOut, Guid? excludeId = null)
+    {
+        var query = _context.PropertyAvailabilities
+            .Where(a => a.PropertyId == propertyId &&
+                       a.CheckInDate < checkOut &&
+                       a.CheckOutDate > checkIn);
+
+        if (excludeId.HasValue)
+            query = query.Where(a => a.Id != excludeId.Value);
+
+        return await query.AnyAsync();
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await _context.SaveChangesAsync();
+    }
 }

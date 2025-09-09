@@ -162,6 +162,19 @@
     },
 
     {
+      "DownstreamPathTemplate": "/api/propertyavailability/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "property-api",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/propertyavailability/{everything}",
+      "UpstreamHttpMethod": ["GET", "POST", "PUT", "DELETE"],
+      "SwaggerKey": "property"
+    },
+    {
       "DownstreamPathTemplate": "/api/property/{everything}",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
