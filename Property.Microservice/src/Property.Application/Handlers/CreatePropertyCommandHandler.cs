@@ -61,7 +61,7 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
                 PricePerNight = request.CreatePropertyRequest.PricePerNight,
                 CleaningFee = request.CreatePropertyRequest.CleaningFee,
                 ServiceFee = request.CreatePropertyRequest.ServiceFee,
-                Status = PropertyStatus.AwaitingVerification,
+                Status = PropertyStatus.PendingVerification,
                 OwnerId = ownerId, // Utiliser l'ID de l'utilisateur connecté
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
