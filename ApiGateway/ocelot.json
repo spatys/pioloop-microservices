@@ -225,6 +225,32 @@
       "UpstreamPathTemplate": "/api/property/search",
       "UpstreamHttpMethod": ["GET"],
       "SwaggerKey": "property"
+    },
+    {
+      "DownstreamPathTemplate": "/api/amenity",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "property-api",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/amenity",
+      "UpstreamHttpMethod": ["GET"],
+      "SwaggerKey": "property"
+    },
+    {
+      "DownstreamPathTemplate": "/api/amenity/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "property-api",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/api/amenity/{everything}",
+      "UpstreamHttpMethod": ["GET"],
+      "SwaggerKey": "property"
     }
   ],
   "SwaggerEndPoints": [

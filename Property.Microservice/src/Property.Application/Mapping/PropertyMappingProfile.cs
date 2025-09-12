@@ -21,7 +21,13 @@ public class PropertyMappingProfile : Profile
                                 DisplayOrder = img.DisplayOrder
                             })))
             .ForMember(dest => dest.Amenities, opt => opt.MapFrom(src => 
-                src.Amenities.OrderBy(a => a.DisplayOrder).Select(a => a.Name)))
+                src.Amenities.Select(pa => new PropertyAmenityResponse
+                {
+                    Id = pa.Amenity.Id,
+                    Name = pa.Amenity.Name,
+                    Category = pa.Amenity.Category,
+                    Icon = pa.Amenity.Icon
+                })))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
         CreateMap<Property.Domain.Entities.PropertyImage, PropertyImageResponse>()
@@ -30,5 +36,8 @@ public class PropertyMappingProfile : Profile
 
         // Availability mappings
         CreateMap<PropertyAvailability, PropertyAvailabilityResponse>();
+        
+        // Amenity mappings
+        CreateMap<Amenity, AmenityResponse>();
     }
 }

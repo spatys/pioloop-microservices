@@ -12,8 +12,8 @@ using Property.Infrastructure.Data;
 namespace Property.Infrastructure.Migrations
 {
     [DbContext(typeof(PropertyDbContext))]
-    [Migration("20250907181924_InitialMigrationWithBlobStorage")]
-    partial class InitialMigrationWithBlobStorage
+    [Migration("20250912110318_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,44 @@ namespace Property.Infrastructure.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Property.Domain.Entities.Amenity", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Category")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Icon")
+                        .HasMaxLength(10)
+                        .HasColumnType("character varying(10)");
+
+                    b.Property<bool>("IsActive")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("boolean")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Amenities");
+                });
 
             modelBuilder.Entity("Property.Domain.Entities.Property", b =>
                 {
@@ -140,58 +178,18 @@ namespace Property.Infrastructure.Migrations
 
             modelBuilder.Entity("Property.Domain.Entities.PropertyAmenity", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<Guid>("PropertyId")
                         .HasColumnType("uuid");
 
-                    b.Property<decimal?>("AdditionalCost")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Category")
+                    b.Property<int>("AmenityId")
                         .HasColumnType("integer");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                    b.HasKey("PropertyId", "AmenityId");
 
-                    b.Property<int>("DisplayOrder")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Icon")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("character varying(50)");
-
-                    b.Property<bool>("IsAvailable")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsIncludedInRent")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<int>("Priority")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("PropertyId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PropertyId");
+                    b.HasIndex("AmenityId");
 
                     b.ToTable("PropertyAmenities");
                 });
@@ -275,11 +273,19 @@ namespace Property.Infrastructure.Migrations
 
             modelBuilder.Entity("Property.Domain.Entities.PropertyAmenity", b =>
                 {
+                    b.HasOne("Property.Domain.Entities.Amenity", "Amenity")
+                        .WithMany("PropertyAmenities")
+                        .HasForeignKey("AmenityId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Property.Domain.Entities.Property", "Property")
                         .WithMany("Amenities")
                         .HasForeignKey("PropertyId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Amenity");
 
                     b.Navigation("Property");
                 });
@@ -304,6 +310,11 @@ namespace Property.Infrastructure.Migrations
                         .IsRequired();
 
                     b.Navigation("Property");
+                });
+
+            modelBuilder.Entity("Property.Domain.Entities.Amenity", b =>
+                {
+                    b.Navigation("PropertyAmenities");
                 });
 
             modelBuilder.Entity("Property.Domain.Entities.Property", b =>

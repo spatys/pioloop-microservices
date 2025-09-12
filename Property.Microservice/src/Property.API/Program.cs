@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Property.Application.Handlers;
 using Property.Application.Mapping;
+using Property.Application.Services;
 using Property.Domain.Interfaces;
 using Property.Infrastructure.Data;
 using Property.Infrastructure.Repositories;
@@ -54,6 +55,8 @@ builder.Services.AddScoped<IPropertyRepository, PropertyRepository>();
 
 // Services
 builder.Services.AddScoped<IPopularityService, PopularityService>();
+builder.Services.AddScoped<IAmenityService, AmenityService>();
+builder.Services.AddScoped<IDatabaseSeedService, DatabaseSeedService>();
 
 // Images are now stored as base64 in database - no external storage needed
 
@@ -107,9 +110,9 @@ app.UseRouting();
 
 // Le Property Service fait confiance à l'API Gateway pour l'authentification
 
-app.MapControllers();
-
 // Initialize database with migrations
 await app.InitializeDatabaseAsync();
+
+app.MapControllers();
 
 app.Run();

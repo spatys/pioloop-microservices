@@ -13,6 +13,7 @@ public class PropertyDbContext : DbContext
 
     public DbSet<PropertyEntity> Properties { get; set; }
     public DbSet<PropertyImage> PropertyImages { get; set; }
+    public DbSet<Amenity> Amenities { get; set; }
     public DbSet<PropertyAmenity> PropertyAmenities { get; set; }
     public DbSet<PropertyAvailability> PropertyAvailabilities { get; set; }
 
@@ -60,20 +61,29 @@ public class PropertyDbContext : DbContext
                   .OnDelete(DeleteBehavior.Cascade);
         });
 
-        // Configuration de PropertyAmenity
-        modelBuilder.Entity<PropertyAmenity>(entity =>
+        // Configuration de Amenity
+        modelBuilder.Entity<Amenity>(entity =>
         {
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.Description).HasMaxLength(200);
-            entity.Property(e => e.Type).IsRequired().HasConversion<int>();
-            entity.Property(e => e.Category).IsRequired().HasConversion<int>();
-            entity.Property(e => e.Icon).HasMaxLength(50);
-            entity.Property(e => e.AdditionalCost).HasColumnType("decimal(18,2)");
+            entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
+            entity.Property(e => e.Icon).HasMaxLength(10);
+            entity.Property(e => e.IsActive).HasDefaultValue(true);
+        });
+
+        // Configuration de PropertyAmenity (table de liaison)
+        modelBuilder.Entity<PropertyAmenity>(entity =>
+        {
+            entity.HasKey(e => new { e.PropertyId, e.AmenityId });
             
             entity.HasOne(e => e.Property)
                   .WithMany(e => e.Amenities)
                   .HasForeignKey(e => e.PropertyId)
+                  .OnDelete(DeleteBehavior.Cascade);
+                  
+            entity.HasOne(e => e.Amenity)
+                  .WithMany(e => e.PropertyAmenities)
+                  .HasForeignKey(e => e.AmenityId)
                   .OnDelete(DeleteBehavior.Cascade);
         });
 

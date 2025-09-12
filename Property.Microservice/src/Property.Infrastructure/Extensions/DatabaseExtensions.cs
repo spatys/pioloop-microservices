@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Property.Infrastructure.Data;
+using Property.Infrastructure.Services;
 
 namespace Property.Infrastructure.Extensions;
 
@@ -11,8 +12,14 @@ public static class DatabaseExtensions
     {
         using var scope = app.Services.CreateScope();
         
-        // Apply migrations
+        // 1. Apply migrations first
         var context = scope.ServiceProvider.GetRequiredService<PropertyDbContext>();
         await context.Database.MigrateAsync();
+        
+
+
+        // 2. Then seed data
+        var seedService = scope.ServiceProvider.GetRequiredService<IDatabaseSeedService>();
+        await seedService.SeedAsync();
     }
 }

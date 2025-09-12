@@ -18,12 +18,6 @@ public class DatabaseSeedService : IDatabaseSeedService
         _roleManager = roleManager;
     }
 
-    public async Task SeedAsync()
-    {
-        // Seed roles
-        await SeedRolesAsync();
-    }
-
     private async Task SeedRolesAsync()
     {
         var requiredRoles = new[] { "Tenant", "Owner", "Manager", "Admin" };
@@ -35,5 +29,11 @@ public class DatabaseSeedService : IDatabaseSeedService
                 await _roleManager.CreateAsync(new IdentityRole<Guid>(role));
             }
         }
+    }
+
+    public async Task SeedAsync()
+    {
+        // Seed roles
+        await SeedRolesAsync();
     }
 }

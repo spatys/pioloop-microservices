@@ -23,7 +23,7 @@ public class PropertyResponse
     public string Status { get; set; } = string.Empty;
     public Guid OwnerId { get; set; }
     public List<PropertyImageResponse> Images { get; set; } = new();
-    public List<string> Amenities { get; set; } = new();
+    public List<PropertyAmenityResponse> Amenities { get; set; } = new();
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

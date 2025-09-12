@@ -68,24 +68,13 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
             };
 
             // Add amenities if provided
-            if (request.CreatePropertyRequest.Amenities?.Any() == true)
+            if (request.CreatePropertyRequest.AmenityIds?.Any() == true)
             {
-                property.Amenities = request.CreatePropertyRequest.Amenities.Select(a => new PropertyAmenity
+                property.Amenities = request.CreatePropertyRequest.AmenityIds.Select(amenityId => new PropertyAmenity
                 {
-                    Id = Guid.NewGuid(),
                     PropertyId = property.Id,
-                    Name = a.Name,
-                    Description = a.Description,
-                    Type = (AmenityType)a.Type,
-                    Category = (AmenityCategory)a.Category,
-                    IsAvailable = a.IsAvailable,
-                    IsIncludedInRent = a.IsIncludedInRent,
-                    AdditionalCost = a.AdditionalCost,
-                    Icon = a.Icon,
-                    Priority = a.Priority,
-                    DisplayOrder = a.Priority,
-                    CreatedAt = DateTime.UtcNow,
-                    UpdatedAt = DateTime.UtcNow
+                    AmenityId = amenityId,
+                    CreatedAt = DateTime.UtcNow
                 }).ToList();
             }
 
