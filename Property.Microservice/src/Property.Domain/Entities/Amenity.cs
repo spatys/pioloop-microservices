@@ -14,9 +14,6 @@ public class Amenity
     [MaxLength(50)]
     public string Category { get; set; } = string.Empty;
     
-    [MaxLength(10)]
-    public string? Icon { get; set; }
-    
     public bool IsActive { get; set; } = true;
     
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
