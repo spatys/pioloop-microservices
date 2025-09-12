@@ -25,8 +25,7 @@ public class PropertyMappingProfile : Profile
                 {
                     Id = pa.Amenity.Id,
                     Name = pa.Amenity.Name,
-                    Category = pa.Amenity.Category,
-                    Icon = pa.Amenity.Icon
+                    Category = pa.Amenity.Category
                 })))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
 
