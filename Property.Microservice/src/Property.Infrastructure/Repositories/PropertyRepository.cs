@@ -23,7 +23,7 @@ public class PropertyRepository : IPropertyRepository
             .Include(p => p.Images.OrderBy(i => i.DisplayOrder))
             .Include(p => p.Amenities)
                 .ThenInclude(pa => pa.Amenity)
-            .Where(p => p.Status == PropertyStatus.Verified); // Seulement les propriétés vérifiées
+            .Where(p => p.Status == PropertyStatus.Validated); // Seulement les propriétés validées
 
         // Filtre par localisation (ex: "Bonabéri, Douala, Littoral")
         if (!string.IsNullOrEmpty(criteria.Location))

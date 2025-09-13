@@ -61,7 +61,7 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
                 PricePerNight = request.CreatePropertyRequest.PricePerNight,
                 CleaningFee = request.CreatePropertyRequest.CleaningFee,
                 ServiceFee = request.CreatePropertyRequest.ServiceFee,
-                Status = PropertyStatus.PendingVerification,
+                Status = PropertyStatus.PendingValidation,
                 OwnerId = ownerId, // Utiliser l'ID de l'utilisateur connecté
                 CreatedAt = DateTime.UtcNow,
                 UpdatedAt = DateTime.UtcNow
@@ -142,10 +142,13 @@ public class CreatePropertyCommandHandler : IRequestHandler<CreatePropertyComman
                 throw new InvalidOperationException("La création de la propriété a échoué. Veuillez réessayer.");
             }
 
+            // Récupérer la propriété créée avec les amenities chargées pour le mapping
+            var propertyWithAmenities = await _propertyRepository.GetByIdAsync(createdProperty.Id);
+
             // Mettre à jour le rôle de l'utilisateur vers "Owner" s'il était "Tenant"
             await UpdateUserRoleToOwner(ownerId);
 
-            return _mapper.Map<PropertyResponse>(createdProperty);
+            return _mapper.Map<PropertyResponse>(propertyWithAmenities);
         }
         catch (Exception ex)
         {

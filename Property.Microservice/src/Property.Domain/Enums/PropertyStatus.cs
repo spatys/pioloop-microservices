@@ -2,8 +2,8 @@ namespace Property.Domain.Enums;
 
 public enum PropertyStatus
 {
-    PendingVerification,
-    Verified,
+    PendingValidation,
+    Validated,
     Rented,
     Deleted
 }
