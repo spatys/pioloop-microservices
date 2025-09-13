@@ -67,7 +67,6 @@ public class PropertyDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             entity.Property(e => e.Category).IsRequired().HasMaxLength(50);
-            entity.Property(e => e.Icon).HasMaxLength(10);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
         });
 
